@@ -1,0 +1,23 @@
+{
+  "name": "ice-text-editor",
+  "title": "Ice Text Editor",
+  "description": "Ice Text Editor...",
+  "version": "0.1.0",
+  "main": "src/ice-text-editor.js",
+  "homepage": "https://github.com/fffilo/ice-text-editor",
+  "authors": [
+    "Franjo Filo <fffilo666@gmail.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fffilo/ice-text-editor.git"
+  },
+  "keywords": [
+    "javascript",
+    "ice",
+    "inline"
+    "contenteditable"
+    "text",
+    "editor",
+  ]
+}

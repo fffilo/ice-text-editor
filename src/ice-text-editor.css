@@ -1,0 +1,13 @@
+.ice-text-editor { display: block; }
+.ice-text-editor:focus { outline: 0 none; box-shadow: 0 0 1px 1px rgba(0,0,0,0.25); }
+.ice-text-editor::before,
+.ice-text-editor::after { content: " "; display: block; position: relative; height: 1px; margin-top: -1px; }
+.ice-text-editor h1,
+.ice-text-editor h2,
+.ice-text-editor h3,
+.ice-text-editor h4,
+.ice-text-editor h5,
+.ice-text-editor h6,
+.ice-text-editor p,
+.ice-text-editor pre,
+.ice-text-editor blockquote { display: block; }
