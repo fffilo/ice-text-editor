@@ -33,17 +33,24 @@
     ice.Toolbar.prototype = {
 
         /**
+         * Element class attribute
+         *
+         * @type {String}
+         */
+        _className: "ice-toolbar",
+
+        /**
          * Default options
          *
          * @type {Object}
          */
         _defaults: {
             template: ''
-                + '<div class="ice-toolbar">'
+                + '<div>'
                 + '<ul>'
-                + '<li><a class="bold" href="#" data-ice-method="bold"><b>B</b></a></li>'
-                + '<li><a class="italic" href="#" data-ice-method="italic"><i>I</i></a></li>'
-                + '<li><a class="underline" href="#" data-ice-method="underline"><u>U</u></a></li>'
+                + '<li><a class="bold" href="#" title="Bold" data-ice-method="bold"><b>B</b></a></li>'
+                + '<li><a class="italic" href="#" title="Italic" data-ice-method="italic"><i>I</i></a></li>'
+                + '<li><a class="underline" href="#" title="Underline" data-ice-method="underline"><u>U</u></a></li>'
                 + '</ul>'
                 + '</div>'
         },
@@ -75,6 +82,7 @@
             div.innerHTML = this.options("template");
             this._element = div.childNodes[0];
             this._element.addEventListener("click", this._handleClick);
+            this._element.classList.add(this._className);
             this._element.ice = this;
             document.body.appendChild(this._element);
         },
@@ -133,7 +141,7 @@
          * @return {Void}
          */
         show: function() {
-            this.element.classList.add("ice-toolbar-show");
+            this.element.classList.add(this._className + "-show");
         },
 
         /**
@@ -142,7 +150,18 @@
          * @return {Void}
          */
         hide: function() {
-            this.element.classList.remove("ice-toolbar-show");
+            this.element.classList.remove(this._className + "-show");
+        },
+
+        /**
+         * Reposition toolbar element
+         *
+         * @param  {Object} rect
+         * @return {Void}
+         */
+        _reposition: function(rect) {
+            this.element.style.left = rect.left + rect.width / 2 - this.element.offsetWidth / 2 + "px";
+            this.element.style.top = rect.top - this.element.offsetHeight + "px";
         },
 
         /**
@@ -160,12 +179,10 @@
             if (!node)
                 return;
 
-            var detail = {
+            this.ice.editor._trigger("toolbar", {
                 method: node.getAttribute("data-ice-method"),
                 arguments: []
-            }
-            var event = new CustomEvent("icetoolbar", { detail:  detail });
-            this.ice.editor.element.dispatchEvent(event);
+            });
 
             e.preventDefault();
         }
@@ -202,10 +219,63 @@
             that[e.detail.method].apply(that, e.detail.arguments);
     }
 
+    /**
+     * Editor iceselect event handler
+     *
+     * @return {Void}
+     */
+    ice.Editor.prototype._handleIceselect = function(e) {
+        if (!e.detail.collapsed) {
+            this.ice.toolbar._reposition(e.detail.rect)
+            this.ice.toolbar.show();
+
+            return;
+        }
+
+        this.ice.toolbar.hide();
+    }
+
+    /**
+     * Editor iceunselect event handler
+     *
+     * @return {Void}
+     */
+    ice.Editor.prototype._handleIceunselect = function(e) {
+        this.ice.toolbar.hide();
+    }
+
     // define toolbar getter on editor prototype
     Object.defineProperty(ice.Editor.prototype, "toolbar", {
         get: function() {
             return this._toolbar;
+        }
+    });
+
+    /**
+     * Active editor
+     *
+     * @type {Object}
+     */
+    var _editor = null;
+
+    // document select event
+    document.addEventListener("selectionchange", function(e) {
+        var ice = window.ice.Editor.prototype.getActiveEditor();
+        if (_editor && _editor !== ice) {
+            _editor._trigger("unselect");
+            _editor = null;
+        }
+
+        if (ice) {
+            var selection = window.getSelection();
+            var range = selection.getRangeAt(0);
+
+            _editor = ice;
+            _editor._trigger("select", {
+                collapsed: range.collapsed,
+                rect: range.getBoundingClientRect(),
+                decorations: _editor.decorations()
+            });
         }
     });
 

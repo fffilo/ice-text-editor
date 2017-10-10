@@ -1,4 +1,5 @@
 .ice-editor { display: block; }
+.ice-editor:active,
 .ice-editor:focus { outline: 0 none; box-shadow: 0 0 1px 1px rgba(0,0,0,0.25); }
 .ice-editor::before,
 .ice-editor::after { content: " "; display: block; position: relative; height: 1px; margin-top: -1px; }

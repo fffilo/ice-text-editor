@@ -585,7 +585,7 @@
             var selection = (this instanceof ice.Editor ? this.window : window).getSelection();
             var node = selection.focusNode;
 
-            while (node && (node.nodeType !== Node.ELEMENT_NODE || !node.ice)) {
+            while (node && (node.nodeType !== Node.ELEMENT_NODE || !(node.ice instanceof ice.Editor))) {
                 node = node.parentNode;
             }
 
@@ -627,13 +627,15 @@
          * Trigger event
          *
          * @param  {String} eventName
+         * @param  {Object} details   (optional)
          * @return {Object}
          */
-        _trigger: function(eventName) {
+        _trigger: function(eventName, details) {
             if (this._skipDispatch === true || this._skipDispatch === eventName)
                 return null;
 
-            var event = new Event("ice" + eventName, { bubbles: true, cancelable: false });
+            // @todo - in IE CustomEvent is not constructor
+            var event = new CustomEvent("ice" + eventName, { detail: details || {} });
             this.element.dispatchEvent(event);
 
             return event;
@@ -647,7 +649,7 @@
         _triggerChange: function() {
             this.element.normalize();
 
-            if (this._innerHTML !== this.element.innerHTML && this._trigger("change"))
+            if (this._innerHTML !== this.element.innerHTML && this._trigger("change", { bubbles: true, cancelable: false }))
                 this._innerHTML = this.element.innerHTML;
         },
 
