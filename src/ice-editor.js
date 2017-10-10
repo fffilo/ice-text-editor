@@ -1,7 +1,15 @@
 /**
- * Ice Text Editor
+ * Ice Editor
  *
  * ...work in progress
+ *
+ * platforms
+ *     - IE10
+ *     - Edge
+ *     - Opera
+ *     - Safari
+ *     - Firefox
+ *     - Chrome
  */
 ;(function() {
 
@@ -39,7 +47,7 @@
          *
          * @type {String}
          */
-        _className: "ice-text-editor",
+        _className: "ice-editor",
 
         /**
          * Allowed block elements tags
