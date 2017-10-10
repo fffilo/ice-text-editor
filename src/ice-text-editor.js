@@ -23,8 +23,6 @@
 
         this._element = element;
         this._options = options;
-        this._innerHTML = "";
-        this._skipDispatch = false;
 
         this._init();
     }
@@ -93,6 +91,8 @@
         _shortcuts: {
             "13,0,0,0": [ "split" ],                // ENTER
             "13,0,0,1": [ "insertLineBreak" ],      // Shift+ENTER
+            "90,0,1,0": [ "undo" ],                 // Ctrl+Z
+            "89,0,1,0": [ "redo" ],                 // Ctrl+Y
             "66,0,1,0": [ "bold" ],                 // Ctrl+B
             "73,0,1,0": [ "italic" ],               // Ctrl+I
             "85,0,1,0": [ "underline" ]             // Ctrl+U
@@ -123,13 +123,27 @@
             // prepare editor
             this.element.classList.add(this._className);
             this.element.setAttribute("contenteditable", "true");
-            this.element.addEventListener("blur", this._handleBlur);
-            this.element.addEventListener("input", this._handleInput);
-            this.element.addEventListener("paste", this._handlePaste);
             this.element.ice = this;
 
+            // call method that starts with _init
+            for (var method in this) {
+                if (method !== "_init" && method.substr(0, 5) === "_init")
+                    this[method]();
+            }
+
+            // bind element events to method that starts with _handle
+            for (var method in this) {
+                if (method.substr(0, 7) === "_handle") {
+                    var arr = method.replace(/([A-Z])/g, "_$1").toLowerCase().split("_");
+                    var event = arr[2];
+                    //var desc = arr[3];
+
+                    this.element.addEventListener(event, this[method]);
+                }
+            }
+
             this._strip();
-            this._dispatch();
+            this._triggerChange();
         },
 
         /**
@@ -145,9 +159,22 @@
             this.element.classList.remove(this._className);
 
             // unbind events
-            this.element.removeEventListener("blur", this._handleBlur);
-            this.element.removeEventListener("input", this._handleInput);
-            this.element.removeEventListener("paste", this._handlePaste);
+            for (var method in this) {
+                if (method.substr(0, 7) === "_handle") {
+                    var arr = method.replace(/([A-Z])/g, "_$1").toLowerCase().split("_");
+                    var obj = arr[2];
+                    var event = arr[3];
+                    var desc = arr[4];
+
+                    this.element.removeEventListener(event, this[method]);
+                }
+            }
+
+            // call method that starts with _destroy
+            for (var method in this) {
+                if (method.substr(0, 8) === "_destroy")
+                    this[method]();
+            }
 
             // clear
             delete this.element.ice;
@@ -188,7 +215,8 @@
          * @return {Boolean}
          */
         get active() {
-            return this.document.activeElement === this.element;
+            //return this.document.activeElement === this.element;
+            return this === this.getActiveEditor();
         },
 
         /**
@@ -425,10 +453,21 @@
             else if (!this.options("defaultTag") || !this.options("allowSplit"))
                 return this.insertLineBreak();
 
+            this._skipDispatch = true;
+
             if (!window.getSelection().isCollapsed)
                 this.document.execCommand("delete");
 
-            return this.document.execCommand("insertParagraph");
+            var result = this.document.execCommand("insertParagraph");
+            var tag = this.options("defaultTag");
+            if (tag)
+                this.formatBlock(tag);
+
+            delete this._skipDispatch;
+            if (result)
+                this._triggerChange();
+
+            return result;
         },
 
         /**
@@ -455,8 +494,9 @@
             if (!this.active || !this.options("defaultTag") || !this.options("allowHorizontalRule"))
                 return false;
 
-            return this.document.execCommand("insertHTML", false, "<hr />");
-            // @todo -> move hr outside block element
+            // @todo
+            //return this.document.execCommand("insertHTML", false, "<hr />");
+            return false;
         },
 
         /**
@@ -467,15 +507,48 @@
          * @return {Boolean}
          */
         formatBlock: function(value) {
-            if (!this.active || !value || this._allowedBlocks.indexOf(value) === -1 || !this.options("defaultTag"))
+            if (!this.active || !value || this._allowedBlocks.indexOf(value) === -1 || !this.options("defaultTag") || !this.options("allowSplit"))
                 return false;
 
             return this.document.execCommand("formatBlock", false, "<" + value + ">");
         },
 
         /**
+         * Undo
+         *
+         * Since we're parsing element's data ourselves
+         * history can be corrupted, so disabling this
+         * option
+         *
+         * @return {Boolean}
+         */
+        undo: function() {
+            if (!this.active)
+                return false;
+
+            return false;
+        },
+
+        /**
+         * Redo
+         *
+         * Since we're parsing element's data ourselves
+         * history can be corrupted, so disabling this
+         * option
+         *
+         * @return {Boolean}
+         */
+        redo: function() {
+            if (!this.active)
+                return false;
+
+            return false
+        },
+
+        /**
          * Get selection decorations
          *
+         * @todo
          * @return {Object}
          */
         decorations: function() {
@@ -495,33 +568,79 @@
         },
 
         /**
+         * Get document active editor
+         * ice.Editor instance
+         *
+         * @return {Object} [description]
+         */
+        getActiveEditor: function() {
+            var selection = (this instanceof ice.Editor ? this.window : window).getSelection();
+            var node = selection.focusNode;
+
+            while (node && (node.nodeType !== Node.ELEMENT_NODE || !node.ice)) {
+                node = node.parentNode;
+            }
+
+            return node ? node.ice : null;
+        },
+
+        /**
+         * Find closest block node
+         *
+         * @param  {Object} node
+         * @return {Object}
+         */
+        _closestBlock: function(node) {
+            while (node && (!node.tagName || node.tagName && this._allowedBlocks.indexOf(node.tagName.toLowerCase()) === -1)) {
+                node = node.parentNode;
+            }
+
+            return node;
+        },
+
+        /**
          * Remove whitespaces between block elements
          *
          * @return {Void}
          */
         _strip: function() {
             this._innerHTML = this.element.innerHTML;
-            var re = new RegExp("\\s+(<(" + this._allowedBlocks.join("|") + "|hr)>)", "g");
+
+            var re1 = new RegExp("<!--[\\s\\S]*?-->", "g");
+            var re2 = new RegExp("\\s+(<(" + this._allowedBlocks.join("|") + "|hr)>)", "g");
+
             this.element.innerHTML = this.element.innerHTML
-                .replace(re, "$1")
+                .replace(re1, "")
+                .replace(re2, "$1")
                 .trim();
         },
 
         /**
-         * Triggers input event on element node
+         * Trigger event
+         *
+         * @param  {String} eventName
+         * @return {Object}
+         */
+        _trigger: function(eventName) {
+            if (this._skipDispatch === true || this._skipDispatch === eventName)
+                return null;
+
+            var event = new Event("ice" + eventName, { bubbles: true, cancelable: false });
+            this.element.dispatchEvent(event);
+
+            return event;
+        },
+
+        /**
+         * Triggers icechange event on element node
          *
          * @return {Void}
          */
-        _dispatch: function() {
+        _triggerChange: function() {
             this.element.normalize();
 
-            if (this._skipDispatch || this._innerHTML === this.element.innerHTML)
-                return;
-
-            this._innerHTML = this.element.innerHTML;
-
-            var event = new Event("icechange", { bubbles: true, cancelable: false });
-            this.element.dispatchEvent(event);
+            if (this._innerHTML !== this.element.innerHTML && this._trigger("change"))
+                this._innerHTML = this.element.innerHTML;
         },
 
         /**
@@ -535,21 +654,21 @@
             var that = this.ice;
             that.element.normalize();
 
-            // do not allow empty editor
-            if (!that.element.childNodes.length && that.options("defaultTag")) {
-                that.document.execCommand("insertHTML", false, "<p><br /></p>");
-            }
-            else if (!that.element.childNodes.length) {
-                that.document.execCommand("insertHTML", false, "<br />");
-            }
-            else if (that.element.childNodes.length === 1 && that.element.childNodes[0].tagName === "BR") {
-                that.document.execCommand("formatBlock", false, "<p>");
-            }
-            else if (window.getSelection().anchorNode.parentNode === that.element) {
-                that.document.execCommand("formatBlock", false, "<p>");
-            }
+            var sel = window.getSelection();
+            var tag = that.options("defaultTag");
 
-            that._dispatch();
+            if (tag && !that.element.childNodes.length)
+                that.document.execCommand("insertHTML", false, "<" + tag + "><br /></" + tag + ">");
+            else if (!that.element.childNodes.length)
+                that.document.execCommand("insertHTML", false, "<br />");
+            else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].tagName === "BR")
+                that.document.execCommand("insertHTML", false, "<" + tag + "><br /></" + tag + ">");
+            else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].nodeType === Node.TEXT_NODE)
+                that.document.execCommand("formatBlock", false, "<" + tag + ">");
+            else if (tag && sel.focusNode && sel.focusNode.nodeType === Node.TEXT_NODE && !that._closestBlock(sel.focusNode))
+                that.document.execCommand("formatBlock", false, "<" + tag + ">");
+
+            that._triggerChange();
         },
 
         /**
@@ -564,7 +683,7 @@
 
             // @todo
 
-            that._dispatch();
+            that._triggerChange();
         },
 
         /**
@@ -618,7 +737,7 @@
 
     // Trap browser shortcut events
     document.addEventListener("keydown", function(e) {
-        var ice = this.activeElement.ice;
+        var ice = window.ice.Editor.prototype.getActiveEditor();
         if (!ice)
             return;
 
@@ -640,6 +759,12 @@
         ice[method].apply(ice, args);
 
         e.preventDefault();
+    });
+
+    // Disable history
+    document.addEventListener("keydown", function(e) {
+        if (e.keyCode === 89 || e.keyCode === 90 && e[isMac ? "metaKey" : "ctrlKey"])
+            e.preventDefault();
     });
 
 })();
