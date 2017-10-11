@@ -551,19 +551,49 @@
          * @return {Object}
          */
         decorations: function() {
-            return {
-                backColor: null,
-                bold: null,
-                fontName: null,
-                fontSize: null,
-                foreColor: null,
-                hiliteColor: null,
-                italic: null,
-                strikeThrough: null,
-                subscript: null,
-                superscript: null,
-                underline: null
+            if (!this.active)
+                return null;
+
+            var doc = this.document;
+            var result = {
+                //backColor: null,
+                bold: doc.queryCommandState("bold"),
+                //fontName: null,
+                //fontSize: null,
+                //foreColor: null,
+                //hiliteColor: null,
+                italic: doc.queryCommandState("italic"),
+                strikeThrough: doc.queryCommandState("strikeThrough"),
+                subscript: doc.queryCommandState("subscript"),
+                superscript: doc.queryCommandState("superscript"),
+                underline: doc.queryCommandState("underline")
             }
+
+            // get states from css
+            var node = ice.Util.getSelectedTextNodes();
+            for (var i = 0; i < node.length; i++) {
+                var css = ice.Util.nodeStyle(node[i].parentElement, "background-color");
+                if (!("backColor" in result))
+                    result.backColor = css;
+                else if (result.backColor !== css)
+                    result.backColor = null;
+                result.hiliteColor = result.backColor;
+
+                var css = ice.Util.nodeStyle(node[i].parentElement, "font-family");
+                if (!("fontName" in result))
+                    result.fontName = css;
+                else if (result.fontName !== css)
+                    result.fontName = null;
+
+                var css = ice.Util.nodeStyle(node[i].parentElement, "color");
+                if (!("foreColor" in result))
+                    result.foreColor = css;
+                else if (result.foreColor !== css)
+                    result.foreColor = null;
+            }
+
+            console.log(result);
+            return result;
         },
 
         /**

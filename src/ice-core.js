@@ -70,12 +70,29 @@
         },
 
         /**
+         * Get/set node css
+         *
+         * @param  {Node}   node
+         * @param  {String} key
+         * @param  {Mixed}  value
+         * @return {Mixed}
+         */
+        nodeStyle: function(node, key, value) {
+            if (typeof value === "undefined") {
+                var css = node.ownerDocument.defaultView.getComputedStyle(node, null);
+                return css ? css[key] : "";
+            }
+
+            node.style[key] = value;
+        },
+
+        /**
          * Get all text nodes in selected range
          * https://stackoverflow.com/questions/667951/how-to-get-nodes-lying-inside-a-range-with-javascript#answer-28150191
          *
          * @return {Mixed}
          */
-        selectedTextNodes: function() {
+        getSelectedTextNodes: function() {
             var selection = window.getSelection();
             if (!selection.rangeCount)
                 return null;
@@ -88,7 +105,7 @@
             var node;
 
             // walk parent nodes from startContainer to commonAncestor
-            for (node = startContainer.parentNode; node; node = node.parentNode) {
+            for (node = startContainer; node; node = node.parentNode) {
                 result.unshift(node);
 
                 if (node == commonAncestor)
