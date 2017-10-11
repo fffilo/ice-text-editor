@@ -194,6 +194,13 @@
     }
 
     /**
+     * Add toolbar option to editor
+     *
+     * @type {Boolean}
+     */
+    ice.Editor.prototype._defaults.toolbar = true;
+
+    /**
      * Init toolbar on editor prototype
      *
      * @return {Void}
@@ -229,7 +236,7 @@
      * @return {Void}
      */
     ice.Editor.prototype._handleIceselect = function(e) {
-        if (!e.detail.collapsed) {
+        if (!e.detail.collapsed && this.ice.toolbar.editor.options("toolbar")) {
             this.ice.toolbar._reposition(e.detail.rect)
             this.ice.toolbar.show();
 
