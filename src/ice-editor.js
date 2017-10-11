@@ -790,4 +790,39 @@
             e.preventDefault();
     });
 
+    /**
+     * Active editor
+     *
+     * @type {Object}
+     */
+    var _editor = null;
+
+    // Select event handler
+    document.addEventListener("selectionchange", function(e) {
+        var ice = window.ice.Util.getActiveEditor();
+        if (_editor && _editor !== ice) {
+            // @todo - in IE CustomEvent is not constructor
+            var detail = { editor: _editor };
+            var event = new CustomEvent("iceunselect", { detail: detail });
+            this.dispatchEvent(event);
+            _editor = null;
+        }
+
+        if (ice) {
+            var selection = window.getSelection();
+            var range = selection.getRangeAt(0);
+            _editor = ice;
+
+            // @todo - in IE CustomEvent is not constructor
+            var detail = {
+                editor: _editor,
+                collapsed: range.collapsed,
+                rect: range.getBoundingClientRect(),
+                decorations: _editor.decorations()
+            };
+            var event = new CustomEvent("iceselect", { detail: detail });
+            this.dispatchEvent(event);
+        }
+    });
+
 })();

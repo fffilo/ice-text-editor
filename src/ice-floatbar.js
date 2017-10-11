@@ -239,34 +239,6 @@
     }
 
     /**
-     * Editor icefloatbar event handler
-     *
-     * @return {Void}
-     */
-    ice.Editor.prototype._handleIcefloatbar = function(e) {
-        var that = this.ice;
-        if (typeof that[e.detail.method] === "function")
-            that[e.detail.method].apply(that, e.detail.arguments);
-    }
-
-    /**
-     * Editor iceselect event handler
-     *
-     * @return {Void}
-     */
-    ice.Editor.prototype._handleIceselect = function(e) {
-        if (!e.detail.collapsed && this.ice.floatbar.editor.options("floatbar")) {
-            this.ice.floatbar._reposition(e.detail.rect);
-            this.ice.floatbar._setDecorations(e.detail.decorations);
-            this.ice.floatbar.show();
-
-            return;
-        }
-
-        this.ice.floatbar.hide();
-    }
-
-    /**
      * Editor input event handler:
      * refresh floatbar decorations
      *
@@ -281,15 +253,6 @@
         this.ice.floatbar._setDecorations(this.ice.decorations());
     }
 
-    /**
-     * Editor iceunselect event handler
-     *
-     * @return {Void}
-     */
-    ice.Editor.prototype._handleIceunselect = function(e) {
-        this.ice.floatbar.hide();
-    }
-
     // define floatbar getter on editor prototype
     Object.defineProperty(ice.Editor.prototype, "floatbar", {
         get: function() {
@@ -297,32 +260,19 @@
         }
     });
 
-    /**
-     * Active editor
-     *
-     * @type {Object}
-     */
-    var _editor = null;
-
     // document select event
-    document.addEventListener("selectionchange", function(e) {
-        var ice = window.ice.Util.getActiveEditor();
-        if (_editor && _editor !== ice) {
-            _editor._trigger("unselect");
-            _editor = null;
-        }
+    document.addEventListener("iceselect", function(e) {
+        if (e.detail.collapsed || !e.detail.editor.floatbar.editor.options("floatbar"))
+            return e.detail.editor.floatbar.hide();
 
-        if (ice) {
-            var selection = window.getSelection();
-            var range = selection.getRangeAt(0);
+        e.detail.editor.floatbar._reposition(e.detail.rect);
+        e.detail.editor.floatbar._setDecorations(e.detail.decorations);
+        e.detail.editor.floatbar.show();
+    });
 
-            _editor = ice;
-            _editor._trigger("select", {
-                collapsed: range.collapsed,
-                rect: range.getBoundingClientRect(),
-                decorations: _editor.decorations()
-            });
-        }
+    // document unselect event
+    document.addEventListener("iceunselect", function(e) {
+        e.detail.editor.floatbar.hide();
     });
 
 })();
