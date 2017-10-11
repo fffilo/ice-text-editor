@@ -1,5 +1,5 @@
 /**
- * Ice Editor Toolbar
+ * Ice Editor Floatbar
  *
  * Simple floating toolbar for editor.
  *
@@ -13,15 +13,15 @@
     "use strict";
 
     /**
-     * ice.Toolbar constructor
+     * ice.Floatbar constructor
      *
      * @param  {Object} editor
      * @param  {Object} options
      * @return {Void}
      */
-    ice.Toolbar = function ice_Toolbar(editor, options) {
-        if (!(this instanceof ice_Toolbar))
-            throw "ice.Toolbar: ice.Toolbar is a constructor";
+    ice.Floatbar = function ice_Floatbar(editor, options) {
+        if (!(this instanceof ice_Floatbar))
+            throw "ice.Floatbar: ice.Floatbar is a constructor";
 
         this._editor = editor;
         this._options = options;
@@ -30,18 +30,18 @@
     }
 
     /**
-     * ice.Toolbar prototype
+     * ice.Floatbar prototype
      *
      * @type {Object}
      */
-    ice.Toolbar.prototype = {
+    ice.Floatbar.prototype = {
 
         /**
          * Element class attribute
          *
          * @type {String}
          */
-        _className: "ice-toolbar",
+        _className: "ice-floatbar",
 
         /**
          * Default options
@@ -66,8 +66,8 @@
          */
         _init: function() {
             if (!(this.editor instanceof window.ice.Editor))
-                throw "ice.Toolbar: Constructor editor argument must be of ice.Editor instance";
-            if (this.editor.toolbar)
+                throw "ice.Floatbar: Constructor editor argument must be of ice.Editor instance";
+            if (this.editor.floatbar)
                 return;
 
             // options
@@ -140,7 +140,7 @@
         },
 
         /**
-         * Show toolbar
+         * Show floatbar
          *
          * @return {Void}
          */
@@ -149,7 +149,7 @@
         },
 
         /**
-         * Hide toolbar
+         * Hide floatbar
          *
          * @return {Void}
          */
@@ -158,7 +158,7 @@
         },
 
         /**
-         * Reposition toolbar element
+         * Reposition floatbar element
          *
          * @param  {Object} rect
          * @return {Void}
@@ -169,7 +169,7 @@
         },
 
         /**
-         * Toolbar click event handler
+         * Floatbar click event handler
          *
          * @param  {Object} e
          * @return {Void}
@@ -183,7 +183,7 @@
             if (!node)
                 return;
 
-            this.ice.editor._trigger("toolbar", {
+            this.ice.editor._trigger("floatbar", {
                 method: node.getAttribute("data-ice-method"),
                 arguments: []
             });
@@ -194,37 +194,37 @@
     }
 
     /**
-     * Add toolbar option to editor
+     * Add floatbar option to editor
      *
      * @type {Boolean}
      */
-    ice.Editor.prototype._defaults.toolbar = true;
+    ice.Editor.prototype._defaults.floatbar = true;
 
     /**
-     * Init toolbar on editor prototype
+     * Init floatbar on editor prototype
      *
      * @return {Void}
      */
-    ice.Editor.prototype._initToolbar = function() {
-        this._toolbar = new ice.Toolbar(this);
+    ice.Editor.prototype._initFloatbar = function() {
+        this._floatbar = new ice.Floatbar(this);
     }
 
     /**
-     * Destroy toolbar on editor prototype
+     * Destroy floatbar on editor prototype
      *
      * @return {Void}
      */
-    ice.Editor.prototype._destroyToolbar = function() {
-        this._toolbar.destroy;
-        this._toolbar = null;
+    ice.Editor.prototype._destroyFloatbar = function() {
+        this._floatbar.destroy();
+        this._floatbar = null;
     }
 
     /**
-     * Editor icetoolbar event handler
+     * Editor icefloatbar event handler
      *
      * @return {Void}
      */
-    ice.Editor.prototype._handleIcetoolbar = function(e) {
+    ice.Editor.prototype._handleIcefloatbar = function(e) {
         var that = this.ice;
         if (typeof that[e.detail.method] === "function")
             that[e.detail.method].apply(that, e.detail.arguments);
@@ -236,14 +236,14 @@
      * @return {Void}
      */
     ice.Editor.prototype._handleIceselect = function(e) {
-        if (!e.detail.collapsed && this.ice.toolbar.editor.options("toolbar")) {
-            this.ice.toolbar._reposition(e.detail.rect)
-            this.ice.toolbar.show();
+        if (!e.detail.collapsed && this.ice.floatbar.editor.options("floatbar")) {
+            this.ice.floatbar._reposition(e.detail.rect)
+            this.ice.floatbar.show();
 
             return;
         }
 
-        this.ice.toolbar.hide();
+        this.ice.floatbar.hide();
     }
 
     /**
@@ -252,13 +252,13 @@
      * @return {Void}
      */
     ice.Editor.prototype._handleIceunselect = function(e) {
-        this.ice.toolbar.hide();
+        this.ice.floatbar.hide();
     }
 
-    // define toolbar getter on editor prototype
-    Object.defineProperty(ice.Editor.prototype, "toolbar", {
+    // define floatbar getter on editor prototype
+    Object.defineProperty(ice.Editor.prototype, "floatbar", {
         get: function() {
-            return this._toolbar;
+            return this._floatbar;
         }
     });
 
