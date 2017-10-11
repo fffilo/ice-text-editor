@@ -183,7 +183,7 @@
          */
         _setDecorations: function(decorations) {
             for (var key in this._ui) {
-                this._ui[key].setAttribute("data-ice-status", decorations[key]);
+                this._ui[key].setAttribute("data-ice-status", decorations ? decorations[key] : null);
             }
         },
 
@@ -194,18 +194,15 @@
          * @return {Void}
          */
         _handleClick: function(e) {
-            var node = e.target;
-            while (node && !node.getAttribute("data-ice-method")) {
-                node = node.parentElement;
-            }
-
+            var node = ice.Util.closest(e.target, "[data-ice-method]");
             if (!node)
                 return;
 
-            this.ice.editor._trigger("floatbar", {
-                method: node.getAttribute("data-ice-method"),
-                arguments: []
-            });
+            var method = node.getAttribute("data-ice-method");
+            var args = [];
+
+            if (typeof this.ice.editor[method] === "function")
+                this.ice.editor[method].apply(this.ice.editor, args);
 
             e.preventDefault();
         }
@@ -260,6 +257,11 @@
         }
     });
 
+    // document unselect event
+    document.addEventListener("iceunselect", function(e) {
+        e.detail.editor.floatbar.hide();
+    });
+
     // document select event
     document.addEventListener("iceselect", function(e) {
         if (e.detail.collapsed || !e.detail.editor.floatbar.editor.options("floatbar"))
@@ -268,11 +270,6 @@
         e.detail.editor.floatbar._reposition(e.detail.rect);
         e.detail.editor.floatbar._setDecorations(e.detail.decorations);
         e.detail.editor.floatbar.show();
-    });
-
-    // document unselect event
-    document.addEventListener("iceunselect", function(e) {
-        e.detail.editor.floatbar.hide();
     });
 
 })();

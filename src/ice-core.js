@@ -30,17 +30,55 @@
     window.ice.Util = {
 
         /**
+         * Would node be selected by
+         * specified selector string
+         *
+         * @param  {Node}    node
+         * @param  {Mixed}   selector
+         * @return {Boolean}
+         */
+        matches: function(node, selector) {
+            var func = false
+                || node.matches
+                || node.matchesSelector
+                || node.mozMatchesSelector
+                || node.msMatchesSelector
+                || node.oMatchesSelector
+                || node.webkitMatchesSelector;
+
+            if (func)
+                return func.call(node, selector);
+
+            return false;
+        },
+
+        /**
+         * Check if node matched selector
+         *
+         * @param  {Mixed}   selector
+         * @return {Boolean}
+         */
+        is: function(node, selector) {
+            if (typeof selector === "string")
+                return ice.Util.matches(node, selector);
+            else if (selector instanceof Node)
+                return node === selector;
+
+            return false;
+        },
+
+        /**
          * Get the first element that matches
          * the selector by testing the node
          * itself and traversing up through
          * its ancestors in the DOM tree
          *
          * @param  {Node}  node
-         * @param  {Node}  selector
+         * @param  {Mixed}  selector
          * @return {Mixed}
          */
         closest: function(node, selector) {
-            while (node && node !== selector) {
+            while (node && !ice.Util.is(node, selector)) {
                 node = node.parentElement;
             }
 
