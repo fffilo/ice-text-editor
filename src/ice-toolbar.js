@@ -1,7 +1,11 @@
 /**
- * Ice Text Editor Toolbar
+ * Ice Editor Toolbar
  *
- * Create simple toolbar for editor.
+ * Simple floating toolbar for editor.
+ *
+ * dependencied:
+ *     - ice-core.js
+ *     - ice-editor.js
  */
 ;(function() {
 
@@ -260,7 +264,7 @@
 
     // document select event
     document.addEventListener("selectionchange", function(e) {
-        var ice = window.ice.Editor.prototype.getActiveEditor();
+        var ice = window.ice.Util.getActiveEditor();
         if (_editor && _editor !== ice) {
             _editor._trigger("unselect");
             _editor = null;

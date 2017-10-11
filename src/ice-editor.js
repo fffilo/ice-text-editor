@@ -1,23 +1,15 @@
 /**
  * Ice Editor
  *
- * ...work in progress
+ * Inline contenteditable text editor
  *
- * platforms
- *     - IE10
- *     - Edge
- *     - Opera
- *     - Safari
- *     - Firefox
- *     - Chrome
+ * dependencied:
+ *     - ice-core.js
  */
 ;(function() {
 
     // strict mode
     "use strict";
-
-    // globalize
-    window.ice = {};
 
     /**
      * ice.Editor constructor
@@ -223,8 +215,7 @@
          * @return {Boolean}
          */
         get active() {
-            //return this.document.activeElement === this.element;
-            return this === this.getActiveEditor();
+            return this === ice.Util.getActiveEditor();
         },
 
         /**
@@ -576,23 +567,6 @@
         },
 
         /**
-         * Get document active editor
-         * ice.Editor instance
-         *
-         * @return {Object} [description]
-         */
-        getActiveEditor: function() {
-            var selection = (this instanceof ice.Editor ? this.window : window).getSelection();
-            var node = selection.focusNode;
-
-            while (node && (node.nodeType !== Node.ELEMENT_NODE || !(node.ice instanceof ice.Editor))) {
-                node = node.parentNode;
-            }
-
-            return node ? node.ice : null;
-        },
-
-        /**
          * Find closest block node
          *
          * @param  {Object} node
@@ -739,21 +713,31 @@
     }
 
     /**
-     * Is Mac platform
+     * Get document active editor
+     * ice.Editor instance
      *
-     * @type {Boolean}
+     * @return {Object} [description]
      */
-    var isMac = [ "Mac68K", "MacPPC", "MacIntel" ].indexOf(window.navigator.platform) > -1;
+    ice.Util.getActiveEditor = function() {
+        var selection = (this instanceof ice.Editor ? this.window : window).getSelection();
+        var node = selection.focusNode;
+
+        while (node && (node.nodeType !== Node.ELEMENT_NODE || !(node.ice instanceof ice.Editor))) {
+            node = node.parentNode;
+        }
+
+        return node ? node.ice : null;
+    }
 
     // Trap browser shortcut events
     document.addEventListener("keydown", function(e) {
-        var ice = window.ice.Editor.prototype.getActiveEditor();
+        var ice = window.ice.Util.getActiveEditor();
         if (!ice)
             return;
 
         var key = e.keyCode
             + "," + e.altKey*1
-            + "," + e[isMac ? "metaKey" : "ctrlKey"]*1
+            + "," + e[window.ice.Util.isMac ? "metaKey" : "ctrlKey"]*1
             + "," + e.shiftKey*1;
         var shortcut = ice._shortcuts[key];
 
@@ -773,7 +757,7 @@
 
     // Disable history
     document.addEventListener("keydown", function(e) {
-        if (e.keyCode === 89 || e.keyCode === 90 && e[isMac ? "metaKey" : "ctrlKey"])
+        if (e.keyCode === 89 || e.keyCode === 90 && e[window.ice.Util.isMac ? "metaKey" : "ctrlKey"])
             e.preventDefault();
     });
 

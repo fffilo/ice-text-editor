@@ -1,8 +1,12 @@
 /**
- * Ice Text Editor Shortcuts
+ * Ice Editor Shortcuts
  *
  * Predefined additional editor shortcuts taken
  * from wordpress' wysiwyg editor.
+ *
+ * dependencied:
+ *     - ice-core.js
+ *     - ice-editor.js
  */
 ;(function() {
 
@@ -10,7 +14,20 @@
     "use strict";
 
     /**
-     * Advanced shortcuts
+     * Browser shortcuts
+     *
+     * Each property in shortcut object is in format
+     * "{keyCode},{altKey},{ctrlKey},{shiftKey}".
+     * All values are numeric (boolean as 0 or 1).
+     *
+     * Each property value is Array object where
+     * first parameter is method name (object can
+     * have optional additional arguments).
+     *
+     * If document keydown event properties
+     * (keyCode,altKey,ctrlKey,shiftKey) matches
+     * key in shortcut object method will be called
+     * (if method exists)
      *
      * @type {Object}
      */

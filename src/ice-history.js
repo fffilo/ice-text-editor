@@ -4,6 +4,10 @@
  * Since we're parsing element's data ourselves
  * history can be corrupted. Implementing new
  * history functionality for editor element.
+ *
+ * dependencied:
+ *     - ice-core.js
+ *     - ice-editor.js
  */
 ;(function() {
 
