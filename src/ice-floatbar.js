@@ -52,9 +52,9 @@
             template: ''
                 + '<div>'
                 + '<ul>'
-                + '<li><a class="bold" href="#" title="Bold" data-ice-method="bold"><b>B</b></a></li>'
-                + '<li><a class="italic" href="#" title="Italic" data-ice-method="italic"><i>I</i></a></li>'
-                + '<li><a class="underline" href="#" title="Underline" data-ice-method="underline"><u>U</u></a></li>'
+                + '<li><a class="bold" href="#" title="Bold" data-ice-method="bold" data-ice-status=""><b>B</b></a></li>'
+                + '<li><a class="italic" href="#" title="Italic" data-ice-method="italic" data-ice-status=""><i>I</i></a></li>'
+                + '<li><a class="underline" href="#" title="Underline" data-ice-method="underline" data-ice-status=""><u>U</u></a></li>'
                 + '</ul>'
                 + '</div>'
         },
@@ -82,13 +82,20 @@
             }
 
             // create
-            var div = document.createElement("div");
+            var div = this.editor.document.createElement("div");
             div.innerHTML = this.options("template");
             this._element = div.childNodes[0];
             this._element.addEventListener("click", this._handleClick);
             this._element.classList.add(this._className);
             this._element.ice = this;
-            document.body.appendChild(this._element);
+            this.editor.document.body.appendChild(this._element);
+
+            // define ui
+            this._ui = {};
+            var node = this.element.querySelectorAll("[data-ice-method]");
+            for (var i = 0; i < node.length; i++) {
+                this._ui[node[i].getAttribute("data-ice-method")] = node[i];
+            }
         },
 
         /**
@@ -169,6 +176,18 @@
         },
 
         /**
+         * Set decorations
+         *
+         * @param  {Object} decorations
+         * @return {Void}
+         */
+        _setDecorations: function(decorations) {
+            for (var key in this._ui) {
+                this._ui[key].setAttribute("data-ice-status", decorations[key]);
+            }
+        },
+
+        /**
          * Floatbar click event handler
          *
          * @param  {Object} e
@@ -237,13 +256,29 @@
      */
     ice.Editor.prototype._handleIceselect = function(e) {
         if (!e.detail.collapsed && this.ice.floatbar.editor.options("floatbar")) {
-            this.ice.floatbar._reposition(e.detail.rect)
+            this.ice.floatbar._reposition(e.detail.rect);
+            this.ice.floatbar._setDecorations(e.detail.decorations);
             this.ice.floatbar.show();
 
             return;
         }
 
         this.ice.floatbar.hide();
+    }
+
+    /**
+     * Editor input event handler:
+     * refresh floatbar decorations
+     *
+     * @param  {Object} e
+     * @return {Void}
+     */
+    ice.Editor.prototype._handleInputFloatbar = function(e) {
+        var selection = window.getSelection();
+        var range = selection.getRangeAt(0);
+
+        this.ice.floatbar._reposition(range.getBoundingClientRect());
+        this.ice.floatbar._setDecorations(this.ice.decorations());
     }
 
     /**

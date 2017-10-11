@@ -592,7 +592,6 @@
                     result.foreColor = null;
             }
 
-            console.log(result);
             return result;
         },
 

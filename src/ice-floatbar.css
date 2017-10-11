@@ -1,9 +1,8 @@
-.ice-floatbar { position: absolute; display: block; visibility: hidden; top: 0; left: 0; background: rgba(0,0,0,0.75); border-radius: 3px; transform: translateY(-6px); }
-.ice-floatbar::after { content: ""; position: absolute; display: block; top: 100%; left: 50%; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid rgba(0,0,0,0.75); transform: translateX(-50%); }
+.ice-floatbar { position: absolute; display: block; visibility: hidden; top: 0; left: 0; background: rgba(0,0,0,0.9); border-radius: 3px; transform: translateY(-6px); font-family: Arial, Helvetica, sans-serif; }
+.ice-floatbar::after { content: ""; position: absolute; display: block; top: 100%; left: 50%; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid rgba(0,0,0,0.9); transform: translateX(-50%); }
 .ice-floatbar.ice-floatbar-show { visibility: visible; }
-.ice-floatbar ul { display: flex; margin: 0; padding: 0; list-style-type: none; }
-.ice-floatbar ul li { flex: 1; margin: 0.25em; padding: 0; }
-.ice-floatbar ul li:first-child { margin-left: 0.5em; }
-.ice-floatbar ul li:last-child { margin-right: 0.5em; }
-.ice-floatbar ul li a { display: block; width: 1.5em; height: 1.5em; line-height: 1.5em; color: #fff; font-weight: normal; text-decoration: none; text-align: center; outline: 0 none; }
+.ice-floatbar ul { display: flex; margin: 0; padding: 1px; list-style-type: none; }
+.ice-floatbar ul li { flex: 1; margin: 1px; padding: 0; }
 .ice-floatbar ul li.separator { width: 0.25em; text-indent: -999px; overflow: hidden; }
+.ice-floatbar ul li a { display: block; width: 2em; height: 2em; line-height: 2em; color: #fff; font-weight: normal; text-decoration: none; text-align: center; outline: 0 none; background-color: rgba(128, 128, 128, 0.4); }
+.ice-floatbar ul li a[data-ice-status="false"] { background-color: transparent; }
