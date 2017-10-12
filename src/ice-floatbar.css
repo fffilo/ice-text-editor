@@ -1,4 +1,4 @@
-.ice-floatbar { position: absolute; display: block; visibility: hidden; top: 0; left: 0; background: rgba(0,0,0,0.9); border-radius: 3px; transform: translateY(-6px); font-family: Arial, Helvetica, sans-serif; }
+.ice-floatbar { position: absolute; display: block; visibility: hidden; top: 0; left: 0; background: rgba(0,0,0,0.9); border-radius: 3px; z-index: 1000; transform: translateY(-6px); font-family: Arial, Helvetica, sans-serif; }
 .ice-floatbar::after { content: ""; position: absolute; display: block; top: 100%; left: 50%; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid rgba(0,0,0,0.9); transform: translateX(-50%); }
 .ice-floatbar.ice-floatbar-show { visibility: visible; }
 .ice-floatbar ul { display: flex; margin: 0; padding: 1px; list-style-type: none; }
