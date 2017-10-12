@@ -265,8 +265,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, true);
-            return this.document.execCommand("backColor", false, value);
+            return this._execCommandStyleWithCSS("backColor", value);
         },
 
         /**
@@ -278,8 +277,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, false);
-            return this.document.execCommand("bold");
+            return this._execCommandStyleWithoutCSS("bold");
         },
 
         /**
@@ -292,8 +290,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, true);
-            return this.document.execCommand("fontName", false, value);
+            return this._execCommandStyleWithCSS("fontName", value);
         },
 
         /**
@@ -306,8 +303,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, true);
-            return this.document.execCommand("fontSize", false, value);
+            return this._execCommandStyleWithCSS("fontSize", value);
         },
 
         /**
@@ -320,8 +316,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, true);
-            return this.document.execCommand("foreColor", false, value);
+            return this._execCommandStyleWithCSS("foreColor", value);
         },
 
         /**
@@ -334,8 +329,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, true);
-            return this.document.execCommand("hiliteColor", false, value);
+            return this._execCommandStyleWithCSS("hiliteColor", value);
         },
 
         /**
@@ -347,8 +341,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, false);
-            return this.document.execCommand("italic");
+            return this._execCommandStyleWithoutCSS("italic");
         },
 
         /**
@@ -360,8 +353,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, false);
-            return this.document.execCommand("strikeThrough");
+            return this._execCommandStyleWithoutCSS("strikeThrough");
         },
 
         /**
@@ -373,8 +365,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, false);
-            return this.document.execCommand("subscript");
+            return this._execCommandStyleWithoutCSS("subscript");
         },
 
         /**
@@ -386,8 +377,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, false);
-            return this.document.execCommand("superscript");
+            return this._execCommandStyleWithoutCSS("superscript");
         },
 
         /**
@@ -399,8 +389,7 @@
             if (!this.active)
                 return false;
 
-            this.document.execCommand("styleWithCSS", false, false);
-            return this.document.execCommand("underline");
+            return this._execCommandStyleWithoutCSS("underline");
         },
 
         /**
@@ -413,7 +402,7 @@
             if (!this.active)
                 return false;
 
-            return this.document.execCommand("createLink", false, value);
+            return this._execCommand("createLink", value);
             // @todo -> target?
         },
 
@@ -426,7 +415,7 @@
             if (!this.active)
                 return false;
 
-            return this.document.execCommand("unlink");
+            return this._execCommand("unlink");
         },
 
         /**
@@ -438,7 +427,7 @@
             if (!this.active)
                 return false;
 
-            return this.document.execCommand("removeFormat");
+            return this._execCommand("removeFormat");
         },
 
         /**
@@ -455,9 +444,9 @@
             this._skipDispatch = true;
 
             if (!window.getSelection().isCollapsed)
-                this.document.execCommand("delete");
+                this._execCommand("delete");
 
-            var result = this.document.execCommand("insertParagraph");
+            var result = this._execCommand("insertParagraph");
             var tag = this.options("defaultTag");
             if (tag)
                 this.formatBlock(tag);
@@ -480,8 +469,8 @@
             else if (!this.options("allowLineBreak"))
                 return false;
 
-            //return this.document.execCommand("insertHTML", false, "<br />");
-            return this.document.execCommand("insertLineBreak");
+            //return this._execCommand("insertHTML", "<br />");
+            return this._execCommand("insertLineBreak");
         },
 
         /**
@@ -494,7 +483,7 @@
                 return false;
 
             // @todo
-            //return this.document.execCommand("insertHTML", false, "<hr />");
+            //return this._execCommand("insertHTML", "<hr />");
             return false;
         },
 
@@ -509,7 +498,7 @@
             if (!this.active || !value || this._allowedBlocks.indexOf(value) === -1 || !this.options("defaultTag") || !this.options("allowSplit"))
                 return false;
 
-            return this.document.execCommand("formatBlock", false, "<" + value + ">");
+            return this._execCommand("formatBlock", "<" + value + ">");
         },
 
         /**
@@ -657,6 +646,73 @@
         },
 
         /**
+         * Document exeCommand proxy
+         *
+         * @param  {String}  key
+         * @param  {String}  value (optional)
+         * @return {Boolean}
+         */
+        _execCommand: function(key, value) {
+            return this.document.execCommand(key, false, value);
+        },
+
+        /**
+         * Due to firefox unwanted behaviour while
+         * (for example) unbolding headline (which
+         * has bold font weight property set in css)
+         * we're gonna try to exec command with and
+         * without css as well
+         *
+         * @param  {String}  key
+         * @param  {String}  value (optional)
+         * @return {Boolean}
+         */
+        _execCommandStyleWithCSS: function(key, value) {
+            var innerHTML = this.element.innerHTML;
+            var result = false;
+
+            if (!result) {
+                this._execCommand("styleWithCSS", true);
+                this._execCommand(key);
+                result = this.element.innerHTML !== innerHTML;
+            }
+
+            if (!result) {
+                this._execCommand("styleWithCSS", false);
+                this._execCommand(key);
+                result = this.element.innerHTML !== innerHTML;
+            }
+
+            return result;
+        },
+
+        /**
+         * See _execCommandStyleWithCSS
+         *
+         * @param  {String}  key
+         * @param  {String}  value (optional)
+         * @return {Boolean}
+         */
+        _execCommandStyleWithoutCSS: function(key, value) {
+            var innerHTML = this.element.innerHTML;
+            var result = false;
+
+            if (!result) {
+                this._execCommand("styleWithCSS", false);
+                this._execCommand(key);
+                result = this.element.innerHTML !== innerHTML;
+            }
+
+            if (!result) {
+                this._execCommand("styleWithCSS", true);
+                this._execCommand(key);
+                result = this.element.innerHTML !== innerHTML;
+            }
+
+            return result;
+        },
+
+        /**
          * Element input event handler:
          * parse, clear, fix...
          *
@@ -671,15 +727,15 @@
             var tag = that.options("defaultTag");
 
             if (tag && !that.element.childNodes.length)
-                that.document.execCommand("insertHTML", false, "<" + tag + "><br /></" + tag + ">");
+                that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
             else if (!that.element.childNodes.length)
-                that.document.execCommand("insertHTML", false, "<br />");
+                that._execCommand("insertHTML", "<br />");
             else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].tagName === "BR")
-                that.document.execCommand("insertHTML", false, "<" + tag + "><br /></" + tag + ">");
+                that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
             else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].nodeType === Node.TEXT_NODE)
-                that.document.execCommand("formatBlock", false, "<" + tag + ">");
+                that._execCommand("formatBlock", "<" + tag + ">");
             else if (tag && sel.focusNode && sel.focusNode.nodeType === Node.TEXT_NODE && !that._closestBlock(sel.focusNode))
-                that.document.execCommand("formatBlock", false, "<" + tag + ">");
+                that._execCommand("formatBlock", "<" + tag + ">");
 
             that._triggerChange();
         },
@@ -736,7 +792,7 @@
             }
 
             // paste
-            that.document.execCommand("insertHTML", false, data);
+            that._execCommand("insertHTML", data);
         }
 
     }
