@@ -165,12 +165,28 @@
         },
 
         /**
+         * Refresh floatbar
+         *
+         * @return {Void}
+         */
+        refresh: function() {
+            this._reposition();
+            this._setDecorations();
+        },
+
+        /**
          * Reposition floatbar element
          *
          * @param  {Object} rect
          * @return {Void}
          */
         _reposition: function(rect) {
+            if (!rect) {
+                var selection = window.getSelection();
+                var range = selection.getRangeAt(0);
+                rect = range.getBoundingClientRect();
+            }
+
             var position = {
                 left: rect.left + rect.width / 2 - this.element.offsetWidth / 2,
                 top: rect.top - this.element.offsetHeight
@@ -197,6 +213,9 @@
          * @return {Void}
          */
         _setDecorations: function(decorations) {
+            if (!decorations)
+                decorations = this.editor.decorations();
+
             for (var key in this._ui) {
                 this._ui[key].setAttribute("data-ice-status", decorations ? decorations[key] : null);
             }
@@ -258,11 +277,7 @@
      * @return {Void}
      */
     ice.Editor.prototype._handleInputFloatbar = function(e) {
-        var selection = window.getSelection();
-        var range = selection.getRangeAt(0);
-
-        this.ice.floatbar._reposition(range.getBoundingClientRect());
-        this.ice.floatbar._setDecorations(this.ice.decorations());
+        this.ice.floatbar.refresh();
     }
 
     // define floatbar getter on editor prototype
