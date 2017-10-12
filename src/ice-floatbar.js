@@ -171,8 +171,23 @@
          * @return {Void}
          */
         _reposition: function(rect) {
-            this.element.style.left = rect.left + rect.width / 2 - this.element.offsetWidth / 2 + "px";
-            this.element.style.top = rect.top - this.element.offsetHeight + "px";
+            var position = {
+                left: rect.left + rect.width / 2 - this.element.offsetWidth / 2,
+                top: rect.top - this.element.offsetHeight
+            }
+
+            var body = this.editor.document.body;
+            var doc = this.editor.document.documentElement;
+            var scrollTop = this.editor.pageYOffset || doc.scrollTop || body.scrollTop;
+            var scrollLeft = this.editor.pageXOffset || doc.scrollLeft || body.scrollLeft;
+            var clientTop = doc.clientTop || body.clientTop || 0;
+            var clientLeft = doc.clientLeft || body.clientLeft || 0;
+
+            position.left += scrollLeft - clientLeft;
+            position.top += scrollTop - clientTop;
+
+            this.element.style.left = Math.round(position.left) + "px";
+            this.element.style.top = Math.round(position.top) + "px";
         },
 
         /**
