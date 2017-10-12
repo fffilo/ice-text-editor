@@ -182,8 +182,11 @@
          */
         _reposition: function(rect) {
             if (!rect) {
-                var selection = window.getSelection();
+                var selection = this.editor.window.getSelection();
+                if (!selection.rangeCount)
+                    return;
                 var range = selection.getRangeAt(0);
+
                 rect = range.getBoundingClientRect();
             }
 

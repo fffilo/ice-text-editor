@@ -443,7 +443,7 @@
 
             this._skipDispatch = true;
 
-            if (!window.getSelection().isCollapsed)
+            if (!this.window.getSelection().isCollapsed)
                 this._execCommand("delete");
 
             var result = this._execCommand("insertParagraph");
@@ -866,6 +866,8 @@
 
         if (ice) {
             var selection = window.getSelection();
+            if (!selection.rangeCount)
+                return null;
             var range = selection.getRangeAt(0);
             _editor = ice;
 
