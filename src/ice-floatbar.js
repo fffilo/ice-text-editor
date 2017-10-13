@@ -192,7 +192,8 @@
 
             var position = {
                 left: rect.left + rect.width / 2 - this.element.offsetWidth / 2,
-                top: rect.top - this.element.offsetHeight
+                top: rect.top - this.element.offsetHeight,
+                className: "top"
             }
 
             var body = this.editor.document.body;
@@ -205,8 +206,16 @@
             position.left += scrollLeft - clientLeft;
             position.top += scrollTop - clientTop;
 
+            if (position.top < 0) {
+                position.top = rect.top + rect.height;
+                position.className = "bottom";
+            }
+
             this.element.style.left = Math.round(position.left) + "px";
             this.element.style.top = Math.round(position.top) + "px";
+            this.element.classList.remove(this._className + "-position-top");
+            this.element.classList.remove(this._className + "-position-bottom");
+            this.element.classList.add(this._className + "-position-" + position.className);
         },
 
         /**
