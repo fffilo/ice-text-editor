@@ -10,5 +10,5 @@
 .ice-floatbar ul li a[data-ice-status="false"] { background-color: transparent; }
 
 .ice-floatbar.ice-floatbar-show { visibility: visible; }
-.ice-floatbar.ice-floatbar-position-bottom::before,
-.ice-floatbar.ice-floatbar-position-top::after { visibility: visible; }
+.ice-floatbar.ice-floatbar-show.ice-floatbar-position-bottom::before,
+.ice-floatbar.ice-floatbar-show.ice-floatbar-position-top::after { visibility: visible; }
