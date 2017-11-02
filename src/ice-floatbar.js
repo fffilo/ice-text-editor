@@ -315,4 +315,13 @@
         e.detail.editor.floatbar.show();
     });
 
+    // window select event
+    window.addEventListener("resize", function(e) {
+        var ice = window.ice.Util.getActiveEditor();
+        if (!ice || !ice.floatbar || !ice.options("floatbar"))
+            return;
+
+        ice.floatbar.refresh()
+    });
+
 })();
