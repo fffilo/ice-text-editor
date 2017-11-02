@@ -301,12 +301,13 @@
 
     // document unselect event
     document.addEventListener("iceunselect", function(e) {
-        e.detail.editor.floatbar.hide();
+        if (e.detail.editor.floatbar)
+            e.detail.editor.floatbar.hide();
     });
 
     // document select event
     document.addEventListener("iceselect", function(e) {
-        if (e.detail.collapsed || !e.detail.editor.floatbar.editor.options("floatbar"))
+        if (e.detail.editor.floatbar && (e.detail.collapsed || !e.detail.editor.floatbar.editor.options("floatbar")))
             return e.detail.editor.floatbar.hide();
 
         e.detail.editor.floatbar._reposition(e.detail.rect);
