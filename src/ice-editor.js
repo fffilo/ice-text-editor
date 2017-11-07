@@ -840,9 +840,9 @@
         e.preventDefault();
     });
 
-    // Disable history
+    // Disable browser history
     document.addEventListener("keydown", function(e) {
-        if (e.keyCode === 89 || e.keyCode === 90 && e[window.ice.Util.isMac ? "metaKey" : "ctrlKey"])
+        if ((e.keyCode === 89 || e.keyCode === 90) && e[window.ice.Util.isMac ? "metaKey" : "ctrlKey"])
             e.preventDefault();
     });
 
