@@ -303,7 +303,18 @@
             if (!this.active)
                 return false;
 
-            return this._execCommandStyleWithCSS("fontSize", value);
+            var result = this._execCommandStyleWithCSS("fontSize", value);
+
+            // fix this, browser uses 1-7 units
+            if (result) {
+                var node = ice.Util.getSelectedTextNodes();
+                for (var i = 0; i < node.length; i++) {
+                    if (node[i].parentElement.style.fontSize)
+                        node[i].parentElement.style.fontSize = value;
+                }
+            }
+
+            return result;
         },
 
         /**
@@ -545,13 +556,15 @@
 
             var doc = this.document;
             var result = {
-                //backColor: null,
+                //backColor: doc.queryCommandValue("backColor"),
                 bold: doc.queryCommandState("bold"),
-                //fontName: null,
-                //fontSize: null,
-                //foreColor: null,
-                //hiliteColor: null,
+                //fontName: doc.queryCommandValue("fontName"),
+                //fontSize: doc.queryCommandValue("fontSize"),
+                //foreColor: doc.queryCommandValue("foreColor"),
+                //hiliteColor: doc.queryCommandValue("backColor"),
                 italic: doc.queryCommandState("italic"),
+                linkURL: undefined,
+                linkTarget: undefined,
                 strikeThrough: doc.queryCommandState("strikeThrough"),
                 subscript: doc.queryCommandState("subscript"),
                 superscript: doc.queryCommandState("superscript"),
@@ -560,25 +573,38 @@
 
             // get states from css
             var node = ice.Util.getSelectedTextNodes();
+            var style = ice.Util.nodeStyle;
             for (var i = 0; i < node.length; i++) {
-                var css = ice.Util.nodeStyle(node[i].parentElement, "background-color");
+                var el = node[i].parentElement;
+                var css = style(el, "background-color");
                 if (!("backColor" in result))
                     result.backColor = css;
                 else if (result.backColor !== css)
                     result.backColor = null;
-                result.hiliteColor = result.backColor;
 
-                var css = ice.Util.nodeStyle(node[i].parentElement, "font-family");
+                var css = style(el, "font-family");
                 if (!("fontName" in result))
                     result.fontName = css;
                 else if (result.fontName !== css)
                     result.fontName = null;
 
-                var css = ice.Util.nodeStyle(node[i].parentElement, "color");
+                var css = style(el, "font-size");
+                if (!("fontSize" in result))
+                    result.fontSize = css;
+                else if (result.fontSize !== css)
+                    result.fontSize = null;
+
+                var css = style(el, "color");
                 if (!("foreColor" in result))
                     result.foreColor = css;
                 else if (result.foreColor !== css)
                     result.foreColor = null;
+
+                result.hiliteColor = result.backColor;
+
+                // @todo
+                //      - linkURL
+                //      - linkTarget
             }
 
             return result;
@@ -673,13 +699,13 @@
 
             if (!result) {
                 this._execCommand("styleWithCSS", true);
-                this._execCommand(key);
+                this._execCommand(key, value);
                 result = this.element.innerHTML !== innerHTML;
             }
 
             if (!result) {
                 this._execCommand("styleWithCSS", false);
-                this._execCommand(key);
+                this._execCommand(key, value);
                 result = this.element.innerHTML !== innerHTML;
             }
 
@@ -699,13 +725,13 @@
 
             if (!result) {
                 this._execCommand("styleWithCSS", false);
-                this._execCommand(key);
+                this._execCommand(key, value);
                 result = this.element.innerHTML !== innerHTML;
             }
 
             if (!result) {
                 this._execCommand("styleWithCSS", true);
-                this._execCommand(key);
+                this._execCommand(key, value);
                 result = this.element.innerHTML !== innerHTML;
             }
 

@@ -52,9 +52,17 @@
             template: ''
                 + '<div>'
                 + '<ul>'
+                + '<li><a class="font-name" href="#" title="Font Name" data-ice-method="fontName" data-ice-status=""><span>Font Name</span></a></li>'
+                + '<li class="separator">|</li>'
+                + '<li><a class="font-size" href="#" title="Font Size" data-ice-method="fontSize" data-ice-status=""><span>Font Size</span></a></li>'
+                + '<li class="separator">|</li>'
                 + '<li><a class="bold" href="#" title="Bold" data-ice-method="bold" data-ice-status=""><b>B</b></a></li>'
                 + '<li><a class="italic" href="#" title="Italic" data-ice-method="italic" data-ice-status=""><i>I</i></a></li>'
                 + '<li><a class="underline" href="#" title="Underline" data-ice-method="underline" data-ice-status=""><u>U</u></a></li>'
+                //+ '<li class="separator">|</li>'
+                //+ '<li><a class="link" href="#" title="Link" data-ice-method="link" data-ice-status=""><span>&#128279;</span></a></li>'
+                + '<li class="separator">|</li>'
+                + '<li><a class="remove-format" href="#" title="Remove Format" data-ice-method="removeFormat" data-ice-status=""><b>&times;</b></a></li>'
                 + '</ul>'
                 + '</div>'
         },
@@ -244,13 +252,157 @@
             if (!node)
                 return;
 
+            var editor = this.ice.editor;
+            var floatbar = editor._floatbar;
             var method = node.getAttribute("data-ice-method");
             var args = [];
 
-            if (typeof this.ice.editor[method] === "function")
-                this.ice.editor[method].apply(this.ice.editor, args);
+            if (typeof floatbar["_handleMethod_" + method] === "function")
+                floatbar["_handleMethod_" + method].apply(floatbar, args);
 
             e.preventDefault();
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button backColor
+         *
+         * @return {Void}
+         */
+        _handleMethod_backColor: function() {
+            var value = prompt("Background Color", this.editor.decorations().backColor);
+            if (value === null)
+                return;
+
+            this.editor.backColor(value);
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button bold
+         *
+         * @return {Void}
+         */
+        _handleMethod_bold: function() {
+            this.editor.bold();
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button fontName
+         *
+         * @return {Void}
+         */
+        _handleMethod_fontName: function() {
+            var value = prompt("Font Name", this.editor.decorations().fontName);
+            if (value === null)
+                return;
+
+            this.editor.fontName(value);
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button fontSize
+         *
+         * @return {Void}
+         */
+        _handleMethod_fontSize: function() {
+            var value = prompt("Font Size", this.editor.decorations().fontSize);
+            if (value === null)
+                return;
+
+            this.editor.fontSize(value);
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button foreColor
+         *
+         * @return {Void}
+         */
+        _handleMethod_foreColor: function() {
+            var value = prompt("Foreground Color", this.editor.decorations().foreColor);
+            if (value === null)
+                return;
+
+            this.editor.foreColor(value);
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button hiliteColor
+         *
+         * @return {Void}
+         */
+        _handleMethod_hiliteColor: function() {
+        /**
+         * Floatbar click event handler for
+         * button thod_backColor
+         *
+         * @return {Void}
+         */
+            this._handleMethod_backColor();
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button italic
+         *
+         * @return {Void}
+         */
+        _handleMethod_italic: function() {
+            this.editor.italic();
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button removeFormat
+         *
+         * @return {Void}
+         */
+        _handleMethod_removeFormat: function() {
+            this.editor.removeFormat();
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button strikeThrough
+         *
+         * @return {Void}
+         */
+        _handleMethod_strikeThrough: function() {
+            this.editor.strikeThrough();
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button subscript
+         *
+         * @return {Void}
+         */
+        _handleMethod_subscript: function() {
+            this.editor.subscript();
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button superscript
+         *
+         * @return {Void}
+         */
+        _handleMethod_superscript: function() {
+            this.editor.superscript();
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button underline
+         *
+         * @return {Void}
+         */
+        _handleMethod_underline: function() {
+            this.editor.underline();
         }
 
     }
