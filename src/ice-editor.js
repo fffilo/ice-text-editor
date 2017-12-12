@@ -466,6 +466,7 @@
                 return false;
             else if (!this.options("defaultTag") || !this.options("allowSplit"))
                 return this.insertLineBreak();
+            // @todo - li block???
 
             this._skipDispatch = true;
 
@@ -514,22 +515,78 @@
         },
 
         /**
-         * Format block: wrap tag around the
+         * Format block: wrap block tag around the
          * line containing the current selection
          *
-         * @param  {String}  value
+         * @param  {String}  value see options.allowedBlocks
          * @return {Boolean}
          */
         formatBlock: function(value) {
+            value = value.toLowerCase();
             if (!this.active || !value || this.options("allowedBlocks").indexOf(value) === -1)
                 return false;
 
+            this._skipDispatch = true;
+            var result;
+
+            // before start reset list blocks and
+            // convert all blocks to paragraph
+            this._execCommand("insertOrderedList");
+            this._execCommand("insertOrderedList");
+            this._execCommand("formatBlock", "<p>");
+
+            // format block
             if (value === "ol")
-                return this._execCommand("insertOrderedList")
+                result = this._execCommand("insertOrderedList");
             else if (value === "ul")
-                return this._execCommand("insertUnorderedList")
+                result = this._execCommand("insertUnorderedList");
             else
-                return this._execCommand("formatBlock", "<" + value + ">");
+                result = this._execCommand("formatBlock", "<" + value + ">");
+
+            // some browsers (chrome) inserts ol/ul inside
+            // block elements (paragraph), and since we
+            // want list element to act as block we're
+            // gonna unwrap it
+            if (result && ["ol", "ul"].indexOf(value) !== -1) {
+                // find list element
+                var node = ice.Util.getSelectedTextNodes();
+                var list = node ? node[0] : null;
+                while (list && list !== this.element && ["ol", "ul"].indexOf((list.tagName || "").toLowerCase()) === -1) {
+                    list = list.parentElement;
+                }
+
+                // unwrap paragraph
+                if (list && list !== this.element && list.parentElement.tagName.toLowerCase() === "p") {
+                    // remember selection
+                    var range = this.window.getSelection().getRangeAt(0);
+                    range = {
+                        startContainer: range.startContainer,
+                        startOffset: range.startOffset,
+                        endContainer: range.endContainer,
+                        endOffset: range.endOffset
+                    }
+
+                    // unwrap
+                    var p = list.parentElement;
+                    p.parentElement.insertBefore(list, p);
+                    p.parentElement.removeChild(p);
+
+                    // new selection range
+                    var newrange = this.document.createRange();
+                    newrange.setStart(range.startContainer, range.startOffset);
+                    newrange.setEnd(range.endContainer, range.endOffset);
+
+                    // set selection
+                    var select = this.window.getSelection();
+                    select.removeAllRanges();
+                    select.addRange(newrange);
+                }
+            }
+
+            delete this._skipDispatch;
+            this._triggerChange();
+
+            return result;
         },
 
         /**
@@ -567,15 +624,16 @@
         /**
          * Get selection decorations
          *
-         * @todo
          * @return {Object}
          */
         decorations: function() {
             if (!this.active)
                 return null;
 
+            var node = ice.Util.getSelectedTextNodes();
             var doc = this.document;
             var result = {
+                //formatBlock: null,
                 //backColor: doc.queryCommandValue("backColor"),
                 bold: doc.queryCommandState("bold"),
                 //fontName: doc.queryCommandValue("fontName"),
@@ -591,8 +649,22 @@
                 underline: doc.queryCommandState("underline")
             }
 
+            // block tags
+            for (var i = 0; i < node.length; i++) {
+                var block = this._closestBlock(node[i]);
+                var tag = block ? block.tagName.toLowerCase() : null;
+                if (!tag)
+                    continue;
+
+                if (!("formatBlock" in result))
+                    result.formatBlock = tag;
+                else if (result.formatBlock !== tag) {
+                    result.formatBlock = null;
+                    break;
+                }
+            }
+
             // get states from css
-            var node = ice.Util.getSelectedTextNodes();
             var style = ice.Util.nodeStyle;
             for (var i = 0; i < node.length; i++) {
                 var el = node[i].parentElement;
@@ -782,6 +854,7 @@
                 that._execCommand("formatBlock", "<" + tag + ">");
             else if (tag && sel.focusNode && sel.focusNode.nodeType === Node.TEXT_NODE && !that._closestBlock(sel.focusNode))
                 that._execCommand("formatBlock", "<" + tag + ">");
+            // @todo - last case warning (We don't execute document.execCommand() this time, because it is called recursively.)
 
             that._triggerChange();
         },

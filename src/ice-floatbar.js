@@ -52,9 +52,10 @@
             template: ''
                 + '<div>'
                 + '<ul>'
-                + '<li><a class="font-name" href="#" title="Font Name" data-ice-method="fontName" data-ice-status=""><span data-ice-status-type="content">Font Name</span></a></li>'
+                + '<li><a class="format-block" href="#" title="Format Block" data-ice-method="formatBlock" data-ice-status=""><span>&#x03C0;</span></a></li>'
                 + '<li class="separator">|</li>'
-                + '<li><a class="font-size" href="#" title="Font Size" data-ice-method="fontSize" data-ice-status=""><span data-ice-status-type="content">Font Size</span></a></li>'
+                + '<li><a class="font-name" href="#" title="Font Name" data-ice-method="fontName" data-ice-status=""><span>T</span></a></li>'
+                + '<li><a class="font-size" href="#" title="Font Size" data-ice-method="fontSize" data-ice-status=""><span>&#x1f5db;</span></a></li>'
                 + '<li class="separator">|</li>'
                 + '<li><a class="fore-color" href="#" title="Foreground Color" data-ice-method="foreColor" data-ice-status=""><span data-ice-status-type="css" data-ice-status-key="background-color">&nbsp;</span></a></li>'
                 + '<li><a class="back-color" href="#" title="Background Color" data-ice-method="backColor" data-ice-status=""><span data-ice-status-type="css" data-ice-status-key="background-color">&nbsp;</span></a></li>'
@@ -343,6 +344,20 @@
                 return;
 
             this.editor.foreColor(value);
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button formatBlock
+         *
+         * @return {Void}
+         */
+        _handleMethod_formatBlock: function() {
+            var value = prompt("Format Block", "");
+            if (value === null)
+                return;
+
+            this.editor.formatBlock(value);
         },
 
         /**
