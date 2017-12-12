@@ -52,9 +52,12 @@
             template: ''
                 + '<div>'
                 + '<ul>'
-                + '<li><a class="font-name" href="#" title="Font Name" data-ice-method="fontName" data-ice-status=""><span>Font Name</span></a></li>'
+                + '<li><a class="font-name" href="#" title="Font Name" data-ice-method="fontName" data-ice-status=""><span data-ice-status-type="content">Font Name</span></a></li>'
                 + '<li class="separator">|</li>'
-                + '<li><a class="font-size" href="#" title="Font Size" data-ice-method="fontSize" data-ice-status=""><span>Font Size</span></a></li>'
+                + '<li><a class="font-size" href="#" title="Font Size" data-ice-method="fontSize" data-ice-status=""><span data-ice-status-type="content">Font Size</span></a></li>'
+                + '<li class="separator">|</li>'
+                + '<li><a class="fore-color" href="#" title="Foreground Color" data-ice-method="foreColor" data-ice-status=""><span data-ice-status-type="css" data-ice-status-key="background-color">&nbsp;</span></a></li>'
+                + '<li><a class="back-color" href="#" title="Background Color" data-ice-method="backColor" data-ice-status=""><span data-ice-status-type="css" data-ice-status-key="background-color">&nbsp;</span></a></li>'
                 + '<li class="separator">|</li>'
                 + '<li><a class="bold" href="#" title="Bold" data-ice-method="bold" data-ice-status=""><b>B</b></a></li>'
                 + '<li><a class="italic" href="#" title="Italic" data-ice-method="italic" data-ice-status=""><i>I</i></a></li>'
@@ -236,8 +239,21 @@
             if (!decorations)
                 decorations = this.editor.decorations();
 
-            for (var key in this._ui) {
-                this._ui[key].setAttribute("data-ice-status", decorations ? decorations[key] : null);
+            for (var prop in this._ui) {
+                this._ui[prop].setAttribute("data-ice-status", decorations ? decorations[prop] : null);
+
+                var stat = this._ui[prop].querySelectorAll("[data-ice-status-type]");
+                for (var i = 0; i < stat.length; i++) {
+                    var type = stat[i].getAttribute("data-ice-status-type");
+                    var key = stat[i].getAttribute("data-ice-status-key");
+
+                    if (type === "content")
+                        stat[i].innerHTML = decorations[prop] || "";
+                    else if (type === "attr")
+                        stat[i].setAttribute(key, decorations[prop]);
+                    else if (type === "css")
+                        stat[i].style[key] = decorations[prop];
+                }
             }
         },
 
@@ -336,12 +352,6 @@
          * @return {Void}
          */
         _handleMethod_hiliteColor: function() {
-        /**
-         * Floatbar click event handler for
-         * button thod_backColor
-         *
-         * @return {Void}
-         */
             this._handleMethod_backColor();
         },
 

@@ -7,14 +7,23 @@
 .ice-floatbar ul li { flex: 1; margin: 1px; padding: 0; }
 .ice-floatbar ul li.separator { width: 1px; margin: 0.375em 0; text-indent: -999px; overflow: hidden; background: rgba(255,255,255,0.9); }
 .ice-floatbar ul li a { position: relative; display: block; width: 2em; height: 2em; line-height: 2em; color: #fff; font-weight: normal; text-decoration: none; text-align: center; outline: 0 none; background-color: transparent; }
+.ice-floatbar ul li a.bold,
+.ice-floatbar ul li a.italic,
+.ice-floatbar ul li a.underline { font-family: "Times New Roman", Times, serif; }
 .ice-floatbar ul li a[data-ice-status="true"] { background-color: rgba(128, 128, 128, 0.4); }
 .ice-floatbar ul li a.font-name,
 .ice-floatbar ul li a.font-size { width: 10em; margin: 0.33334em 0.5em; font-size: 0.75em; text-align: left; }
 .ice-floatbar ul li a.font-size { width: 3em; }
+/*
 .ice-floatbar ul li a.font-name::before,
 .ice-floatbar ul li a.font-size::before { content: attr(data-ice-status); position: absolute; display: block; top: 0; right: 0; bottom: 0; left: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ice-floatbar ul li a.font-name > span,
 .ice-floatbar ul li a.font-size > span { display: none; }
+*/
+.ice-floatbar ul li a.back-color > span,
+.ice-floatbar ul li a.fore-color > span { position: relative; display: inline-block; width: 1em; height: 1em; margin: 0.5em 0; box-shadow: 0 0 0 1px #fff; border-radius: 50%; background: rgba(0,0,0,0) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==) center center; overflow: hidden; }
+.ice-floatbar ul li a.back-color > span::after,
+.ice-floatbar ul li a.fore-color > span::after { content: ""; position: absolute; display: block; top: 0; right: 0; bottom: 0; left: 0; background-color: inherit; }
 
 .ice-floatbar.ice-floatbar-show { visibility: visible; }
 .ice-floatbar.ice-floatbar-show.ice-floatbar-position-bottom::before,
