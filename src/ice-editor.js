@@ -42,23 +42,6 @@
         _className: "ice-editor",
 
         /**
-         * Allowed block elements tags
-         *
-         * @type {Array}
-         */
-        _allowedBlocks: [
-            "h1",
-            "h2",
-            "h3",
-            "h4",
-            "h5",
-            "h6",
-            "p",
-            "pre",
-            "blockquote"
-        ],
-
-        /**
          * Default options
          *
          * @type {Object}
@@ -67,7 +50,20 @@
             defaultTag: "p",
             allowLineBreak: true,
             allowHorizontalRule: true,
-            allowSplit: true
+            allowSplit: true,
+            allowedBlocks: [
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "h6",
+                "p",
+                "pre",
+                "blockquote",
+                "ul",
+                "ol"
+            ]
         },
 
         /**
@@ -225,7 +221,7 @@
          * @return {String}
          */
         get prettyHTML() {
-            var tag = this._allowedBlocks.join("|") + "|hr"
+            var tag = this.options("allowedBlocks").join("|") + "|hr"
             var re1 = new RegExp("(<\/(" + tag + ")>)(<(" + tag + ")>)", "g");
 
             var tag = "hr";
@@ -303,17 +299,22 @@
             if (!this.active)
                 return false;
 
-            if (!this._execCommandStyleWithCSS("fontSize", value))
-                return false;
+            this._skipDispatch = true;
+            var result = this._execCommandStyleWithCSS("fontSize", value);
 
             // fix this, browser uses 1-7 units
-            var node = ice.Util.getSelectedTextNodes();
-            for (var i = 0; i < node.length; i++) {
-                if (node[i].parentElement.style.fontSize)
-                    node[i].parentElement.style.fontSize = value;
+            if (result) {
+                var node = ice.Util.getSelectedTextNodes();
+                for (var i = 0; i < node.length; i++) {
+                    if (node[i].parentElement.style.fontSize)
+                        node[i].parentElement.style.fontSize = value;
+                }
             }
 
-            return true;
+            delete this._skipDispatch;
+            this._triggerChange();
+
+            return result;
         },
 
         /**
@@ -413,19 +414,22 @@
             if (!this.active)
                 return false;
 
-            if (!this._execCommand("createLink", value))
-                return false;
-            if (!target)
-                return true;
+            this._skipDispatch = true;
+            var result = this._execCommand("createLink", value);
 
             // add target attribute to a tag
-            var node = ice.Util.getSelectedTextNodes();
-            for (var i = 0; i < node.length; i++) {
-                if (node[i].parentElement.tagName === "A")
-                    node[i].parentElement.setAttribute("target", target);
+            if (result && target) {
+                var node = ice.Util.getSelectedTextNodes();
+                for (var i = 0; i < node.length; i++) {
+                    if (node[i].parentElement.tagName === "A")
+                        node[i].parentElement.setAttribute("target", target);
+                }
             }
 
-            return true;
+            delete this._skipDispatch;
+            this._triggerChange();
+
+            return result;
         },
 
         /**
@@ -517,10 +521,15 @@
          * @return {Boolean}
          */
         formatBlock: function(value) {
-            if (!this.active || !value || this._allowedBlocks.indexOf(value) === -1 || !this.options("defaultTag") || !this.options("allowSplit"))
+            if (!this.active || !value || this.options("allowedBlocks").indexOf(value) === -1)
                 return false;
 
-            return this._execCommand("formatBlock", "<" + value + ">");
+            if (value === "ol")
+                return this._execCommand("insertOrderedList")
+            else if (value === "ul")
+                return this._execCommand("insertUnorderedList")
+            else
+                return this._execCommand("formatBlock", "<" + value + ">");
         },
 
         /**
@@ -628,7 +637,7 @@
          * @return {Object}
          */
         _closestBlock: function(node) {
-            while (node && (!node.tagName || node.tagName && this._allowedBlocks.indexOf(node.tagName.toLowerCase()) === -1)) {
+            while (node && (!node.tagName || node.tagName && this.options("allowedBlocks").indexOf(node.tagName.toLowerCase()) === -1)) {
                 node = node.parentNode;
             }
 
@@ -644,7 +653,7 @@
             this._innerHTML = this.element.innerHTML;
 
             var re1 = new RegExp("<!--[\\s\\S]*?-->", "g");
-            var re2 = new RegExp("\\s+(<(" + this._allowedBlocks.join("|") + "|hr)>)", "g");
+            var re2 = new RegExp("\\s+(<(" + this.options("allowedBlocks").join("|") + "|hr)>)", "g");
 
             this.element.innerHTML = this.element.innerHTML
                 .replace(re1, "")
