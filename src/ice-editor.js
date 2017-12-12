@@ -303,18 +303,17 @@
             if (!this.active)
                 return false;
 
-            var result = this._execCommandStyleWithCSS("fontSize", value);
+            if (!this._execCommandStyleWithCSS("fontSize", value))
+                return false;
 
             // fix this, browser uses 1-7 units
-            if (result) {
-                var node = ice.Util.getSelectedTextNodes();
-                for (var i = 0; i < node.length; i++) {
-                    if (node[i].parentElement.style.fontSize)
-                        node[i].parentElement.style.fontSize = value;
-                }
+            var node = ice.Util.getSelectedTextNodes();
+            for (var i = 0; i < node.length; i++) {
+                if (node[i].parentElement.style.fontSize)
+                    node[i].parentElement.style.fontSize = value;
             }
 
-            return result;
+            return true;
         },
 
         /**
@@ -406,15 +405,27 @@
         /**
          * Set link on selection
          *
-         * @param  {String}  value
+         * @param  {String}  value  url
+         * @param  {String}  target (optional)
          * @return {Boolean}
          */
-        createLink: function(value) {
+        createLink: function(value, target) {
             if (!this.active)
                 return false;
 
-            return this._execCommand("createLink", value);
-            // @todo -> target?
+            if (!this._execCommand("createLink", value))
+                return false;
+            if (!target)
+                return true;
+
+            // add target attribute to a tag
+            var node = ice.Util.getSelectedTextNodes();
+            for (var i = 0; i < node.length; i++) {
+                if (node[i].parentElement.tagName === "A")
+                    node[i].parentElement.setAttribute("target", target);
+            }
+
+            return true;
         },
 
         /**
