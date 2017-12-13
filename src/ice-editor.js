@@ -303,12 +303,10 @@
             var result = this._execCommandStyleWithCSS("fontSize", value);
 
             // set real units (browser uses 1-7)
-            if (result) {
-                var node = ice.Util.getSelectedNodes(".ice-editor [style*=font-size]");
-                for (var i = 0; i < node.length; i++) {
-                    node[i].style.fontSize = value;
-                }
-            }
+            if (result)
+                ice.Util.getSelectedNodes(".ice-editor [style*=font-size]").forEach(function(node) {
+                    node.style.fontSize = value;
+                });
 
             delete this._skipDispatch;
             this._handleInput();
@@ -370,16 +368,9 @@
             if (result) {
                 ice.Util.saveSelectionRange();
 
-                var node = ice.Util.getSelectedNodes("strike");
-                for (var i = 0; i < node.length; i++) {
-                    var s = document.createElement("s");
-                    while (node[i].childNodes.length) {
-                        s.appendChild(node[i].childNodes[0]);
-                    }
-
-                    node[i].parentElement.insertBefore(s, node[i]);
-                    node[i].parentElement.removeChild(node[i]);
-                }
+                ice.Util.getSelectedNodes("strike").forEach(function(node) {
+                    ice.Util.replaceTag(node, "s");
+                });
 
                 ice.Util.restoreSelectionRange();
             }
@@ -468,10 +459,9 @@
 
             // add target attribute to a tag
             if (result && target) {
-                var node = ice.Util.getSelectedNodes(".ice-editor a");
-                for (var i = 0; i < node.length; i++) {
-                    node[i].setAttribute("target", target);
-                }
+                ice.Util.getSelectedNodes(".ice-editor a").forEach(function(node) {
+                    node.setAttribute("target", target);
+                });
             }
 
             delete this._skipDispatch;
@@ -610,19 +600,11 @@
             // want list element to act as block we're
             // gonna unwrap it
             if (result && ["ol", "ul"].indexOf(value) !== -1) {
-                var node = ice.Util.getSelectedNodes(".ice-editor ol, .ice-editor ul");
-                var list = node ? node[0] : null;
-
-                // unwrap paragraph
-                if (list && list.parentElement.tagName.toLowerCase() === "p") {
+                ice.Util.getSelectedNodes(".ice-editor p > ol, .ice-editor p > ul").forEach(function(node) {
                     ice.Util.saveSelectionRange();
-
-                    var p = list.parentElement;
-                    p.parentElement.insertBefore(list, p);
-                    p.parentElement.removeChild(p);
-
+                    ice.Util.unwrapNode(node);
                     ice.Util.restoreSelectionRange();
-                }
+                });
             }
 
             delete this._skipDispatch;

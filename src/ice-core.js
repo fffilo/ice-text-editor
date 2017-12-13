@@ -95,6 +95,38 @@
         },
 
         /**
+         * Unwrap node
+         *
+         * @param  {Object} node
+         * @return {Void}
+         */
+        unwrapNode: function(node) {
+            var el = node.parentElement;
+            el.parentElement.insertBefore(node, el);
+            el.parentElement.removeChild(el);
+        },
+
+        /**
+         * Replace tagName in node
+         *
+         * @param  {Mixed}  node
+         * @param  {String} tagName
+         * @return {Void}
+         */
+        replaceTag: function(node, tagName) {
+            if (!(node instanceof Node))
+                return;
+
+            var el = document.createElement(tagName);
+            while (node.childNodes.length) {
+                el.appendChild(node.childNodes[0]);
+            }
+
+            node.parentElement.insertBefore(el, node);
+            node.parentElement.removeChild(node);
+        },
+
+        /**
          * Get next node while searching
          * through children and parent
          * elements
