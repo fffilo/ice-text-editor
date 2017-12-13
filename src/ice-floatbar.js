@@ -68,6 +68,7 @@
                 + '<li><a class="bold" href="#" title="Bold" data-ice-method="bold" data-ice-status=""><b>B</b></a></li>'
                 + '<li><a class="italic" href="#" title="Italic" data-ice-method="italic" data-ice-status=""><i>I</i></a></li>'
                 + '<li><a class="underline" href="#" title="Underline" data-ice-method="underline" data-ice-status=""><u>U</u></a></li>'
+                + '<li><a class="strike-through" href="#" title="Strikethrough" data-ice-method="strikeThrough" data-ice-status=""><s>S</s></a></li>'
                 //+ '<li class="separator">|</li>'
                 //+ '<li><a class="link" href="#" title="Link" data-ice-method="link" data-ice-status=""><span>&#128279;</span></a></li>'
                 + '<li class="separator">|</li>'
@@ -466,6 +467,17 @@
          */
         _handleMethod_underline: function(node) {
             this.editor.underline();
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button strikethrough
+         *
+         * @param  {Object} node
+         * @return {Void}
+         */
+        _handleMethod_strikeThrough: function(node) {
+            this.editor.strikeThrough();
         }
 
     }

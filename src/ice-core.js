@@ -23,6 +23,15 @@
     window.ice = {};
 
     /**
+     * Selection object:
+     * see saveSelection and restoreSelection
+     * methods
+     *
+     * @type {Object}
+     */
+    var _selectionRange = null;
+
+    /**
      * Util
      *
      * @type {Object}
@@ -125,12 +134,13 @@
         },
 
         /**
-         * Get all text nodes in selected range
+         * Get all nodes in selected range
          * https://stackoverflow.com/questions/667951/how-to-get-nodes-lying-inside-a-range-with-javascript#answer-28150191
          *
-         * @return {Mixed}
+         * @param  {String} selector (optional)
+         * @return {Array}
          */
-        getSelectedTextNodes: function() {
+        getSelectedNodes: function(selector) {
             var selection = window.getSelection();
             if (!selection.rangeCount)
                 return null;
@@ -160,10 +170,78 @@
                     break;
             }
 
-            // filter text nodes only
-            return result.filter(function(e) {
-                return e.nodeType === Node.TEXT_NODE;
+            // select parent elements
+            var parents = [];
+            for (var i = 0; i < result.length; i++) {
+                node = result[i].parentElement;
+                while (node) {
+                    if (result.indexOf(node) !== -1)
+                        break;
+                    else if (parents.indexOf(node) === -1)
+                        parents.push(node);
+                    else
+                        node = node.parentElement;
+                }
+            }
+
+            // filter selector
+            return result.concat(parents).filter(function(node) {
+                if (selector)
+                    return ice.Util.is(node, selector);
+                else
+                    return true;
             });
+        },
+
+        /**
+         * Get all text nodes in selected range
+         *
+         * @return {Array}
+         */
+        getSelectedTextNodes: function() {
+            return ice.Util.getSelectedNodes().filter(function(node) {
+                return node.nodeType === Node.TEXT_NODE;
+            });
+        },
+
+        /**
+         * Remember window selection
+         *
+         * @return {Void}
+         */
+        saveSelectionRange: function() {
+            var selection = window.getSelection();
+            _selectionRange = null;
+            if (!selection.rangeCount)
+                return;
+
+            var range = selection.getRangeAt(0);
+            _selectionRange = {
+                startContainer: range.startContainer,
+                startOffset: range.startOffset,
+                endContainer: range.endContainer,
+                endOffset: range.endOffset
+            }
+        },
+
+        /**
+         * Restore last saved window selection
+         *
+         * @return {Void}
+         */
+        restoreSelectionRange: function() {
+            if (!_selectionRange)
+                return;
+
+            var range = document.createRange();
+            range.setStart(_selectionRange.startContainer, _selectionRange.startOffset);
+            range.setEnd(_selectionRange.endContainer, _selectionRange.endOffset);
+            _selectionRange = null;
+
+            // set selection
+            var select = window.getSelection();
+            select.removeAllRanges();
+            select.addRange(range);
         },
 
         /**

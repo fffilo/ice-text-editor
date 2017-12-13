@@ -302,7 +302,7 @@
             this._skipDispatch = true;
             var result = this._execCommandStyleWithCSS("fontSize", value);
 
-            // fix this, browser uses 1-7 units
+            // set real units (browser uses 1-7)
             if (result) {
                 var node = ice.Util.getSelectedTextNodes();
                 for (var i = 0; i < node.length; i++) {
@@ -364,7 +364,31 @@
             if (!this.active)
                 return false;
 
-            return this._execCommandStyleWithoutCSS("strikeThrough");
+            this._skipDispatch = true;
+            var result = this._execCommandStyleWithoutCSS("strikeThrough");
+
+            // replace depricated strike tag with s tag
+            if (result) {
+                ice.Util.saveSelectionRange();
+
+                var node = ice.Util.getSelectedNodes("strike");
+                for (var i = 0; i < node.length; i++) {
+                    var s = document.createElement("s");
+                    while (node[i].childNodes.length) {
+                        s.appendChild(node[i].childNodes[0]);
+                    }
+
+                    node[i].parentElement.insertBefore(s, node[i]);
+                    node[i].parentElement.removeChild(node[i]);
+                }
+
+                ice.Util.restoreSelectionRange();
+            }
+
+            delete this._skipDispatch;
+            this._triggerChange();
+
+            return result;
         },
 
         /**
@@ -583,29 +607,13 @@
 
                 // unwrap paragraph
                 if (list && list !== this.element && list.parentElement.tagName.toLowerCase() === "p") {
-                    // remember selection
-                    var range = this.window.getSelection().getRangeAt(0);
-                    range = {
-                        startContainer: range.startContainer,
-                        startOffset: range.startOffset,
-                        endContainer: range.endContainer,
-                        endOffset: range.endOffset
-                    }
+                    ice.Util.saveSelectionRange();
 
-                    // unwrap
                     var p = list.parentElement;
                     p.parentElement.insertBefore(list, p);
                     p.parentElement.removeChild(p);
 
-                    // new selection range
-                    var newrange = this.document.createRange();
-                    newrange.setStart(range.startContainer, range.startOffset);
-                    newrange.setEnd(range.endContainer, range.endOffset);
-
-                    // set selection
-                    var select = this.window.getSelection();
-                    select.removeAllRanges();
-                    select.addRange(newrange);
+                    ice.Util.restoreSelectionRange();
                 }
             }
 
