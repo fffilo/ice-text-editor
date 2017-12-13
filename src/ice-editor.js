@@ -304,10 +304,9 @@
 
             // set real units (browser uses 1-7)
             if (result) {
-                var node = ice.Util.getSelectedTextNodes();
+                var node = ice.Util.getSelectedNodes(".ice-editor [style*=font-size]");
                 for (var i = 0; i < node.length; i++) {
-                    if (node[i].parentElement.style.fontSize)
-                        node[i].parentElement.style.fontSize = value;
+                    node[i].style.fontSize = value;
                 }
             }
 
@@ -469,10 +468,9 @@
 
             // add target attribute to a tag
             if (result && target) {
-                var node = ice.Util.getSelectedTextNodes();
+                var node = ice.Util.getSelectedNodes(".ice-editor a");
                 for (var i = 0; i < node.length; i++) {
-                    if (node[i].parentElement.tagName === "A")
-                        node[i].parentElement.setAttribute("target", target);
+                    node[i].setAttribute("target", target);
                 }
             }
 
@@ -598,12 +596,8 @@
             // want list element to act as block we're
             // gonna unwrap it
             if (result && ["ol", "ul"].indexOf(value) !== -1) {
-                // find list element
-                var node = ice.Util.getSelectedTextNodes();
+                var node = ice.Util.getSelectedNodes(".ice-editor ol, .ice-editor ul");
                 var list = node ? node[0] : null;
-                while (list && list !== this.element && ["ol", "ul"].indexOf((list.tagName || "").toLowerCase()) === -1) {
-                    list = list.parentElement;
-                }
 
                 // unwrap paragraph
                 if (list && list !== this.element && list.parentElement.tagName.toLowerCase() === "p") {
