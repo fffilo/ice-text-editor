@@ -57,6 +57,11 @@
                 + '<li><a class="font-name" href="#" title="Font Name" data-ice-method="fontName" data-ice-status=""><span>T</span></a></li>'
                 + '<li><a class="font-size" href="#" title="Font Size" data-ice-method="fontSize" data-ice-status=""><span>&#x1f5db;</span></a></li>'
                 + '<li class="separator">|</li>'
+                + '<li><a class="text-align-left" href="#" title="Text Align Left" data-ice-method="align" data-ice-status=""><span>&#x2190;</span></a></li>'
+                + '<li><a class="text-align-center" href="#" title="Text Align Center" data-ice-method="align" data-ice-status=""><span>&#x2194;</span></a></li>'
+                + '<li><a class="text-align-right" href="#" title="Text Align Right" data-ice-method="align" data-ice-status=""><span>&#x2192;</span></a></li>'
+                + '<li><a class="text-align-justify" href="#" title="Text Align Justify" data-ice-method="align" data-ice-status=""><span>&#x27F7;</span></a></li>'
+                + '<li class="separator">|</li>'
                 + '<li><a class="fore-color" href="#" title="Foreground Color" data-ice-method="foreColor" data-ice-status=""><span data-ice-status-type="css" data-ice-status-key="background-color">&nbsp;</span></a></li>'
                 + '<li><a class="back-color" href="#" title="Background Color" data-ice-method="backColor" data-ice-status=""><span data-ice-status-type="css" data-ice-status-key="background-color">&nbsp;</span></a></li>'
                 + '<li class="separator">|</li>'
@@ -272,21 +277,42 @@
             var editor = this.ice.editor;
             var floatbar = editor._floatbar;
             var method = node.getAttribute("data-ice-method");
-            var args = [];
 
             if (typeof floatbar["_handleMethod_" + method] === "function")
-                floatbar["_handleMethod_" + method].apply(floatbar, args);
+                floatbar["_handleMethod_" + method].apply(floatbar, [node]);
 
             e.preventDefault();
         },
 
         /**
          * Floatbar click event handler for
-         * button backColor
+         * button align
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_backColor: function() {
+        _handleMethod_align: function(node) {
+            var className = node.getAttribute("class");
+            if (!className)
+                return;
+
+            var aligns = [ "left", "center", "right", "justify" ];
+            for (var i = 0; i < aligns.length; i++) {
+                if (className.indexOf(aligns[i]) !== -1) {
+                    this.editor.align(aligns[i]);
+                    break;
+                }
+            }
+        },
+
+        /**
+         * Floatbar click event handler for
+         * button backColor
+         *
+         * @param  {Object} node
+         * @return {Void}
+         */
+        _handleMethod_backColor: function(node) {
             var value = prompt("Background Color", this.editor.decorations().backColor);
             if (value === null)
                 return;
@@ -298,9 +324,10 @@
          * Floatbar click event handler for
          * button bold
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_bold: function() {
+        _handleMethod_bold: function(node) {
             this.editor.bold();
         },
 
@@ -308,9 +335,10 @@
          * Floatbar click event handler for
          * button fontName
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_fontName: function() {
+        _handleMethod_fontName: function(node) {
             var value = prompt("Font Name", this.editor.decorations().fontName);
             if (value === null)
                 return;
@@ -322,9 +350,10 @@
          * Floatbar click event handler for
          * button fontSize
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_fontSize: function() {
+        _handleMethod_fontSize: function(node) {
             var value = prompt("Font Size", this.editor.decorations().fontSize);
             if (value === null)
                 return;
@@ -336,9 +365,10 @@
          * Floatbar click event handler for
          * button foreColor
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_foreColor: function() {
+        _handleMethod_foreColor: function(node) {
             var value = prompt("Foreground Color", this.editor.decorations().foreColor);
             if (value === null)
                 return;
@@ -350,9 +380,10 @@
          * Floatbar click event handler for
          * button formatBlock
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_formatBlock: function() {
+        _handleMethod_formatBlock: function(node) {
             var value = prompt("Format Block", "");
             if (value === null)
                 return;
@@ -364,9 +395,10 @@
          * Floatbar click event handler for
          * button hiliteColor
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_hiliteColor: function() {
+        _handleMethod_hiliteColor: function(node) {
             this._handleMethod_backColor();
         },
 
@@ -374,9 +406,10 @@
          * Floatbar click event handler for
          * button italic
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_italic: function() {
+        _handleMethod_italic: function(node) {
             this.editor.italic();
         },
 
@@ -384,9 +417,10 @@
          * Floatbar click event handler for
          * button removeFormat
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_removeFormat: function() {
+        _handleMethod_removeFormat: function(node) {
             this.editor.removeFormat();
         },
 
@@ -394,9 +428,10 @@
          * Floatbar click event handler for
          * button strikeThrough
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_strikeThrough: function() {
+        _handleMethod_strikeThrough: function(node) {
             this.editor.strikeThrough();
         },
 
@@ -404,9 +439,10 @@
          * Floatbar click event handler for
          * button subscript
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_subscript: function() {
+        _handleMethod_subscript: function(node) {
             this.editor.subscript();
         },
 
@@ -414,9 +450,10 @@
          * Floatbar click event handler for
          * button superscript
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_superscript: function() {
+        _handleMethod_superscript: function(node) {
             this.editor.superscript();
         },
 
@@ -424,9 +461,10 @@
          * Floatbar click event handler for
          * button underline
          *
+         * @param  {Object} node
          * @return {Void}
          */
-        _handleMethod_underline: function() {
+        _handleMethod_underline: function(node) {
             this.editor.underline();
         }
 
