@@ -581,16 +581,16 @@
             this._skipDispatch = true;
             var result;
 
-            // before start reset list blocks and
-            // convert all blocks to paragraph
-            if (decor.formatBlock === null) {
-                this._execCommand("insertOrderedList");
+            // toggle list elements
+            while (ice.Util.getSelectedNodes(".ice-editor ol").length) {
                 this._execCommand("insertOrderedList");
             }
-            else if (decor.formatBlock === "ol")
-                this._execCommand("insertOrderedList");
-            else if (decor.formatBlock === "ul")
+            while (ice.Util.getSelectedNodes(".ice-editor ul").length) {
                 this._execCommand("insertUnorderedList");
+            }
+
+            // reset block to paragraph
+            this._execCommand("formatBlock", "<h6>");
             this._execCommand("formatBlock", "<p>");
 
             // format block
@@ -598,8 +598,12 @@
                 result = this._execCommand("insertOrderedList");
             else if (value === "ul")
                 result = this._execCommand("insertUnorderedList");
-            else
+            else if (value !== "p")
                 result = this._execCommand("formatBlock", "<" + value + ">");
+
+            // @todo - while converting list to block
+            // every li element shoud be separate block
+            // (chrome separate it with <br>)
 
             // some browsers (chrome) inserts ol/ul inside
             // block elements (paragraph), and since we
@@ -610,7 +614,7 @@
                 var list = node ? node[0] : null;
 
                 // unwrap paragraph
-                if (list && list !== this.element && list.parentElement.tagName.toLowerCase() === "p") {
+                if (list && list.parentElement.tagName.toLowerCase() === "p") {
                     ice.Util.saveSelectionRange();
 
                     var p = list.parentElement;
