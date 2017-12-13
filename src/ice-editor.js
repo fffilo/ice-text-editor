@@ -311,7 +311,7 @@
             }
 
             delete this._skipDispatch;
-            this._triggerChange();
+            this._handleInput();
 
             return result;
         },
@@ -385,7 +385,7 @@
             }
 
             delete this._skipDispatch;
-            this._triggerChange();
+            this._handleInput();
 
             return result;
         },
@@ -475,7 +475,7 @@
             }
 
             delete this._skipDispatch;
-            this._triggerChange();
+            this._handleInput();
 
             return result;
         },
@@ -528,7 +528,7 @@
 
             delete this._skipDispatch;
             if (result)
-                this._triggerChange();
+                this._handleInput();
 
             return result;
         },
@@ -574,13 +574,23 @@
             if (!this.active || !value || this.options("allowedBlocks").indexOf(value) === -1)
                 return false;
 
+            var decor = this.decorations();
+            if (decor.formatBlock === value)
+                return false;
+
             this._skipDispatch = true;
             var result;
 
             // before start reset list blocks and
             // convert all blocks to paragraph
-            this._execCommand("insertOrderedList");
-            this._execCommand("insertOrderedList");
+            if (decor.formatBlock === null) {
+                this._execCommand("insertOrderedList");
+                this._execCommand("insertOrderedList");
+            }
+            else if (decor.formatBlock === "ol")
+                this._execCommand("insertOrderedList");
+            else if (decor.formatBlock === "ul")
+                this._execCommand("insertUnorderedList");
             this._execCommand("formatBlock", "<p>");
 
             // format block
@@ -612,7 +622,7 @@
             }
 
             delete this._skipDispatch;
-            this._triggerChange();
+            this._handleInput();
 
             return result;
         },
@@ -883,7 +893,12 @@
          * @return {Void}
          */
         _handleInput: function(e) {
-            var that = this.ice;
+            var that = this;
+            if (!(that instanceof ice.Editor))
+                that = that.ice;
+            if (that._skipDispatch)
+                return;
+
             that.element.normalize();
 
             var sel = window.getSelection();
