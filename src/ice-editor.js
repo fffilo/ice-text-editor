@@ -404,6 +404,32 @@
         },
 
         /**
+         * Set text align on selection
+         *
+         * @param  {String}  value left|right|center|justify
+         * @return {Boolean}
+         */
+        align: function(value) {
+            if (!this.active)
+                return false;
+
+            var method;
+            value = value.toLowerCase();
+            if (value === "center")
+                value = "justifyCenter";
+            if (value === "justify")
+                value = "justifyFull";
+            if (value === "left")
+                value = "justifyLeft";
+            if (value === "right")
+                value = "justifyRight";
+            if (!value)
+                return false;
+
+            return this._execCommandStyleWithCSS(value);
+        },
+
+        /**
          * Set link on selection
          *
          * @param  {String}  value  url
@@ -634,6 +660,7 @@
             var doc = this.document;
             var result = {
                 //formatBlock: null,
+                //align: null,
                 //backColor: doc.queryCommandValue("backColor"),
                 bold: doc.queryCommandState("bold"),
                 //fontName: doc.queryCommandValue("fontName"),
@@ -668,6 +695,22 @@
             var style = ice.Util.nodeStyle;
             for (var i = 0; i < node.length; i++) {
                 var el = node[i].parentElement;
+                var css = style(el, "text-align");
+                if (!("align" in result))
+                    result.align = css;
+                else if (result.align !== css)
+                    result.align = null;
+                if (result.align === "justify-all")
+                    result.align = "justify";
+                else if (result.align === "start" && style(el, "direction") === "rtl")
+                    result.align = "right";
+                else if (result.align === "start")
+                    result.align = "left";
+                else if (result.align === "end" && style(el, "direction") === "rtl")
+                    result.align = "left";
+                else if (result.align === "end")
+                    result.align = "right";
+
                 var css = style(el, "background-color");
                 if (!("backColor" in result))
                     result.backColor = css;
