@@ -658,6 +658,7 @@
             var doc = this.document;
             var result = {
                 //formatBlock: null,
+                tagList: [],
                 //align: null,
                 //backColor: doc.queryCommandValue("backColor"),
                 bold: doc.queryCommandState("bold"),
@@ -677,10 +678,10 @@
             // block tags
             for (var i = 0; i < node.length; i++) {
                 var block = this._closestBlock(node[i]);
-                var tag = block ? block.tagName.toLowerCase() : null;
-                if (!tag)
+                if (!block)
                     continue;
 
+                var tag = block.tagName.toLowerCase();
                 if (!("formatBlock" in result))
                     result.formatBlock = tag;
                 else if (result.formatBlock !== tag) {

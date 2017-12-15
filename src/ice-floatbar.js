@@ -49,6 +49,7 @@
          * @type {Object}
          */
         _defaults: {
+            /*
             template: ''
                 + '<div>'
                 + '<ul>'
@@ -69,11 +70,42 @@
                 + '<li><a class="italic" href="#" title="Italic" data-ice-method="italic" data-ice-status=""><i>I</i></a></li>'
                 + '<li><a class="underline" href="#" title="Underline" data-ice-method="underline" data-ice-status=""><u>U</u></a></li>'
                 + '<li><a class="strike-through" href="#" title="Strikethrough" data-ice-method="strikeThrough" data-ice-status=""><s>S</s></a></li>'
-                //+ '<li class="separator">|</li>'
-                //+ '<li><a class="link" href="#" title="Link" data-ice-method="link" data-ice-status=""><span>&#128279;</span></a></li>'
+                + '<li class="separator">|</li>'
+                + '<li><a class="create-link" href="#" title="Link" data-ice-method="createLink" data-ice-status="linkURL"><span>&#128279;</span></a></li>'
                 + '<li class="separator">|</li>'
                 + '<li><a class="remove-format" href="#" title="Remove Format" data-ice-method="removeFormat" data-ice-status=""><b>&times;</b></a></li>'
                 + '</ul>'
+                + '</div>'
+            */
+            template: ''
+                + '<div data-ice-floatbar-view="">'
+                + '<nav class="ice-floatbar-nav">'
+                + '<ul class="ice-floatbar-flex">'
+                + '<li><a class="bold" href="#" title="Bold" data-ice-method="bold" data-ice-decoration="bold"><i class="fa fa-bold"></i></a></li>'
+                + '<li><a class="italic" href="#" title="Italic" data-ice-method="italic" data-ice-decoration="italic"><i class="fa fa-italic"></i></a></li>'
+                + '<li><a class="font" href="#" title="Font" data-ice-toggle-view="font"><i class="fa fa-font"></i></a></li>'
+                + '<li><a class="align" href="#" title="Text Align" data-ice-toggle-view="align" data-ice-decoration="align"><i class="fa fa-align-center"></i></a></li>'
+                + '<li><a class="link" href="#" title="Link" data-ice-toggle-view="link"><i class="fa fa-link"></i></a></li>'
+                + '<li><a class="color" href="#" title="Foreground Color" data-ice-toggle-view="color"><i class="fa fa-circle"></i></a></li>'
+                + '</ul>'
+                + '</nav>'
+                + '<article class="ice-floatbar-dropdown font">'
+                + '<p><b>work in progress:</b><br />font properties placeholder</p>'
+                + '</article>'
+                + '<article class="ice-floatbar-dropdown align">'
+                + '<ul class="ice-floatbar-flex">'
+                + '<li><a class="align-left" href="#" title="Text Align Left" data-ice-method="align" data-ice-decoration="align" data-ice-argument="left"><i class="fa fa-align-left"></i></a></li>'
+                + '<li><a class="align-center" href="#" title="Text Align Center" data-ice-method="align" data-ice-decoration="align" data-ice-argument="center"><i class="fa fa-align-center"></i></a></li>'
+                + '<li><a class="align-right" href="#" title="Text Align Right" data-ice-method="align" data-ice-decoration="align" data-ice-argument="right"><i class="fa fa-align-right"></i></a></li>'
+                + '<li><a class="align-justify" href="#" title="Text Align Justify" data-ice-method="align" data-ice-decoration="align" data-ice-argument="justify"><i class="fa fa-align-justify"></i></a></li>'
+                + '</ul>'
+                + '</article>'
+                + '<article class="ice-floatbar-dropdown link">'
+                + '<p><b>work in progress:</b><br />link properties placeholder</p>'
+                + '</article>'
+                + '<article class="ice-floatbar-dropdown color">'
+                + '<p><b>work in progress:</b><br />color properties placeholder</p>'
+                + '</article>'
                 + '</div>'
         },
 
@@ -103,6 +135,7 @@
             var div = this.editor.document.createElement("div");
             div.innerHTML = this.options("template");
             this._element = div.childNodes[0];
+            this._element.addEventListener("pointerdown", this._handlePointerdown);
             this._element.addEventListener("click", this._handleClick);
             this._element.classList.add(this._className);
             this._element.ice = this;
@@ -110,10 +143,12 @@
 
             // define ui
             this._ui = {};
-            var node = this.element.querySelectorAll("[data-ice-method]");
-            for (var i = 0; i < node.length; i++) {
-                this._ui[node[i].getAttribute("data-ice-method")] = node[i];
-            }
+            this.element.querySelectorAll("[data-ice-decoration]").forEach(function(node) {
+                var attr = node.getAttribute("data-ice-decoration");
+                if (!(attr in this._ui))
+                    this._ui[attr] = [];
+                this._ui[attr].push(node);
+            }.bind(this));
         },
 
         /**
@@ -124,6 +159,7 @@
         destroy: function() {
             delete this._element.ice;
             this._element.removeEventListener("click", this._handleClick);
+            this._element.removeEventListener("pointerdown", this._handlePointerdown);
             this._element.parentElement.removeChild(this._element);
             this._element = null;
         },
@@ -180,6 +216,7 @@
          */
         hide: function() {
             this.element.classList.remove(this._className + "-show");
+            this.element.removeAttribute("data-ice-floatbar-view");
         },
 
         /**
@@ -246,22 +283,24 @@
             if (!decorations)
                 decorations = this.editor.decorations();
 
-            for (var prop in this._ui) {
-                this._ui[prop].setAttribute("data-ice-status", decorations ? decorations[prop] : null);
-
-                var stat = this._ui[prop].querySelectorAll("[data-ice-status-type]");
-                for (var i = 0; i < stat.length; i++) {
-                    var type = stat[i].getAttribute("data-ice-status-type");
-                    var key = stat[i].getAttribute("data-ice-status-key");
-
-                    if (type === "content")
-                        stat[i].innerHTML = decorations[prop] || "";
-                    else if (type === "attr")
-                        stat[i].setAttribute(key, decorations[prop]);
-                    else if (type === "css")
-                        stat[i].style[key] = decorations[prop];
-                }
+            for (var decor in this._ui) {
+                this._ui[decor].forEach(function(node) {
+                    node.setAttribute("data-ice-status", decorations ? decorations[decor] : null);
+                });
             }
+        },
+
+        /**
+         * Floatbar pointerdown event handler:
+         * prevent default so editor text does
+         * not get unselected
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handlePointerdown: function(e) {
+            if (!ice.Util.closest(e.target, "[data-ice-method],[data-ice-toggle-view]"))
+                e.preventDefault();
         },
 
         /**
@@ -271,213 +310,32 @@
          * @return {Void}
          */
         _handleClick: function(e) {
+            var node = ice.Util.closest(e.target, "[data-ice-toggle-view]");
+            if (node) {
+                var editor = this.ice.editor;
+                var floatbar = editor._floatbar;
+                var attr = node.getAttribute("data-ice-toggle-view");
+                var value = floatbar.element.getAttribute("data-ice-floatbar-view");
+
+                if (value === attr)
+                    floatbar.element.removeAttribute("data-ice-floatbar-view");
+                else
+                    floatbar.element.setAttribute("data-ice-floatbar-view", attr);
+
+                floatbar._reposition();
+            }
+
             var node = ice.Util.closest(e.target, "[data-ice-method]");
-            if (!node)
-                return;
+            if (node) {
+                var editor = this.ice.editor;
+                var floatbar = editor._floatbar;
+                var method = node.getAttribute("data-ice-method");
+                var args = node.getAttribute("data-ice-argument");
 
-            var editor = this.ice.editor;
-            var floatbar = editor._floatbar;
-            var method = node.getAttribute("data-ice-method");
-
-            if (typeof floatbar["_handleMethod_" + method] === "function")
-                floatbar["_handleMethod_" + method].apply(floatbar, [node]);
+                editor[method].apply(editor, args ? [ args ] : []);
+            }
 
             e.preventDefault();
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button align
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_align: function(node) {
-            var className = node.getAttribute("class");
-            if (!className)
-                return;
-
-            var aligns = [ "left", "center", "right", "justify" ];
-            for (var i = 0; i < aligns.length; i++) {
-                if (className.indexOf(aligns[i]) !== -1) {
-                    this.editor.align(aligns[i]);
-                    break;
-                }
-            }
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button backColor
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_backColor: function(node) {
-            var value = prompt("Background Color", this.editor.decorations().backColor);
-            if (value === null)
-                return;
-
-            this.editor.backColor(value);
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button bold
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_bold: function(node) {
-            this.editor.bold();
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button fontName
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_fontName: function(node) {
-            var value = prompt("Font Name", this.editor.decorations().fontName);
-            if (value === null)
-                return;
-
-            this.editor.fontName(value);
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button fontSize
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_fontSize: function(node) {
-            var value = prompt("Font Size", this.editor.decorations().fontSize);
-            if (value === null)
-                return;
-
-            this.editor.fontSize(value);
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button foreColor
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_foreColor: function(node) {
-            var value = prompt("Foreground Color", this.editor.decorations().foreColor);
-            if (value === null)
-                return;
-
-            this.editor.foreColor(value);
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button formatBlock
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_formatBlock: function(node) {
-            var value = prompt("Format Block", "");
-            if (value === null)
-                return;
-
-            this.editor.formatBlock(value);
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button hiliteColor
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_hiliteColor: function(node) {
-            this._handleMethod_backColor();
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button italic
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_italic: function(node) {
-            this.editor.italic();
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button removeFormat
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_removeFormat: function(node) {
-            this.editor.removeFormat();
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button strikeThrough
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_strikeThrough: function(node) {
-            this.editor.strikeThrough();
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button subscript
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_subscript: function(node) {
-            this.editor.subscript();
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button superscript
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_superscript: function(node) {
-            this.editor.superscript();
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button underline
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_underline: function(node) {
-            this.editor.underline();
-        },
-
-        /**
-         * Floatbar click event handler for
-         * button strikethrough
-         *
-         * @param  {Object} node
-         * @return {Void}
-         */
-        _handleMethod_strikeThrough: function(node) {
-            this.editor.strikeThrough();
         }
 
     }
