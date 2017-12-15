@@ -43,3 +43,18 @@
 .ice-floatbar [data-ice-decoration="align"][data-ice-argument="center"][data-ice-status="center"],
 .ice-floatbar [data-ice-decoration="align"][data-ice-argument="right"][data-ice-status="right"],
 .ice-floatbar [data-ice-decoration="align"][data-ice-argument="justify"][data-ice-status="justify"] { color: #478bfb; }
+
+/* font-awesome fallback * /
+.fa { display: inline-block; font-family: "Times New Roman", Times, serif; font-style: normal; text-decoration: none; }
+.fa-bold::before { content: "B"; font-weight: bold; }
+.fa-italic::before { content: "I"; font-style: italic; }
+.fa-underline::before { content: "U"; text-decoration: underline; }
+.fa-strikethrough::before { content: "S"; text-decoration: line-through; }
+.fa-font::before { content: "F"; }
+.fa-link::before { content: "\1f517"; }
+.fa-circle::before { content: "\25CF"; }
+.fa-align-left::before { content: "\2190"; }
+.fa-align-center::before { content: "\2194"; }
+.fa-align-right::before { content: "\2192"; }
+.fa-align-justify::before { content: "\27F7"; }
+*/
