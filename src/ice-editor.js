@@ -967,14 +967,18 @@
      * Get document active editor
      * ice.Editor instance
      *
-     * @return {Object} [description]
+     * @return {Object}
      */
     ice.Util.getActiveEditor = function() {
         var selection = (this instanceof ice.Editor ? this.window : window).getSelection();
         var node = selection.focusNode;
 
-        while (node && (node.nodeType !== Node.ELEMENT_NODE || !(node.ice instanceof ice.Editor))) {
+        while (node && !(node.ice instanceof ice.Editor)) {
             node = node.parentNode;
+
+            //if (node && node.ice && !(node.ice instanceof ice.Editor))
+            //    if (node.ice.editor && (node.ice.editor instanceof ice.Editor))
+            //        node = node.ice.editor.element;
         }
 
         return node ? node.ice : null;
@@ -1040,7 +1044,14 @@
             // @todo - in IE CustomEvent is not constructor
             var detail = {
                 editor: _editor,
-                collapsed: range.collapsed,
+                range: {
+                    collapsed: range.collapsed,
+                    commonAncestorContainer: range.commonAncestorContainer,
+                    endContainer: range.endContainer,
+                    endOffset: range.endOffset,
+                    startContainer: range.startContainer,
+                    startOffset: range.startOffset
+                },
                 rect: range.getBoundingClientRect(),
                 decorations: _editor.decorations()
             };

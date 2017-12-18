@@ -1,5 +1,6 @@
 /* display and position */
-.ice-floatbar { position: absolute; display: block; visibility: hidden; top: 0; left: 0; width: 16em; margin: 0; padding: 0.25em; z-index: 1000; font-family: Arial, Helvetica, sans-serif; background: rgba(0,0,0,0.9); color: #fafafa; border-radius: 0.25em; }
+.ice-floatbar { position: absolute; display: block; visibility: hidden; top: 0; left: 0; width: 16em; margin: 0; padding: 0.25em; z-index: 1000; font-family: Arial, Helvetica, sans-serif; background: rgba(0,0,0,0.9); color: #fafafa; border-radius: 0.25em; box-sizing: border-box; }
+.ice-floatbar * { box-sizing: border-box; }
 .ice-floatbar.ice-floatbar-show { visibility: visible; }
 .ice-floatbar.ice-floatbar-position-bottom { transform: translateY(0.25em); }
 .ice-floatbar.ice-floatbar-position-top { transform: translateY(-0.25em);  }
@@ -13,15 +14,22 @@
 .ice-floatbar nav,
 .ice-floatbar ul,
 .ice-floatbar li,
-.ice-floatbar p { display: block; margin: 0; padding: 0; }
+.ice-floatbar p,
+.ice-floatbar input[type="text"] { display: block; margin: 0; padding: 0; }
 .ice-floatbar ul { display: flex; margin: 0; padding: 1px; text-align: center; list-style-type: none; }
 .ice-floatbar li { flex: 1; }
-.ice-floatbar p { margin: 1em; font-size: 0.75em; }
+.ice-floatbar p { padding: 0.5em; }
+.ice-floatbar p:not(:first-child) { padding-top: 0.25em; }
+.ice-floatbar p:not(:last-child) { padding-bottom: 0.25em; }
 .ice-floatbar a { display: block; height: 2em; line-height: 2em; font-weight: normal; outline: 0 none; color: inherit; text-decoration: none; }
 .ice-floatbar a:hover { color: #478bfb; }
+.ice-floatbar input[type="text"] { width: 100%; line-height: 2; font-size: 0.8em; border: 0 none; outline: 0 none; color: inherit; background: transparent; }
+.ice-floatbar label { line-height: 2; font-size: 0.8em; }
 
 /* list */
 .ice-floatbar ul.ice-floatbar-list { display: block; max-height: 10em; padding: 0.5em; font-size: 0.8em; text-align: left; overflow-y: scroll; }
+.ice-floatbar ul.ice-floatbar-list:not(:first-child) { padding-top: 0.25em; }
+.ice-floatbar ul.ice-floatbar-list:not(:last-child) { padding-bottom: 0.25em; }
 .ice-floatbar ul.ice-floatbar-list li { display: block; flex: initial; }
 .ice-floatbar ul.ice-floatbar-list a { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -30,7 +38,7 @@
 .ice-floatbar .ice-floatbar-nav a { min-width: 2em; }
 
 /* dropdown */
-.ice-floatbar .ice-floatbar-dropdown { display: none; border-top: 1px solid #aaa; }
+.ice-floatbar .ice-floatbar-dropdown { display: none; padding-top: 0.25em; border-top: 1px solid #aaa; }
 .ice-floatbar[data-ice-floatbar-view="format-block"] .ice-floatbar-dropdown.format-block,
 .ice-floatbar[data-ice-floatbar-view="font"] .ice-floatbar-dropdown.font,
 .ice-floatbar[data-ice-floatbar-view="align"] .ice-floatbar-dropdown.align,
@@ -60,6 +68,7 @@
 
 /* font-awesome fallback * /
 .fa { display: inline-block; font-family: "Times New Roman", Times, serif; font-style: normal; text-decoration: none; }
+.fa-code::before { content: "\3c0"; }
 .fa-bold::before { content: "B"; font-weight: bold; }
 .fa-italic::before { content: "I"; font-style: italic; }
 .fa-underline::before { content: "U"; text-decoration: underline; }
