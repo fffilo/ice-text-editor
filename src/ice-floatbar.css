@@ -31,6 +31,7 @@
 
 /* dropdown */
 .ice-floatbar .ice-floatbar-dropdown { display: none; border-top: 1px solid #aaa; }
+.ice-floatbar[data-ice-floatbar-view="format-block"] .ice-floatbar-dropdown.format-block,
 .ice-floatbar[data-ice-floatbar-view="font"] .ice-floatbar-dropdown.font,
 .ice-floatbar[data-ice-floatbar-view="align"] .ice-floatbar-dropdown.align,
 .ice-floatbar[data-ice-floatbar-view="link"] .ice-floatbar-dropdown.link,
@@ -41,6 +42,17 @@
 .ice-floatbar [data-ice-decoration="italic"][data-ice-status="true"],
 .ice-floatbar [data-ice-decoration="underline"][data-ice-status="true"],
 .ice-floatbar [data-ice-decoration="strikeThrough"][data-ice-status="true"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="h1"][data-ice-status="h1"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="h2"][data-ice-status="h2"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="h3"][data-ice-status="h3"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="h4"][data-ice-status="h4"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="h5"][data-ice-status="h5"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="h6"][data-ice-status="h6"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="p"][data-ice-status="p"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="pre"][data-ice-status="pre"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="blockquote"][data-ice-status="blockquote"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="ol"][data-ice-status="ol"],
+.ice-floatbar [data-ice-decoration="formatBlock"][data-ice-argument="ul"][data-ice-status="ul"],
 .ice-floatbar [data-ice-decoration="align"][data-ice-argument="left"][data-ice-status="left"],
 .ice-floatbar [data-ice-decoration="align"][data-ice-argument="center"][data-ice-status="center"],
 .ice-floatbar [data-ice-decoration="align"][data-ice-argument="right"][data-ice-status="right"],
