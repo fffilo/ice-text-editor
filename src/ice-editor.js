@@ -975,10 +975,6 @@
 
         while (node && !(node.ice instanceof ice.Editor)) {
             node = node.parentNode;
-
-            //if (node && node.ice && !(node.ice instanceof ice.Editor))
-            //    if (node.ice.editor && (node.ice.editor instanceof ice.Editor))
-            //        node = node.ice.editor.element;
         }
 
         return node ? node.ice : null;

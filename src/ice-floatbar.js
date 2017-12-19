@@ -50,7 +50,8 @@
          */
         _defaults: {
             template: ''
-                + '<div data-ice-floatbar-view="">'
+                + '<div class="ice-floatbar-wrapper">'
+                + '<div class="ice-floatbar-content">'
                 + '<nav class="ice-floatbar-nav">'
                 + '<ul>'
                 + '<li><a class="format-block" href="#" title="Format Block" data-ice-toggle-view="format-block"><i class="fa fa-code"></i></a></li>'
@@ -78,7 +79,7 @@
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown font">'
-                + '<p><input type="text" placeholder="Font Size" value="" data-ice-decoration="fontSize" data-ice-can-mouse-down="true" /></p>'
+                + '<p><input type="text" title="Font Size" placeholder="Font Size" value="" data-ice-decoration="fontSize" /></p>'
                 + '<ul class="ice-floatbar-list">'
                 + '<li><a href="#" title="Arial, Helvetica, sans-serif" data-ice-method="fontName" data-ice-argument="Arial, Helvetica, sans-serif">Arial, Helvetica, sans-serif</a></li>'
                 + '<li><a href="#" title="&quot;Arial Black&quot;, Gadget, sans-serif" data-ice-method="fontName" data-ice-argument="&quot;Arial Black&quot;, Gadget, sans-serif">&quot;Arial Black&quot;, Gadget, sans-serif</a></li>'
@@ -93,7 +94,7 @@
                 + '<li><a href="#" title="&quot;Times New Roman&quot;, Times, serif" data-ice-method="fontName" data-ice-argument="&quot;Times New Roman&quot;, Times, serif">&quot;Times New Roman&quot;, Times, serif</a></li>'
                 + '<li><a href="#" title="&quot;Trebuchet MS&quot;, Helvetica, sans-serif" data-ice-method="fontName" data-ice-argument="&quot;Trebuchet MS&quot;, Helvetica, sans-serif">&quot;Trebuchet MS&quot;, Helvetica, sans-serif</a></li>'
                 + '<li><a href="#" title="Verdana, Geneva, sans-serif" data-ice-method="fontName" data-ice-argument="Verdana, Geneva, sans-serif">Verdana, Geneva, sans-serif</a></li>'
-                + '<ul>'
+                + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown align">'
                 + '<ul>'
@@ -104,12 +105,14 @@
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown link">'
-                + '<p><input type="text" placeholder="Link URL" value="" data-ice-decoration="linkURL" data-ice-can-mouse-down="true" /></p>'
-                + '<p><label>Show in New Tab</label><label class="switch"><input type="checkbox" /><span></span></label></p>'
+                + '<p><input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-decoration="linkURL" /></p>'
+                + '<p><label>Show in New Tab</label><label class="switch"><input type="checkbox" /><span class="slider round"></span></label></p>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown color">'
-                + '<p><input type="text" placeholder="Foreground Color" value="" data-ice-decoration="foreColor" data-ice-can-mouse-down="true" /></p>'
+                + '<p><input type="text" title="Foreground Color" placeholder="Foreground Color" value="" data-ice-decoration="foreColor" /></p>'
+                + '<p><input type="text" title="Background Color" placeholder="Background Color" value="" data-ice-decoration="backColor" /></p>'
                 + '</article>'
+                + '</div>'
                 + '</div>'
         },
 
@@ -135,48 +138,11 @@
                     delete this._options[i];
             }
 
-            // bind handles with this
-            this._handleThisMousedown = this._handleMousedown.bind(this);
-            this._handleThisClick = this._handleClick.bind(this);
-            this._handleThisChange = this._handleChange.bind(this);
-            this._handleThisBlur = this._handleBlur.bind(this);
-
             // create
-            var div = this.editor.document.createElement("div");
-            div.innerHTML = this.options("template");
-            this._element = div.childNodes[0];
-            this._element.addEventListener("mousedown", this._handleThisMousedown);
-            this._element.addEventListener("click", this._handleThisClick);
-            this._element.classList.add(this._className);
-            this._element.ice = this;
+            this._element = this.editor.document.createElement("iframe");
+            this._element.classList.add("ice-floatbar");
+            this._element.onload = this._load.bind(this);
             this.editor.document.body.appendChild(this._element);
-
-            // hide not allowed format blocks
-            this.element.querySelectorAll('[data-ice-method="formatBlock"][data-ice-argument]').forEach(function(node) {
-                if (this.editor.options("allowedBlocks").indexOf(node.getAttribute("data-ice-argument")) === -1) {
-                    node.style.display = "none";
-                }
-            }.bind(this));
-
-            // @todo - font family list
-
-            // input elements
-            this.element.querySelectorAll("[data-ice-can-mouse-down]").forEach(function(node) {
-                node.addEventListener("change", this._handleThisChange);
-                node.addEventListener("blur", this._handleThisBlur);
-            }.bind(this));
-
-            // selection range
-            this._lastSelectionRange = null;
-
-            // define ui
-            this._ui = {};
-            this.element.querySelectorAll("[data-ice-decoration]").forEach(function(node) {
-                var attr = node.getAttribute("data-ice-decoration");
-                if (!(attr in this._ui))
-                    this._ui[attr] = [];
-                this._ui[attr].push(node);
-            }.bind(this));
         },
 
         /**
@@ -186,10 +152,62 @@
          */
         destroy: function() {
             delete this._element.ice;
-            this._element.removeEventListener("click", this._handleThisClick);
-            this._element.removeEventListener("mousedown", this._handleThisMousedown);
             this._element.parentElement.removeChild(this._element);
             this._element = null;
+
+            delete this._handleThisClick;
+            delete this._handleThisChange;
+        },
+
+        /**
+         * Load iframe:
+         * add classes to dom nodes, append
+         * template and add event listeners
+         *
+         * @return {Void}
+         */
+        _load: function() {
+            this._element.contentDocument.documentElement.classList.add("ice-floatbar-html");
+            this._element.contentDocument.body.classList.add("ice-floatbar-body");
+
+            // bind handles with this
+            this._handleThisClick = this._handleClick.bind(this);
+            this._handleThisChange = this._handleChange.bind(this);
+
+            // template
+            var div = this.editor.document.createElement("div");
+            div.innerHTML = this.options("template");
+            this._wrapper = div.childNodes[0];
+            this._wrapper.classList.add("ice-floatbar-wrapper");
+            this._wrapper.classList.add("ice-floatbar-position-top");
+            this._wrapper.addEventListener("click", this._handleThisClick);
+            this._element.contentDocument.body.appendChild(this._wrapper);
+
+            // append all sylesheets to iframe
+            for (var i = 0; i < document.styleSheets.length; i++) {
+                var style = document.styleSheets[i].ownerNode.cloneNode();
+                this._element.contentDocument.head.appendChild(style);
+            }
+
+            // hide not allowed format blocks
+            this.wrapper.querySelectorAll('[data-ice-method="formatBlock"][data-ice-argument]').forEach(function(node) {
+                if (this.editor.options("allowedBlocks").indexOf(node.getAttribute("data-ice-argument")) === -1) {
+                    node.style.display = "none";
+                }
+            }.bind(this));
+
+            // @todo - font family list
+
+            // define ui (decoration nodes)
+            this._ui = {};
+            this.wrapper.querySelectorAll("[data-ice-decoration]").forEach(function(node) {
+                var attr = node.getAttribute("data-ice-decoration");
+                if (!(attr in this._ui))
+                    this._ui[attr] = [];
+                this._ui[attr].push(node);
+
+                node.addEventListener("change", this._handleThisChange);
+            }.bind(this));
         },
 
         /**
@@ -208,6 +226,15 @@
          */
         get element() {
             return this._element;
+        },
+
+        /**
+         * Get this.wrapper object
+         *
+         * @return {Object}
+         */
+        get wrapper() {
+            return this._wrapper;
         },
 
         /**
@@ -244,7 +271,7 @@
          */
         hide: function() {
             this.element.classList.remove(this._className + "-show");
-            this.element.removeAttribute("data-ice-floatbar-view");
+            this.wrapper.removeAttribute("data-ice-floatbar-view");
         },
 
         /**
@@ -273,6 +300,9 @@
                 rect = range.getBoundingClientRect();
             }
 
+            //this.element.style.width = this.wrapper.scrollWidth + "px";
+            this.element.style.height = this.wrapper.scrollHeight + "px";
+
             var position = {
                 left: rect.left + rect.width / 2 - this.element.offsetWidth / 2,
                 top: rect.top - this.element.offsetHeight,
@@ -299,6 +329,9 @@
             this.element.classList.remove(this._className + "-position-top");
             this.element.classList.remove(this._className + "-position-bottom");
             this.element.classList.add(this._className + "-position-" + position.className);
+            this.wrapper.classList.remove(this._className + "-position-top");
+            this.wrapper.classList.remove(this._className + "-position-bottom");
+            this.wrapper.classList.add(this._className + "-position-" + position.className);
         },
 
         /**
@@ -322,28 +355,6 @@
         },
 
         /**
-         * Floatbar mousedown event handler:
-         * prevent default so editor text does
-         * not get unselected
-         *
-         * @param  {Object} e
-         * @return {Void}
-         */
-        _handleMousedown: function(e) {
-            // click on allowed element
-            if (ice.Util.closest(e.target, "[data-ice-method],[data-ice-toggle-view],[data-ice-can-mouse-down]"))
-                return;
-
-            // we're gonna prevent default, so
-            // unfocus active element (if active
-            // element is child of floatbar)
-            if (ice.Util.closest(this.editor.document.activeElement, ".ice-floatbar") === this.editor.floatbar.element)
-                this.editor.document.activeElement.blur();
-
-            e.preventDefault();
-        },
-
-        /**
          * Floatbar click event handler:
          * toggle view or execute editor method
          *
@@ -354,29 +365,32 @@
             var node = ice.Util.closest(e.target, "[data-ice-toggle-view]");
             if (node) {
                 var attr = node.getAttribute("data-ice-toggle-view");
-                var value = this.element.getAttribute("data-ice-floatbar-view");
+                var value = this.wrapper.getAttribute("data-ice-floatbar-view");
 
                 if (value === attr)
-                    this.element.removeAttribute("data-ice-floatbar-view");
+                    this.wrapper.removeAttribute("data-ice-floatbar-view");
                 else
-                    this.element.setAttribute("data-ice-floatbar-view", attr);
+                    this.wrapper.setAttribute("data-ice-floatbar-view", attr);
 
                 this._reposition();
             }
 
             var node = ice.Util.closest(e.target, "[data-ice-method]");
             if (node) {
-                var method = node.getAttribute("data-ice-decoration");
+                var method = node.getAttribute("data-ice-method");
                 var args = node.getAttribute("data-ice-argument");
 
-                this.editor[method].apply(this.editor, args ? [ args ] : []);
+                if (typeof this.editor[method] === "function")
+                    this.editor[method].apply(this.editor, args ? [ args ] : []);
             }
 
-            e.preventDefault();
+            // prevent default on anchor tag click
+            if (ice.Util.closest(e.target, "a"))
+                e.preventDefault();
         },
 
         /**
-         * Floatbar blur event handler:
+         * Floatbar change event handler:
          * execute editor method
          *
          * @param  {Object} e
@@ -387,36 +401,8 @@
             var method = node.getAttribute("data-ice-decoration");;
             var args = node.value;
 
-            // using timeout 'cuz we need to wait
-            // for selection to return to editor
-            setTimeout(function() {
+            if (typeof this.editor[method] === "function")
                 this.editor[method].apply(this.editor, args ? [ args ] : []);
-            }.bind(this));
-        },
-
-        /**
-         * Floatbar blur event handler:
-         * set editor last selection
-         *
-         * @param  {Object} e
-         * @return {Void}
-         */
-        _handleBlur: function(e) {
-            console.log("_handleBlur");
-            if (this.editor.document.activeElement === this.editor.element)
-                return;
-
-            var last = this._lastSelectionRange;
-            var range = document.createRange();
-            var select = window.getSelection();
-
-            range.setStart(last.startContainer, last.startOffset);
-            range.setEnd(last.endContainer, last.endOffset);
-
-            select.removeAllRanges();
-            select.addRange(range);
-
-            this.editor.element.focus();
         }
 
     }
@@ -481,8 +467,6 @@
         e.detail.editor.floatbar._reposition(e.detail.rect);
         e.detail.editor.floatbar._setDecorations(e.detail.decorations);
         e.detail.editor.floatbar.show();
-
-        e.detail.editor.floatbar._lastSelectionRange = e.detail.range;
     });
 
     // window select event
