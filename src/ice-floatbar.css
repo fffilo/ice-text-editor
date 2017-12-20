@@ -1,5 +1,5 @@
 /* display and position */
-.ice-floatbar { position: absolute; display: block; visibility: hidden; top: 0; left: 0; width: 16em; margin: 0; padding: 0; z-index: 1000; border: 0; box-sizing: border-box; }
+.ice-floatbar { position: absolute; display: block; visibility: hidden; top: -2em; left: calc(50% - 8em); width: 16em; margin: 0; padding: 0; z-index: 1000; border: 0; box-sizing: border-box; transition: top .4s, left .4s; }
 .ice-floatbar * { box-sizing: border-box; }
 .ice-floatbar.ice-floatbar-show { visibility: visible; }
 
