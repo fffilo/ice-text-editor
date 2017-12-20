@@ -79,7 +79,7 @@
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown font">'
-                + '<p><input type="text" title="Font Size" placeholder="Font Size" value="" data-ice-decoration="fontSize" /></p>'
+                + '<p><input type="range" title="Font Size" placeholder="Font Size" value="" min="6" max="128" data-ice-suffix="px" data-ice-decoration="fontSize" /><span title="Font Size" data-ice-decoration="fontSize"></span></p>'
                 + '<ul class="ice-floatbar-list">'
                 + '<li><a href="#" title="Arial, Helvetica, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;Arial, Helvetica, sans-serif&quot;]">Arial, Helvetica, sans-serif</a></li>'
                 + '<li><a href="#" title="&quot;Arial Black&quot;, Gadget, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;&bsol;&quot;Arial Black&bsol;&quot;, Gadget, sans-serif&quot;]">&quot;Arial Black&quot;, Gadget, sans-serif</a></li>'
@@ -391,8 +391,21 @@
                 this._ui[decor].forEach(function(node) {
                     node.setAttribute("data-ice-status", decorations ? decorations[decor] : null);
 
-                    if (typeof node.value === "string")
-                        node.value = decorations ? decorations[decor] : null;
+                    // input node
+                    if (typeof node.value === "string") {
+                        var value = decorations ? decorations[decor] : null;
+                        if (value && ["number", "range"].indexOf(node.type) !== -1) {
+                            var match = value.match(/(\d+(\.\d+)?)(\w+)?/);
+                            var number = parseFloat(match[1]);
+                            var unit = match[2] || "";
+
+                            if (unit)
+                                node.setAttribute("data-ice-suffix", unit);
+                            node.value = number;
+                        }
+                        else
+                            node.value = value;
+                    }
                 });
             }
         },
@@ -433,10 +446,18 @@
         _handleChange: function(e) {
             var node = e.target;
             var method = node.getAttribute("data-ice-decoration");;
-            var args = node.value;
 
-            if (typeof this.editor[method] === "function")
-                this.editor[method].apply(this.editor, args ? [ args ] : []);
+            if (typeof this.editor[method] !== "function")
+                return;
+
+            var value = node.value;
+            if (value) {
+                value = (node.getAttribute("data-ice-prefix") || "") + value;
+                value += node.getAttribute("data-ice-suffix") || "";
+                value = [ value ];
+            }
+
+            this.editor[method].apply(this.editor, value || []);
         }
 
     }

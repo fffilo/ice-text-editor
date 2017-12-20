@@ -303,7 +303,7 @@
             var result = this._execCommandStyleWithCSS("fontSize", value);
 
             // set real units (browser uses 1-7)
-            if (result)
+            if (result && isNaN(value*1))
                 ice.Util.getSelectedNodes(".ice-editor [style*=font-size]").forEach(function(node) {
                     node.style.fontSize = value;
                 });
