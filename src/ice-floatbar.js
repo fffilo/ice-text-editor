@@ -60,7 +60,7 @@
                 + '<li><a class="font" href="#" title="Font" data-ice-toggle-view="font"><i class="fa fa-font"></i></a></li>'
                 + '<li><a class="align" href="#" title="Text Align" data-ice-toggle-view="align"><i class="fa fa-align-center"></i></a></li>'
                 + '<li><a class="link" href="#" title="Link" data-ice-toggle-view="link"><i class="fa fa-link"></i></a></li>'
-                + '<li><a class="color" href="#" title="Foreground Color" data-ice-toggle-view="color"><i class="fa fa-circle"></i></a></li>'
+                + '<li><a class="color" href="#" title="Color" data-ice-toggle-view="color"><i class="fa fa-circle"></i></a></li>'
                 + '</ul>'
                 + '</nav>'
                 + '<article class="ice-floatbar-dropdown format-block">'
@@ -106,7 +106,7 @@
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown link">'
                 + '<p><input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-decoration="linkURL" /></p>'
-                + '<p><label>Show in New Tab</label><label class="switch"><input type="checkbox" /><span class="slider round"></span></label></p>'
+                + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" /><span></span></label></p>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown color">'
                 + '<p><input type="text" title="Foreground Color" placeholder="Foreground Color" value="" data-ice-decoration="foreColor" /></p>'
@@ -392,6 +392,11 @@
         /**
          * Floatbar change event handler:
          * execute editor method
+         *
+         * Event is binded on every noda that
+         * has data-ice-decoration attribute.
+         * It will be triggered only for
+         * input/textarea/select nodes.
          *
          * @param  {Object} e
          * @return {Void}

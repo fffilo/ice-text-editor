@@ -196,8 +196,8 @@
             for (node = startContainer; node; node = ice.Util.nextNode(node)) {
                 if (!ice.Util.closest(node.parentNode, commonAncestor))
                     break;
-
-                result.push(node);
+                if (result.indexOf(node) === -1)
+                    result.push(node);
                 if (node == endContainer)
                     break;
             }

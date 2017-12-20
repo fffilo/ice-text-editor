@@ -6,7 +6,7 @@
 /* reset */
 .ice-floatbar-html,
 .ice-floatbar-body,
-.ice-floatbar-wrapper { position: relative; margin: 0; padding: 0; overflow: hidden; box-sizing: border-box; background: transparent; }
+.ice-floatbar-wrapper { position: relative; margin: 0; padding: 0; overflow: hidden; box-sizing: border-box; background: transparent; -moz-user-select: none; -ms-user-select: none; user-select: none; }
 .ice-floatbar-wrapper article,
 .ice-floatbar-wrapper nav,
 .ice-floatbar-wrapper ul,
@@ -19,9 +19,9 @@
 .ice-floatbar-wrapper p:not(:first-child) { padding-top: 0.25em; }
 .ice-floatbar-wrapper p:not(:last-child) { padding-bottom: 0.25em; }
 .ice-floatbar-wrapper a { display: block; height: 2em; line-height: 2em; font-weight: normal; outline: 0 none; color: inherit; text-decoration: none; }
-.ice-floatbar-wrapper a:hover { color: #478bfb; }
+.ice-floatbar-wrapper a:hover { color: #2196f3; }
 .ice-floatbar-wrapper input[type="text"] { width: 100%; line-height: 2; font-size: 0.8em; }
-.ice-floatbar-wrapper label { line-height: 2; font-size: 0.8em; }
+.ice-floatbar-wrapper label { line-height: 2; font-size: 0.8em; vertical-align: middle; }
 .ice-floatbar-wrapper .fa { line-height: inherit; }
 
 /* display content */
@@ -40,16 +40,14 @@
 .ice-floatbar-wrapper ul.ice-floatbar-list li { display: block; flex: initial; }
 .ice-floatbar-wrapper ul.ice-floatbar-list a { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* switch * /
-.switch { position: relative; display: inline-block; width: 4em; height: 2em; }
-.switch input { display: none; }
-.switch .slider { position: absolute; cursor: pointer; top: 0; right: 0; bottom: 0; left: 0; background-color: #ccc; transition: .4s; }
-.switch .slider::before { content: ""; position: absolute; height: 26px; width: 26px; bottom: 4px; left: 4px;  background-color: white; transition: .4s; }
-.switch input:checked + .switch .slider { background-color: #2196F3; }
-.switch input:focus + .switch .slider { box-shadow: 0 0 1px #2196F3; }
-.switch input:checked + .switch .slider::before { transform: translateX(26px); }
-.switch .slider.round { border-radius: 34px; }
-.switch .slider.round::before { border-radius: 50%; }
+/* switch */
+.ice-floatbar-switch { position: relative; display: inline-block; float: right; width: 4em; height: 2em; }
+.ice-floatbar-switch input { display: none; }
+.ice-floatbar-switch span { position: absolute; cursor: pointer; top: 0; right: 0; bottom: 0; left: 0; background-color: #ccc; transition: .4s; border-radius: 1em; }
+.ice-floatbar-switch span::before { content: ""; position: absolute; width: 1.5em; height: 1.5em; bottom: 0.25em; left: 0.25em; background-color: #fff; border-radius: 50%; transition: .4s; }
+.ice-floatbar-switch input:focus + span { box-shadow: 0 0 1px #2196f3; }
+.ice-floatbar-switch input:checked + span { background-color: #2196f3; }
+.ice-floatbar-switch input:checked + span::before { transform: translateX(2em); }
 
 /* main navigation */
 .ice-floatbar-wrapper .ice-floatbar-nav { display: block; margin: 0; padding: 0; }
@@ -82,7 +80,7 @@
 .ice-floatbar-wrapper [data-ice-decoration="align"][data-ice-argument="left"][data-ice-status="left"],
 .ice-floatbar-wrapper [data-ice-decoration="align"][data-ice-argument="center"][data-ice-status="center"],
 .ice-floatbar-wrapper [data-ice-decoration="align"][data-ice-argument="right"][data-ice-status="right"],
-.ice-floatbar-wrapper [data-ice-decoration="align"][data-ice-argument="justify"][data-ice-status="justify"] { color: #478bfb; }
+.ice-floatbar-wrapper [data-ice-decoration="align"][data-ice-argument="justify"][data-ice-status="justify"] { color: #2196f3; }
 
 /* font-awesome fallback * /
 .fa { display: inline-block; font-family: "Times New Roman", Times, serif; font-style: normal; text-decoration: none; }
