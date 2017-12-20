@@ -667,8 +667,9 @@
                 //foreColor: doc.queryCommandValue("foreColor"),
                 //hiliteColor: doc.queryCommandValue("backColor"),
                 italic: doc.queryCommandState("italic"),
-                linkURL: undefined,
-                linkTarget: undefined,
+                //linkURL: null,
+                //linkTarget: null,
+                linkCount: 0,
                 strikeThrough: doc.queryCommandState("strikeThrough"),
                 subscript: doc.queryCommandState("subscript"),
                 superscript: doc.queryCommandState("superscript"),
@@ -736,9 +737,26 @@
 
                 result.hiliteColor = result.backColor;
 
-                // @todo
-                //      - linkURL
-                //      - linkTarget
+                var link = ice.Util.closest(node[i], "a");
+                if (link) {
+                    var href = link.href;
+                    var target = link.target || "_self";
+                    result.linkCount += 1;
+
+                    if (!("linkURL" in result))
+                        result.linkURL = href;
+                    else if (result.linkURL !== href)
+                        result.linkURL = null;
+
+                    if (!("linkTarget" in result))
+                        result.linkTarget = target;
+                    else if (result.linkTarget !== target)
+                        result.linkTarget = null;
+                }
+                else {
+                    result.linkURL = null;
+                    result.linkTarget = null;
+                }
             }
 
             return result;

@@ -54,59 +54,59 @@
                 + '<div class="ice-floatbar-content">'
                 + '<nav class="ice-floatbar-nav">'
                 + '<ul>'
-                + '<li><a class="format-block" href="#" title="Format Block" data-ice-toggle-view="format-block"><i class="fa fa-code"></i></a></li>'
-                + '<li><a class="bold" href="#" title="Bold" data-ice-method="bold" data-ice-decoration="bold"><i class="fa fa-bold"></i></a></li>'
-                + '<li><a class="italic" href="#" title="Italic" data-ice-method="italic" data-ice-decoration="italic"><i class="fa fa-italic"></i></a></li>'
-                + '<li><a class="font" href="#" title="Font" data-ice-toggle-view="font"><i class="fa fa-font"></i></a></li>'
-                + '<li><a class="align" href="#" title="Text Align" data-ice-toggle-view="align"><i class="fa fa-align-center"></i></a></li>'
-                + '<li><a class="link" href="#" title="Link" data-ice-toggle-view="link"><i class="fa fa-link"></i></a></li>'
-                + '<li><a class="color" href="#" title="Color" data-ice-toggle-view="color"><i class="fa fa-circle"></i></a></li>'
+                + '<li><a class="format-block" href="#" title="Format Block" data-ice-method="toggle" data-ice-args="[&quot;format-block&quot;]"><i class="fa fa-code"></i></a></li>'
+                + '<li><a class="bold" href="#" title="Bold" data-ice-method="exec" data-ice-args="[&quot;bold&quot;]" data-ice-decoration="bold"><i class="fa fa-bold"></i></a></li>'
+                + '<li><a class="italic" href="#" title="Italic" data-ice-method="exec" data-ice-args="[&quot;italic&quot;]" data-ice-decoration="italic"><i class="fa fa-italic"></i></a></li>'
+                + '<li><a class="font" href="#" title="Font" data-ice-method="toggle" data-ice-args="[&quot;font&quot;]"><i class="fa fa-font"></i></a></li>'
+                + '<li><a class="align" href="#" title="Text Align" data-ice-method="toggle" data-ice-args="[&quot;align&quot;]" ><i class="fa fa-align-center"></i></a></li>'
+                + '<li><a class="link" href="#" title="Link" data-ice-method="toggle" data-ice-args="[&quot;link&quot;]" data-ice-decoration="linkCount"><i class="fa fa-link"></i></a></li>'
+                + '<li><a class="color" href="#" title="Color" data-ice-method="toggle" data-ice-args="[&quot;color&quot;]" ><i class="fa fa-circle"></i></a></li>'
                 + '</ul>'
                 + '</nav>'
                 + '<article class="ice-floatbar-dropdown format-block">'
                 + '<ul class="ice-floatbar-list">'
-                + '<li><a href="#" title="Headline 1" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="h1">Headline 1</a></li>'
-                + '<li><a href="#" title="Headline 2" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="h2">Headline 2</a></li>'
-                + '<li><a href="#" title="Headline 3" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="h3">Headline 3</a></li>'
-                + '<li><a href="#" title="Headline 4" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="h4">Headline 4</a></li>'
-                + '<li><a href="#" title="Headline 5" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="h5">Headline 5</a></li>'
-                + '<li><a href="#" title="Headline 6" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="h6">Headline 6</a></li>'
-                + '<li><a href="#" title="Paragraph" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="p">Paragraph</a></li>'
-                + '<li><a href="#" title="Code" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="pre">Code</a></li>'
-                + '<li><a href="#" title="Quote" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="blockquote">Quote</a></li>'
-                + '<li><a href="#" title="Ordered List" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="ol">Ordered List</a></li>'
-                + '<li><a href="#" title="Unordered List" data-ice-method="formatBlock" data-ice-decoration="formatBlock" data-ice-argument="ul">Unordered List</a></li>'
+                + '<li><a href="#" title="Headline 1" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h1&quot;]" data-ice-decoration="formatBlock">Headline 1</a></li>'
+                + '<li><a href="#" title="Headline 2" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h2&quot;]" data-ice-decoration="formatBlock">Headline 2</a></li>'
+                + '<li><a href="#" title="Headline 3" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h3&quot;]" data-ice-decoration="formatBlock">Headline 3</a></li>'
+                + '<li><a href="#" title="Headline 4" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h4&quot;]" data-ice-decoration="formatBlock">Headline 4</a></li>'
+                + '<li><a href="#" title="Headline 5" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h5&quot;]" data-ice-decoration="formatBlock">Headline 5</a></li>'
+                + '<li><a href="#" title="Headline 6" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h6&quot;]" data-ice-decoration="formatBlock">Headline 6</a></li>'
+                + '<li><a href="#" title="Paragraph" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;p&quot;]" data-ice-decoration="formatBlock">Paragraph</a></li>'
+                + '<li><a href="#" title="Code" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;pre&quot;]" data-ice-decoration="formatBlock">Code</a></li>'
+                + '<li><a href="#" title="Quote" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;blockquote&quot;]" data-ice-decoration="formatBlock">Quote</a></li>'
+                + '<li><a href="#" title="Ordered List" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;ol&quot;]" data-ice-decoration="formatBlock">Ordered List</a></li>'
+                + '<li><a href="#" title="Unordered List" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;ul&quot;]" data-ice-decoration="formatBlock">Unordered List</a></li>'
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown font">'
                 + '<p><input type="text" title="Font Size" placeholder="Font Size" value="" data-ice-decoration="fontSize" /></p>'
                 + '<ul class="ice-floatbar-list">'
-                + '<li><a href="#" title="Arial, Helvetica, sans-serif" data-ice-method="fontName" data-ice-argument="Arial, Helvetica, sans-serif">Arial, Helvetica, sans-serif</a></li>'
-                + '<li><a href="#" title="&quot;Arial Black&quot;, Gadget, sans-serif" data-ice-method="fontName" data-ice-argument="&quot;Arial Black&quot;, Gadget, sans-serif">&quot;Arial Black&quot;, Gadget, sans-serif</a></li>'
-                + '<li><a href="#" title="&quot;Comic Sans MS&quot;, cursive, sans-serif" data-ice-method="fontName" data-ice-argument="&quot;Comic Sans MS&quot;, cursive, sans-serif">&quot;Comic Sans MS&quot;, cursive, sans-serif</a></li>'
-                + '<li><a href="#" title="&quot;Courier New&quot;, Courier, monospace" data-ice-method="fontName" data-ice-argument="&quot;Courier New&quot;, Courier, monospace">&quot;Courier New&quot;, Courier, monospace</a></li>'
-                + '<li><a href="#" title="Georgia, serif" data-ice-method="fontName" data-ice-argument="Georgia, serif">Georgia, serif</a></li>'
-                + '<li><a href="#" title="Impact, Charcoal, sans-serif" data-ice-method="fontName" data-ice-argument="Impact, Charcoal, sans-serif">Impact, Charcoal, sans-serif</a></li>'
-                + '<li><a href="#" title="&quot;Lucida Console&quot;, Monaco, monospace" data-ice-method="fontName" data-ice-argument="&quot;Lucida Console&quot;, Monaco, monospace">&quot;Lucida Console&quot;, Monaco, monospace</a></li>'
-                + '<li><a href="#" title="&quot;Lucida Sans Unicode&quot;, &quot;Lucida Grande&quot;, sans-serif" data-ice-method="fontName" data-ice-argument="&quot;Lucida Sans Unicode&quot;, &quot;Lucida Grande&quot;, sans-serif">&quot;Lucida Sans Unicode&quot;, &quot;Lucida Grande&quot;, sans-serif</a></li>'
-                + '<li><a href="#" title="&quot;Palatino Linotype&quot;, &quot;Book Antiqua&quot;, Palatino, serif" data-ice-method="fontName" data-ice-argument="&quot;Palatino Linotype&quot;, &quot;Book Antiqua&quot;, Palatino, serif">&quot;Palatino Linotype&quot;, &quot;Book Antiqua&quot;, Palatino, serif</a></li>'
-                + '<li><a href="#" title="Tahoma, Geneva, sans-serif" data-ice-method="fontName" data-ice-argument="Tahoma, Geneva, sans-serif">Tahoma, Geneva, sans-serif</a></li>'
-                + '<li><a href="#" title="&quot;Times New Roman&quot;, Times, serif" data-ice-method="fontName" data-ice-argument="&quot;Times New Roman&quot;, Times, serif">&quot;Times New Roman&quot;, Times, serif</a></li>'
-                + '<li><a href="#" title="&quot;Trebuchet MS&quot;, Helvetica, sans-serif" data-ice-method="fontName" data-ice-argument="&quot;Trebuchet MS&quot;, Helvetica, sans-serif">&quot;Trebuchet MS&quot;, Helvetica, sans-serif</a></li>'
-                + '<li><a href="#" title="Verdana, Geneva, sans-serif" data-ice-method="fontName" data-ice-argument="Verdana, Geneva, sans-serif">Verdana, Geneva, sans-serif</a></li>'
+                + '<li><a href="#" title="Arial, Helvetica, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;Arial, Helvetica, sans-serif&quot;]">Arial, Helvetica, sans-serif</a></li>'
+                + '<li><a href="#" title="&quot;Arial Black&quot;, Gadget, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;&bsol;&quot;Arial Black&bsol;&quot;, Gadget, sans-serif&quot;]">&quot;Arial Black&quot;, Gadget, sans-serif</a></li>'
+                + '<li><a href="#" title="&quot;Comic Sans MS&quot;, cursive, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;&bsol;&quot;Comic Sans MS&bsol;&quot;, cursive, sans-serif&quot;]">&quot;Comic Sans MS&quot;, cursive, sans-serif</a></li>'
+                + '<li><a href="#" title="&quot;Courier New&quot;, Courier, monospace" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;&bsol;&quot;Courier New&bsol;&quot;, Courier, monospace&quot;]">&quot;Courier New&quot;, Courier, monospace</a></li>'
+                + '<li><a href="#" title="Georgia, serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;Georgia, serif&quot;]">Georgia, serif</a></li>'
+                + '<li><a href="#" title="Impact, Charcoal, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;Impact, Charcoal, sans-serif&quot;]">Impact, Charcoal, sans-serif</a></li>'
+                + '<li><a href="#" title="&quot;Lucida Console&quot;, Monaco, monospace" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;&bsol;&quot;Lucida Console&bsol;&quot;, Monaco, monospace&quot;]">&quot;Lucida Console&quot;, Monaco, monospace</a></li>'
+                + '<li><a href="#" title="&quot;Lucida Sans Unicode&quot;, &quot;Lucida Grande&quot;, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;&bsol;&quot;Lucida Sans Unicode&bsol;&quot;, &bsol;&quot;Lucida Grande&bsol;&quot;, sans-serif&quot;]">&quot;Lucida Sans Unicode&quot;, &quot;Lucida Grande&quot;, sans-serif</a></li>'
+                + '<li><a href="#" title="&quot;Palatino Linotype&quot;, &quot;Book Antiqua&quot;, Palatino, serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;&bsol;&quot;Palatino Linotype&bsol;&quot;, &bsol;&quot;Book Antiqua&bsol;&quot;, Palatino, serif&quot;]">&quot;Palatino Linotype&quot;, &quot;Book Antiqua&quot;, Palatino, serif</a></li>'
+                + '<li><a href="#" title="Tahoma, Geneva, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;Tahoma, Geneva, sans-serif&quot;]">Tahoma, Geneva, sans-serif</a></li>'
+                + '<li><a href="#" title="&quot;Times New Roman&quot;, Times, serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;&bsol;&quot;Times New Roman&bsol;&quot;, Times, serif&quot;]">&quot;Times New Roman&quot;, Times, serif</a></li>'
+                + '<li><a href="#" title="&quot;Trebuchet MS&quot;, Helvetica, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;&bsol;&quot;Trebuchet MS&bsol;&quot;, Helvetica, sans-serif&quot;]">&quot;Trebuchet MS&quot;, Helvetica, sans-serif</a></li>'
+                + '<li><a href="#" title="Verdana, Geneva, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;Verdana, Geneva, sans-serif&quot;]">Verdana, Geneva, sans-serif</a></li>'
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown align">'
                 + '<ul>'
-                + '<li><a class="align-left" href="#" title="Text Align Left" data-ice-method="align" data-ice-decoration="align" data-ice-argument="left"><i class="fa fa-align-left"></i></a></li>'
-                + '<li><a class="align-center" href="#" title="Text Align Center" data-ice-method="align" data-ice-decoration="align" data-ice-argument="center"><i class="fa fa-align-center"></i></a></li>'
-                + '<li><a class="align-right" href="#" title="Text Align Right" data-ice-method="align" data-ice-decoration="align" data-ice-argument="right"><i class="fa fa-align-right"></i></a></li>'
-                + '<li><a class="align-justify" href="#" title="Text Align Justify" data-ice-method="align" data-ice-decoration="align" data-ice-argument="justify"><i class="fa fa-align-justify"></i></a></li>'
+                + '<li><a class="align-left" href="#" title="Text Align Left" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;left&quot;]" data-ice-decoration="align"><i class="fa fa-align-left"></i></a></li>'
+                + '<li><a class="align-center" href="#" title="Text Align Center" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;center&quot;]" data-ice-decoration="align"><i class="fa fa-align-center"></i></a></li>'
+                + '<li><a class="align-right" href="#" title="Text Align Right" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;right&quot;]" data-ice-decoration="align"><i class="fa fa-align-right"></i></a></li>'
+                + '<li><a class="align-justify" href="#" title="Text Align Justify" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;justify&quot;]" data-ice-decoration="align"><i class="fa fa-align-justify"></i></a></li>'
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown link">'
                 + '<p><input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-decoration="linkURL" /></p>'
-                + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" /><span></span></label></p>'
+                + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" checked="checked" /><span></span></label></p>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown color">'
                 + '<p><input type="text" title="Foreground Color" placeholder="Foreground Color" value="" data-ice-decoration="foreColor" /></p>'
@@ -140,7 +140,7 @@
 
             // create
             this._element = this.editor.document.createElement("iframe");
-            this._element.classList.add("ice-floatbar");
+            this._element.classList.add(this._className);
             this._element.onload = this._load.bind(this);
             this.editor.document.body.appendChild(this._element);
         },
@@ -167,8 +167,8 @@
          * @return {Void}
          */
         _load: function() {
-            this._element.contentDocument.documentElement.classList.add("ice-floatbar-html");
-            this._element.contentDocument.body.classList.add("ice-floatbar-body");
+            this._element.contentDocument.documentElement.classList.add(this._className + "-html");
+            this._element.contentDocument.body.classList.add(this._className + "-body");
 
             // bind handles with this
             this._handleThisClick = this._handleClick.bind(this);
@@ -178,8 +178,8 @@
             var div = this.editor.document.createElement("div");
             div.innerHTML = this.options("template");
             this._wrapper = div.childNodes[0];
-            this._wrapper.classList.add("ice-floatbar-wrapper");
-            this._wrapper.classList.add("ice-floatbar-position-top");
+            this._wrapper.classList.add(this._className + "-wrapper");
+            this._wrapper.classList.add(this._className + "-position-top");
             this._wrapper.addEventListener("click", this._handleThisClick);
             this._element.contentDocument.body.appendChild(this._wrapper);
 
@@ -271,7 +271,7 @@
          */
         hide: function() {
             this.element.classList.remove(this._className + "-show");
-            this.wrapper.removeAttribute("data-ice-floatbar-view");
+            this.wrapper.removeAttribute("data-" + this._className + "-dropdown");
         },
 
         /**
@@ -282,6 +282,49 @@
         refresh: function() {
             this._reposition();
             this._setDecorations();
+        },
+
+        /**
+         * Get or set current dropdown
+         *
+         * @param  {String} value
+         * @return {Mixed}
+         */
+        dropdown: function(value) {
+            if (typeof value === "undefined")
+                return this.wrapper.getAttribute("data-" + this._className + "-dropdown");
+
+            if (value)
+                this.wrapper.setAttribute("data-" + this._className + "-dropdown", value);
+            else
+                this.wrapper.removeAttribute("data-" + this._className + "-dropdown");
+        },
+
+        /**
+         * Toggle current dropdown
+         *
+         * @param  {String} value
+         * @return {Void}
+         */
+        toggle: function(value) {
+            if (this.dropdown() === value)
+                this.dropdown(null);
+            else
+                this.dropdown(value);
+
+            this._reposition();
+        },
+
+        /**
+         * Execute ice-editor method
+         * note: you can pass additional arguments
+         *
+         * @param  {String} method
+         * @return {Mixed}
+         */
+        exec: function(method) {
+            if (typeof this.editor[method] === "function")
+                this.editor[method].apply(this.editor, Array.prototype.slice.call(arguments, 1));
         },
 
         /**
@@ -362,31 +405,17 @@
          * @return {Void}
          */
         _handleClick: function(e) {
-            var node = ice.Util.closest(e.target, "[data-ice-toggle-view]");
-            if (node) {
-                var attr = node.getAttribute("data-ice-toggle-view");
-                var value = this.wrapper.getAttribute("data-ice-floatbar-view");
-
-                if (value === attr)
-                    this.wrapper.removeAttribute("data-ice-floatbar-view");
-                else
-                    this.wrapper.setAttribute("data-ice-floatbar-view", attr);
-
-                this._reposition();
-            }
+            if (ice.Util.closest(e.target, "a"))
+                e.preventDefault();
 
             var node = ice.Util.closest(e.target, "[data-ice-method]");
             if (node) {
                 var method = node.getAttribute("data-ice-method");
-                var args = node.getAttribute("data-ice-argument");
+                var args = JSON.parse(node.getAttribute("data-ice-args"));
 
-                if (typeof this.editor[method] === "function")
-                    this.editor[method].apply(this.editor, args ? [ args ] : []);
+                if (typeof this[method] === "function")
+                    this[method].apply(this, args);
             }
-
-            // prevent default on anchor tag click
-            if (ice.Util.closest(e.target, "a"))
-                e.preventDefault();
         },
 
         /**
@@ -459,7 +488,7 @@
     // document unselect event
     document.addEventListener("iceunselect", function(e) {
         if (e.detail.editor.floatbar) {
-            if (!ice.Util.closest(e.detail.editor.document.activeElement, ".ice-floatbar"))
+            if (!ice.Util.closest(e.detail.editor.document.activeElement, "." + ice.Floatbar.prototype._className))
                 e.detail.editor.floatbar.hide();
         }
     });
