@@ -304,7 +304,7 @@
 
             // set real units (browser uses 1-7)
             if (result && isNaN(value*1))
-                ice.Util.getSelectedNodes(".ice-editor [style*=font-size]").forEach(function(node) {
+                ice.Util.getSelectedNodes("." + this._className + " [style*=font-size]").forEach(function(node) {
                     node.style.fontSize = value;
                 });
 
@@ -454,12 +454,29 @@
             if (!this.active)
                 return false;
 
+            // use value from decorations
+            var decoration = this.decorations();
+            if (value === null)
+                value = decoration.linkURL;
+            if (value === null)
+                return false;
+
+            // replace null target with current one,
+            // false opens in same window, true
+            // opens in new tab
+            if (target === null)
+                target = decoration.linkTarget;
+            else if (target === false)
+                target = "_self";
+            else if (target === true)
+                target = "_blank";
+
             this._skipDispatch = true;
             var result = this._execCommand("createLink", value);
 
             // add target attribute to a tag
             if (result && target) {
-                ice.Util.getSelectedNodes(".ice-editor a").forEach(function(node) {
+                ice.Util.getSelectedNodes("." + this._className + " a").forEach(function(node) {
                     node.setAttribute("target", target);
                 });
             }
@@ -572,10 +589,10 @@
             var result;
 
             // toggle list elements
-            while (ice.Util.getSelectedNodes(".ice-editor ol").length) {
+            while (ice.Util.getSelectedNodes("." + this._className + " ol").length) {
                 this._execCommand("insertOrderedList");
             }
-            while (ice.Util.getSelectedNodes(".ice-editor ul").length) {
+            while (ice.Util.getSelectedNodes("." + this._className + " ul").length) {
                 this._execCommand("insertUnorderedList");
             }
 
@@ -600,7 +617,7 @@
             // want list element to act as block we're
             // gonna unwrap it
             if (result && ["ol", "ul"].indexOf(value) !== -1) {
-                ice.Util.getSelectedNodes(".ice-editor p > ol, .ice-editor p > ul").forEach(function(node) {
+                ice.Util.getSelectedNodes("." + this._className + " p > ol, ." + this._className + " p > ul").forEach(function(node) {
                     ice.Util.saveSelectionRange();
                     ice.Util.unwrapNode(node);
                     ice.Util.restoreSelectionRange();
@@ -739,7 +756,7 @@
 
                 var link = ice.Util.closest(node[i], "a");
                 if (link) {
-                    var href = link.href;
+                    var href = link.getAttribute("href");
                     var target = link.target || "_self";
                     result.linkCount += 1;
 

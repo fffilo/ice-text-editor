@@ -54,32 +54,35 @@
                 + '<div class="ice-floatbar-content">'
                 + '<nav class="ice-floatbar-nav">'
                 + '<ul>'
-                + '<li><a class="format-block" href="#" title="Format Block" data-ice-method="toggle" data-ice-args="[&quot;format-block&quot;]"><i class="fa fa-code"></i></a></li>'
-                + '<li><a class="bold" href="#" title="Bold" data-ice-method="exec" data-ice-args="[&quot;bold&quot;]" data-ice-decoration="bold"><i class="fa fa-bold"></i></a></li>'
-                + '<li><a class="italic" href="#" title="Italic" data-ice-method="exec" data-ice-args="[&quot;italic&quot;]" data-ice-decoration="italic"><i class="fa fa-italic"></i></a></li>'
-                + '<li><a class="font" href="#" title="Font" data-ice-method="toggle" data-ice-args="[&quot;font&quot;]"><i class="fa fa-font"></i></a></li>'
-                + '<li><a class="align" href="#" title="Text Align" data-ice-method="toggle" data-ice-args="[&quot;align&quot;]" ><i class="fa fa-align-center"></i></a></li>'
-                + '<li><a class="link" href="#" title="Link" data-ice-method="toggle" data-ice-args="[&quot;link&quot;]" data-ice-decoration="linkCount"><i class="fa fa-link"></i></a></li>'
-                + '<li><a class="color" href="#" title="Color" data-ice-method="toggle" data-ice-args="[&quot;color&quot;]" ><i class="fa fa-circle"></i></a></li>'
+                + '<li><a href="#" title="Format Block" data-ice-method="toggle" data-ice-args="[&quot;format-block&quot;]"><i class="fa fa-code"></i></a></li>'
+                + '<li data-ice-decoration="bold"><a href="#" title="Bold" data-ice-method="exec" data-ice-args="[&quot;bold&quot;]"><i class="fa fa-bold"></i></a></li>'
+                + '<li data-ice-decoration="italic"><a href="#" title="Italic" data-ice-method="exec" data-ice-args="[&quot;italic&quot;]"><i class="fa fa-italic"></i></a></li>'
+                + '<li><a href="#" title="Font" data-ice-method="toggle" data-ice-args="[&quot;font&quot;]"><i class="fa fa-font"></i></a></li>'
+                + '<li><a href="#" title="Text Align" data-ice-method="toggle" data-ice-args="[&quot;align&quot;]" ><i class="fa fa-align-center"></i></a></li>'
+                + '<li data-ice-decoration="linkCount">'
+                + '<a href="#" title="Link" data-ice-method="toggle" data-ice-args="[&quot;link&quot;]"><i class="fa fa-link"></i></a>'
+                + '<a href="#" title="Unlink" data-ice-method="exec" data-ice-args="[&quot;unlink&quot;]"><i class="fa fa-link"></i></a>'
+                + '</li>'
+                + '<li><a href="#" title="Color" data-ice-method="toggle" data-ice-args="[&quot;color&quot;]" ><i class="fa fa-circle"></i></a></li>'
                 + '</ul>'
                 + '</nav>'
                 + '<article class="ice-floatbar-dropdown format-block">'
-                + '<ul class="ice-floatbar-list">'
-                + '<li><a href="#" title="Headline 1" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h1&quot;]" data-ice-decoration="formatBlock">Headline 1</a></li>'
-                + '<li><a href="#" title="Headline 2" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h2&quot;]" data-ice-decoration="formatBlock">Headline 2</a></li>'
-                + '<li><a href="#" title="Headline 3" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h3&quot;]" data-ice-decoration="formatBlock">Headline 3</a></li>'
-                + '<li><a href="#" title="Headline 4" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h4&quot;]" data-ice-decoration="formatBlock">Headline 4</a></li>'
-                + '<li><a href="#" title="Headline 5" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h5&quot;]" data-ice-decoration="formatBlock">Headline 5</a></li>'
-                + '<li><a href="#" title="Headline 6" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h6&quot;]" data-ice-decoration="formatBlock">Headline 6</a></li>'
-                + '<li><a href="#" title="Paragraph" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;p&quot;]" data-ice-decoration="formatBlock">Paragraph</a></li>'
-                + '<li><a href="#" title="Code" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;pre&quot;]" data-ice-decoration="formatBlock">Code</a></li>'
-                + '<li><a href="#" title="Quote" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;blockquote&quot;]" data-ice-decoration="formatBlock">Quote</a></li>'
-                + '<li><a href="#" title="Ordered List" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;ol&quot;]" data-ice-decoration="formatBlock">Ordered List</a></li>'
-                + '<li><a href="#" title="Unordered List" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;ul&quot;]" data-ice-decoration="formatBlock">Unordered List</a></li>'
+                + '<ul class="ice-floatbar-list" data-ice-decoration="formatBlock">'
+                + '<li><a href="#" title="Headline 1" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h1&quot;]">Headline 1</a></li>'
+                + '<li><a href="#" title="Headline 2" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h2&quot;]">Headline 2</a></li>'
+                + '<li><a href="#" title="Headline 3" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h3&quot;]">Headline 3</a></li>'
+                + '<li><a href="#" title="Headline 4" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h4&quot;]">Headline 4</a></li>'
+                + '<li><a href="#" title="Headline 5" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h5&quot;]">Headline 5</a></li>'
+                + '<li><a href="#" title="Headline 6" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h6&quot;]">Headline 6</a></li>'
+                + '<li><a href="#" title="Paragraph" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;p&quot;]">Paragraph</a></li>'
+                + '<li><a href="#" title="Code" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;pre&quot;]">Code</a></li>'
+                + '<li><a href="#" title="Quote" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;blockquote&quot;]">Quote</a></li>'
+                + '<li><a href="#" title="Ordered List" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;ol&quot;]">Ordered List</a></li>'
+                + '<li><a href="#" title="Unordered List" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;ul&quot;]">Unordered List</a></li>'
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown font">'
-                + '<p><input type="range" title="Font Size" placeholder="Font Size" value="" min="6" max="128" data-ice-suffix="px" data-ice-decoration="fontSize" /><span title="Font Size" data-ice-decoration="fontSize"></span></p>'
+                + '<p><input type="range" title="Font Size" placeholder="Font Size" value="" min="6" max="128" data-ice-suffix="px" data-ice-method="exec" data-ice-args="[&quot;fontSize&quot;,&quot;&dollar;value&quot;]" data-ice-decoration="fontSize" /><span title="Font Size" data-ice-decoration="fontSize"></span></p>'
                 + '<ul class="ice-floatbar-list">'
                 + '<li><a href="#" title="Arial, Helvetica, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;Arial, Helvetica, sans-serif&quot;]">Arial, Helvetica, sans-serif</a></li>'
                 + '<li><a href="#" title="&quot;Arial Black&quot;, Gadget, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;&bsol;&quot;Arial Black&bsol;&quot;, Gadget, sans-serif&quot;]">&quot;Arial Black&quot;, Gadget, sans-serif</a></li>'
@@ -97,20 +100,20 @@
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown align">'
-                + '<ul>'
-                + '<li><a class="align-left" href="#" title="Text Align Left" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;left&quot;]" data-ice-decoration="align"><i class="fa fa-align-left"></i></a></li>'
-                + '<li><a class="align-center" href="#" title="Text Align Center" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;center&quot;]" data-ice-decoration="align"><i class="fa fa-align-center"></i></a></li>'
-                + '<li><a class="align-right" href="#" title="Text Align Right" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;right&quot;]" data-ice-decoration="align"><i class="fa fa-align-right"></i></a></li>'
-                + '<li><a class="align-justify" href="#" title="Text Align Justify" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;justify&quot;]" data-ice-decoration="align"><i class="fa fa-align-justify"></i></a></li>'
+                + '<ul data-ice-decoration="align">'
+                + '<li><a class="align-left" href="#" title="Text Align Left" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;left&quot;]"><i class="fa fa-align-left"></i></a></li>'
+                + '<li><a class="align-center" href="#" title="Text Align Center" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;center&quot;]"><i class="fa fa-align-center"></i></a></li>'
+                + '<li><a class="align-right" href="#" title="Text Align Right" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;right&quot;]"><i class="fa fa-align-right"></i></a></li>'
+                + '<li><a class="align-justify" href="#" title="Text Align Justify" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;justify&quot;]"><i class="fa fa-align-justify"></i></a></li>'
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown link">'
-                + '<p><input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-decoration="linkURL" /></p>'
-                + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" checked="checked" /><span></span></label></p>'
+                + '<p><input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,&quot;&dollar;value&quot;,null]" data-ice-decoration="linkURL" /></p>'
+                + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" value="_blank" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,&quot;&dollar;checked&quot;]" data-ice-decoration="linkTarget" /><span></span></label></p>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown color">'
-                + '<p><input type="text" title="Foreground Color" placeholder="Foreground Color" value="" data-ice-decoration="foreColor" /></p>'
-                + '<p><input type="text" title="Background Color" placeholder="Background Color" value="" data-ice-decoration="backColor" /></p>'
+                + '<p><input type="text" title="Foreground Color" placeholder="Foreground Color" value="" data-ice-method="exec" data-ice-args="[&quot;foreColor&quot;,&quot;&dollar;value&quot;]" data-ice-decoration="foreColor" /></p>'
+                + '<p><input type="text" title="Background Color" placeholder="Background Color" value="" data-ice-method="exec" data-ice-args="[&quot;backColor&quot;,&quot;&dollar;value&quot;]" data-ice-decoration="backColor" /></p>'
                 + '</article>'
                 + '</div>'
                 + '</div>'
@@ -181,6 +184,7 @@
             this._wrapper.classList.add(this._className + "-wrapper");
             this._wrapper.classList.add(this._className + "-position-top");
             this._wrapper.addEventListener("click", this._handleThisClick);
+            this._wrapper.addEventListener("change", this._handleThisChange);
             this._element.contentDocument.body.appendChild(this._wrapper);
 
             // append all sylesheets to iframe
@@ -205,8 +209,6 @@
                 if (!(attr in this._ui))
                     this._ui[attr] = [];
                 this._ui[attr].push(node);
-
-                node.addEventListener("change", this._handleThisChange);
             }.bind(this));
         },
 
@@ -261,6 +263,10 @@
          * @return {Void}
          */
         show: function() {
+            if (this.element.classList.contains(this._className + "-show"))
+                return;
+
+            this.dropdown(null);
             this.element.classList.add(this._className + "-show");
         },
 
@@ -270,8 +276,11 @@
          * @return {Void}
          */
         hide: function() {
+            if (!this.element.classList.contains(this._className + "-show"))
+                return;
+
             this.element.classList.remove(this._className + "-show");
-            this.wrapper.removeAttribute("data-" + this._className + "-dropdown");
+            this.dropdown(null);
         },
 
         /**
@@ -389,22 +398,27 @@
 
             for (var decor in this._ui) {
                 this._ui[decor].forEach(function(node) {
-                    node.setAttribute("data-ice-status", decorations ? decorations[decor] : null);
+                    var value = decorations ? decorations[decor] : null;
+                    //var prefix = node.getAttribute("data-ice-prefix") || "";
+                    //var suffix = node.getAttribute("data-ice-suffix") || "";
+                    node.setAttribute("data-ice-status", value);
 
-                    // input node
-                    if (typeof node.value === "string") {
-                        var value = decorations ? decorations[decor] : null;
-                        if (value && ["number", "range"].indexOf(node.type) !== -1) {
-                            var match = value.match(/(\d+(\.\d+)?)(\w+)?/);
-                            var number = parseFloat(match[1]);
-                            var unit = match[2] || "";
+                    // value (input/select/textarea)
+                    if (node.tagName === "INPUT" && ["checkbox", "radio"].indexOf(node.type) !== -1) {
+                        node.checked = node.value == value;
+                    }
+                    else if (node.tagName === "INPUT" && ["number", "range"].indexOf(node.type) !== -1) {
+                        var match = value.match(/(\d+(\.\d+)?)(\w+)?/);
+                        var number = parseFloat(match[1]);
+                        var unit = match[2] || "";
 
-                            if (unit)
-                                node.setAttribute("data-ice-suffix", unit);
-                            node.value = number;
-                        }
-                        else
-                            node.value = value;
+                        if (unit)
+                            node.setAttribute("data-ice-suffix", unit);
+
+                        node.value = number;
+                    }
+                    else if (typeof node.value === "string") {
+                        node.value = value;
                     }
                 });
             }
@@ -412,7 +426,8 @@
 
         /**
          * Floatbar click event handler:
-         * toggle view or execute editor method
+         * prevent default for a tags and
+         * execute this._handleChange
          *
          * @param  {Object} e
          * @return {Void}
@@ -421,43 +436,46 @@
             if (ice.Util.closest(e.target, "a"))
                 e.preventDefault();
 
-            var node = ice.Util.closest(e.target, "[data-ice-method]");
-            if (node) {
-                var method = node.getAttribute("data-ice-method");
-                var args = JSON.parse(node.getAttribute("data-ice-args"));
+            // this._handleChange will do the job
+            if (["input", "select", "textarea"].indexOf(e.target.tagName.toLowerCase()) !== -1)
+                return;
 
-                if (typeof this[method] === "function")
-                    this[method].apply(this, args);
-            }
+            this._handleChange(e);
         },
 
         /**
          * Floatbar change event handler:
-         * execute editor method
-         *
-         * Event is binded on every noda that
-         * has data-ice-decoration attribute.
-         * It will be triggered only for
-         * input/textarea/select nodes.
+         * execute floatbar method
          *
          * @param  {Object} e
          * @return {Void}
          */
         _handleChange: function(e) {
-            var node = e.target;
-            var method = node.getAttribute("data-ice-decoration");;
-
-            if (typeof this.editor[method] !== "function")
+            var node = ice.Util.closest(e.target, "[data-ice-method]");
+            if (!node)
                 return;
 
-            var value = node.value;
-            if (value) {
-                value = (node.getAttribute("data-ice-prefix") || "") + value;
-                value += node.getAttribute("data-ice-suffix") || "";
-                value = [ value ];
-            }
+            // get method and arguments from data attribute
+            // and replace items that starts with dollar
+            // sign with node property (for example:
+            // $value with node.value)
+            var method = node.getAttribute("data-ice-method");
+            var attr = node.getAttribute("data-ice-args");
+            var args = JSON.parse(attr).map(function(item) {
+                var result = item;
+                if (typeof result === "string" && result.substr(0,1) === "$" && result.substr(1) in node)
+                    result = node[result.substr(1)];
+                if (item === "$value")
+                    result = ""
+                        + (node.getAttribute("data-ice-prefix") || "")
+                        + result
+                        + (node.getAttribute("data-ice-suffix") || "");
 
-            this.editor[method].apply(this.editor, value || []);
+                return result;
+            });
+
+            if (typeof this[method] === "function")
+                this[method].apply(this, args);
         }
 
     }
@@ -506,7 +524,8 @@
         }
     });
 
-    // document unselect event
+    // document unselect event:
+    // hide current editor floatbar
     document.addEventListener("iceunselect", function(e) {
         if (e.detail.editor.floatbar) {
             if (!ice.Util.closest(e.detail.editor.document.activeElement, "." + ice.Floatbar.prototype._className))
@@ -514,17 +533,20 @@
         }
     });
 
-    // document select event
+    // document select event:
+    // reposition and show current editor floatbar
     document.addEventListener("iceselect", function(e) {
         if (e.detail.editor.floatbar && (e.detail.range.collapsed || !e.detail.editor.floatbar.editor.options("floatbar")))
             return e.detail.editor.floatbar.hide();
 
+        //e.detail.editor.floatbar.dropdown(null);
         e.detail.editor.floatbar._reposition(e.detail.rect);
         e.detail.editor.floatbar._setDecorations(e.detail.decorations);
         e.detail.editor.floatbar.show();
     });
 
-    // window select event
+    // window select event:
+    // refresh floatbar decorations
     window.addEventListener("resize", function(e) {
         var ice = window.ice.Util.getActiveEditor();
         if (!ice || !ice.floatbar || !ice.options("floatbar"))
