@@ -6,7 +6,9 @@
 /* reset */
 .ice-floatbar-html,
 .ice-floatbar-body,
-.ice-floatbar-wrapper { position: relative; margin: 0; padding: 0; overflow: hidden; box-sizing: border-box; background: transparent; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+.ice-floatbar-wrapper { position: relative !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; box-sizing: border-box !important; background: transparent; color: #fafafa; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+
+/* common tags */
 .ice-floatbar-wrapper article,
 .ice-floatbar-wrapper nav,
 .ice-floatbar-wrapper ul,
@@ -19,8 +21,10 @@
 .ice-floatbar-wrapper p + p { padding-top: 0; }
 .ice-floatbar-wrapper a { display: block; height: 2em; line-height: 2em; font-weight: normal; outline: 0 none; color: inherit; text-decoration: none; }
 .ice-floatbar-wrapper a:hover { color: #2196f3; }
-.ice-floatbar-wrapper input { width: 100%; line-height: 2; font-size: 0.8em; }
-.ice-floatbar-wrapper label { line-height: 2; font-size: 0.8em; vertical-align: middle; }
+.ice-floatbar-wrapper input { width: 100%; line-height: 2; font-size: 0.8em; color: inherit; font-weight: inherit; }
+.ice-floatbar-wrapper input:focus { color: inherit; font-weight: inherit; }
+.ice-floatbar-wrapper input::placeholder { color: #999; }
+.ice-floatbar-wrapper label { display: inline-block; line-height: 2; font-size: 0.8em; vertical-align: middle; color: inherit; font-weight: inherit; }
 .ice-floatbar-wrapper .fa { line-height: inherit; }
 
 /* display content */
@@ -30,7 +34,7 @@
 .ice-floatbar-wrapper.ice-floatbar-position-top::after { content: ""; display: block; width: 0; height: 0; margin: 0 auto; border: 0.25em solid transparent; transform: translateX(-50%); }
 .ice-floatbar-wrapper.ice-floatbar-position-bottom::before { bottom: 100%; border-bottom-color: rgba(0,0,0,0.9); }
 .ice-floatbar-wrapper.ice-floatbar-position-top::after { top: 100%; border-top-color: rgba(0,0,0,0.9); }
-.ice-floatbar-content { position: relative; margin: 0; padding: 0.25em; font-family: Arial, Helvetica, sans-serif; color: #fafafa; background: rgba(0,0,0,0.9); border-radius: 0.25em; }
+.ice-floatbar-content { position: relative; margin: 0; padding: 0.25em; font-family: Arial, Helvetica, sans-serif; background: rgba(0,0,0,0.9); border-radius: 0.25em; }
 
 /* main navigation */
 .ice-floatbar-wrapper .ice-floatbar-nav { display: block; margin: 0; padding: 0; }
