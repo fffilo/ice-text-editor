@@ -352,6 +352,9 @@
                 rect = range.getBoundingClientRect();
             }
 
+            if (!this.element || !this.wrapper)
+                return;
+
             //this.element.style.width = this.wrapper.scrollWidth + "px";
             this.element.style.height = this.wrapper.scrollHeight + "px";
 
