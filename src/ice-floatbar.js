@@ -411,14 +411,16 @@
                         node.checked = node.value == value;
                     }
                     else if (node.tagName === "INPUT" && ["number", "range"].indexOf(node.type) !== -1) {
-                        var match = value.match(/(\d+(\.\d+)?)(\w+)?/);
-                        var number = parseFloat(match[1]);
-                        var unit = match[2] || "";
+                        var match = (value || "").match(/(\d+(\.\d+)?)(\w+)?/);
+                        if (match) {
+                            var number = parseFloat(match[1]);
+                            var unit = match[2] || "";
 
-                        if (unit)
-                            node.setAttribute("data-ice-suffix", unit);
+                            if (unit)
+                                node.setAttribute("data-ice-suffix", unit);
 
-                        node.value = number;
+                            node.value = number;
+                        }
                     }
                     else if (typeof node.value === "string") {
                         node.value = value;
