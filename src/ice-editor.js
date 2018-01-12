@@ -448,9 +448,10 @@
          *
          * @param  {String}  value  url
          * @param  {String}  target (optional)
+         * @param  {String}  rel    (optional)
          * @return {Boolean}
          */
-        createLink: function(value, target) {
+        createLink: function(value, target, rel) {
             if (!this.active)
                 return false;
 
@@ -461,15 +462,11 @@
             if (value === null)
                 return false;
 
-            // replace null target with current one,
-            // false opens in same window, true
-            // opens in new tab
+            // replace null target/rel with current one
             if (target === null)
                 target = decoration.linkTarget;
-            else if (target === false)
-                target = "_self";
-            else if (target === true)
-                target = "_blank";
+            if (rel === null)
+                rel = decoration.linkRel;
 
             this._skipDispatch = true;
             var result = this._execCommand("createLink", value);
@@ -478,6 +475,13 @@
             if (result && target) {
                 ice.Util.getSelectedNodes("." + this._className + " a").forEach(function(node) {
                     node.setAttribute("target", target);
+                });
+            }
+
+            // add rel attribute to a tag
+            if (result && rel) {
+                ice.Util.getSelectedNodes("." + this._className + " a").forEach(function(node) {
+                    node.setAttribute("rel", rel);
                 });
             }
 
@@ -686,6 +690,7 @@
                 italic: doc.queryCommandState("italic"),
                 //linkURL: null,
                 //linkTarget: null,
+                //linkRel: null,
                 linkCount: 0,
                 strikeThrough: doc.queryCommandState("strikeThrough"),
                 subscript: doc.queryCommandState("subscript"),
@@ -757,7 +762,8 @@
                 var link = ice.Util.closest(node[i], "a");
                 if (link) {
                     var href = link.getAttribute("href");
-                    var target = link.target || "_self";
+                    var target = link.target || null;
+                    var rel = link.rel || null;
                     result.linkCount += 1;
 
                     if (!("linkURL" in result))
@@ -769,6 +775,11 @@
                         result.linkTarget = target;
                     else if (result.linkTarget !== target)
                         result.linkTarget = null;
+
+                    if (!("linkRel" in result))
+                        result.linkRel = rel;
+                    else if (result.linkRel !== rel)
+                        result.linkRel = null;
                 }
                 else {
                     result.linkURL = null;

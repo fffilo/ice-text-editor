@@ -108,8 +108,9 @@
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown link">'
-                + '<p><input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,&quot;&dollar;value&quot;,null]" data-ice-decoration="linkURL" /></p>'
-                + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" value="_blank" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,&quot;&dollar;checked&quot;]" data-ice-decoration="linkTarget" /><span></span></label></p>'
+                + '<p><input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,&quot;&dollar;value&quot;,null,null]" data-ice-decoration="linkURL" /></p>'
+                + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" value="_blank" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,&quot;&dollar;value&quot;,null]" data-ice-decoration="linkTarget" /><span></span></label></p>'
+                + '<p><label>No Follow</label><label class="ice-floatbar-switch" title="No Follow"><input type="checkbox" value="nofollow" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,null,&quot;&dollar;value&quot;]" data-ice-decoration="linkRel" /><span></span></label></p>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown color">'
                 + '<p><input type="text" title="Foreground Color" placeholder="Foreground Color" value="" data-ice-method="exec" data-ice-args="[&quot;foreColor&quot;,&quot;&dollar;value&quot;]" data-ice-decoration="foreColor" /></p>'
@@ -332,6 +333,7 @@
          * @return {Mixed}
          */
         exec: function(method) {
+            console.log(this.editor, Array.prototype.slice.call(arguments, 1));
             if (typeof this.editor[method] === "function")
                 this.editor[method].apply(this.editor, Array.prototype.slice.call(arguments, 1));
         },
@@ -475,6 +477,8 @@
                         + (node.getAttribute("data-ice-prefix") || "")
                         + result
                         + (node.getAttribute("data-ice-suffix") || "");
+                if (node.tagName === "INPUT" && ["checkbox", "radio"].indexOf(node.type) !== -1 && item === "$value" && !node.checked)
+                    result = undefined;
 
                 return result;
             });
