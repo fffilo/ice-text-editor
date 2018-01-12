@@ -333,7 +333,6 @@
          * @return {Mixed}
          */
         exec: function(method) {
-            console.log(this.editor, Array.prototype.slice.call(arguments, 1));
             if (typeof this.editor[method] === "function")
                 this.editor[method].apply(this.editor, Array.prototype.slice.call(arguments, 1));
         },
