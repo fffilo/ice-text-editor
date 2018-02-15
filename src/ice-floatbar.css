@@ -42,11 +42,11 @@
 
 /* dropdown */
 .ice-floatbar-wrapper .ice-floatbar-dropdown { display: none; margin-top: 0.25em; padding-top: 0.25em; border-top: 1px solid #aaa; }
-.ice-floatbar-wrapper[data-ice-floatbar-dropdown="format-block"] .ice-floatbar-dropdown.format-block,
-.ice-floatbar-wrapper[data-ice-floatbar-dropdown="font"] .ice-floatbar-dropdown.font,
-.ice-floatbar-wrapper[data-ice-floatbar-dropdown="align"] .ice-floatbar-dropdown.align,
-.ice-floatbar-wrapper[data-ice-floatbar-dropdown="link"] .ice-floatbar-dropdown.link,
-.ice-floatbar-wrapper[data-ice-floatbar-dropdown="color"] .ice-floatbar-dropdown.color { display: block; }
+.ice-floatbar-wrapper[data-ice-floatbar-dropdown="format-block"] .ice-floatbar-dropdown.ice-floatbar-dropdown-format-block,
+.ice-floatbar-wrapper[data-ice-floatbar-dropdown="font"] .ice-floatbar-dropdown.ice-floatbar-dropdown-font,
+.ice-floatbar-wrapper[data-ice-floatbar-dropdown="align"] .ice-floatbar-dropdown.ice-floatbar-dropdown-align,
+.ice-floatbar-wrapper[data-ice-floatbar-dropdown="link"] .ice-floatbar-dropdown.ice-floatbar-dropdown-link,
+.ice-floatbar-wrapper[data-ice-floatbar-dropdown="color"] .ice-floatbar-dropdown.ice-floatbar-dropdown-color { display: block; }
 
 /* inputs */
 .ice-floatbar-wrapper input[type="number"] {  width: calc(100% - 4.5em); }

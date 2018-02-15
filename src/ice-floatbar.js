@@ -66,7 +66,7 @@
                 + '<li><a href="#" title="Color" data-ice-method="toggle" data-ice-args="[&quot;color&quot;]" ><i class="fa fa-circle"></i></a></li>'
                 + '</ul>'
                 + '</nav>'
-                + '<article class="ice-floatbar-dropdown format-block">'
+                + '<article class="ice-floatbar-dropdown ice-floatbar-dropdown-format-block">'
                 + '<ul class="ice-floatbar-list" data-ice-decoration="formatBlock">'
                 + '<li><a href="#" title="Headline 1" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h1&quot;]">Headline 1</a></li>'
                 + '<li><a href="#" title="Headline 2" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;h2&quot;]">Headline 2</a></li>'
@@ -81,7 +81,7 @@
                 + '<li><a href="#" title="Unordered List" data-ice-method="exec" data-ice-args="[&quot;formatBlock&quot;,&quot;ul&quot;]">Unordered List</a></li>'
                 + '</ul>'
                 + '</article>'
-                + '<article class="ice-floatbar-dropdown font">'
+                + '<article class="ice-floatbar-dropdown ice-floatbar-dropdown-font">'
                 + '<p><input type="range" title="Font Size" placeholder="Font Size" value="" min="6" max="128" data-ice-suffix="px" data-ice-method="exec" data-ice-args="[&quot;fontSize&quot;,&quot;&dollar;value&quot;]" data-ice-decoration="fontSize" /><span title="Font Size" data-ice-decoration="fontSize"></span></p>'
                 + '<ul class="ice-floatbar-list">'
                 + '<li><a href="#" title="Arial, Helvetica, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;Arial, Helvetica, sans-serif&quot;]">Arial, Helvetica, sans-serif</a></li>'
@@ -99,20 +99,20 @@
                 + '<li><a href="#" title="Verdana, Geneva, sans-serif" data-ice-method="exec" data-ice-args="[&quot;fontName&quot,&quot;Verdana, Geneva, sans-serif&quot;]">Verdana, Geneva, sans-serif</a></li>'
                 + '</ul>'
                 + '</article>'
-                + '<article class="ice-floatbar-dropdown align">'
+                + '<article class="ice-floatbar-dropdown ice-floatbar-dropdown-align">'
                 + '<ul data-ice-decoration="align">'
-                + '<li><a class="align-left" href="#" title="Text Align Left" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;left&quot;]"><i class="fa fa-align-left"></i></a></li>'
-                + '<li><a class="align-center" href="#" title="Text Align Center" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;center&quot;]"><i class="fa fa-align-center"></i></a></li>'
-                + '<li><a class="align-right" href="#" title="Text Align Right" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;right&quot;]"><i class="fa fa-align-right"></i></a></li>'
-                + '<li><a class="align-justify" href="#" title="Text Align Justify" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;justify&quot;]"><i class="fa fa-align-justify"></i></a></li>'
+                + '<li><a href="#" title="Text Align Left" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;left&quot;]"><i class="fa fa-align-left"></i></a></li>'
+                + '<li><a href="#" title="Text Align Center" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;center&quot;]"><i class="fa fa-align-center"></i></a></li>'
+                + '<li><a href="#" title="Text Align Right" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;right&quot;]"><i class="fa fa-align-right"></i></a></li>'
+                + '<li><a href="#" title="Text Align Justify" data-ice-method="exec" data-ice-args="[&quot;align&quot;,&quot;justify&quot;]"><i class="fa fa-align-justify"></i></a></li>'
                 + '</ul>'
                 + '</article>'
-                + '<article class="ice-floatbar-dropdown link">'
+                + '<article class="ice-floatbar-dropdown ice-floatbar-dropdown-link">'
                 + '<p><input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,&quot;&dollar;value&quot;,null,null]" data-ice-decoration="linkURL" /></p>'
                 + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" value="_blank" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,&quot;&dollar;value&quot;,null]" data-ice-decoration="linkTarget" /><span></span></label></p>'
                 + '<p><label>No Follow</label><label class="ice-floatbar-switch" title="No Follow"><input type="checkbox" value="nofollow" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,null,&quot;&dollar;value&quot;]" data-ice-decoration="linkRel" /><span></span></label></p>'
                 + '</article>'
-                + '<article class="ice-floatbar-dropdown color">'
+                + '<article class="ice-floatbar-dropdown ice-floatbar-dropdown-color">'
                 + '<p><input type="text" title="Foreground Color" placeholder="Foreground Color" value="" data-ice-method="exec" data-ice-args="[&quot;foreColor&quot;,&quot;&dollar;value&quot;]" data-ice-decoration="foreColor" /></p>'
                 + '<p><input type="text" title="Background Color" placeholder="Background Color" value="" data-ice-method="exec" data-ice-args="[&quot;backColor&quot;,&quot;&dollar;value&quot;]" data-ice-decoration="backColor" /></p>'
                 + '</article>'
@@ -426,6 +426,9 @@
                     else if (typeof node.value === "string") {
                         node.value = value;
                     }
+
+                    var event = new Event("change", { bubbles: false });
+                    node.dispatchEvent(event);
                 });
             }
         },
