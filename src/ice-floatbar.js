@@ -54,7 +54,7 @@
                 + '<div class="ice-floatbar-content">'
                 + '<nav class="ice-floatbar-nav">'
                 + '<ul>'
-                + '<li><a href="#" title="Format Block" data-ice-method="toggle" data-ice-args="[&quot;format-block&quot;]"><i class="fa fa-code"></i></a></li>'
+                + '<li><a href="#" title="Format Block" data-ice-method="toggle" data-ice-args="[&quot;format-block&quot;]"><i class="fa fa-paragraph"></i></a></li>'
                 + '<li data-ice-decoration="bold"><a href="#" title="Bold" data-ice-method="exec" data-ice-args="[&quot;bold&quot;]"><i class="fa fa-bold"></i></a></li>'
                 + '<li data-ice-decoration="italic"><a href="#" title="Italic" data-ice-method="exec" data-ice-args="[&quot;italic&quot;]"><i class="fa fa-italic"></i></a></li>'
                 + '<li><a href="#" title="Font" data-ice-method="toggle" data-ice-args="[&quot;font&quot;]"><i class="fa fa-font"></i></a></li>'

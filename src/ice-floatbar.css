@@ -99,7 +99,7 @@
 
 /* font-awesome fallback * /
 .fa { display: inline-block; font-family: "Times New Roman", Times, serif; font-style: normal; text-decoration: none; }
-.fa-code::before { content: "\3c0"; }
+.fa-paragraph::before { content: "\3c0"; }
 .fa-bold::before { content: "B"; font-weight: bold; }
 .fa-italic::before { content: "I"; font-style: italic; }
 .fa-underline::before { content: "U"; text-decoration: underline; }
