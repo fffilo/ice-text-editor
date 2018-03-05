@@ -184,6 +184,27 @@
             var commonAncestor = range.commonAncestorContainer;
             var node;
 
+            // start/end fix
+            if (startContainer && range.startOffset === startContainer.length || endContainer && range.endOffset && range.endOffset === 0) {
+                if (startContainer && range.startOffset === startContainer.length && startContainer.nextSibling) {
+                    startContainer = startContainer.nextSibling;
+                    while (startContainer.childNodes && startContainer.childNodes.length) {
+                        startContainer = startContainer.childNodes[0];
+                    }
+                }
+                if (endContainer && range.endOffset === 0 && endContainer.previousSibling) {
+                    endContainer = endContainer.previousSibling;
+                    while (endContainer.childNodes && endContainer.childNodes.length) {
+                        endContainer = endContainer.childNodes[endContainer.childNodes.length - 1];
+                    }
+                }
+
+                range = document.createRange();
+                range.setStart(startContainer, 0);
+                range.setEnd(endContainer, endContainer.length);
+                commonAncestor = range.commonAncestorContainer;
+            }
+
             // walk parent nodes from startContainer to commonAncestor
             for (node = startContainer; node; node = node.parentNode) {
                 result.unshift(node);
