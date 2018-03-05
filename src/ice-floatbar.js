@@ -525,7 +525,9 @@
      * @return {Void}
      */
     ice.Editor.prototype._handleInputFloatbar = function(e) {
-        this.ice.floatbar.refresh();
+        setTimeout(function() {
+            this.ice.floatbar.refresh();
+        }.bind(this));
     }
 
     // define floatbar getter on editor prototype

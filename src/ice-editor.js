@@ -470,20 +470,19 @@
 
             this._skipDispatch = true;
             var result = this._execCommand("createLink", value);
+            var link = ice.Util.getSelectedNodes("." + this._className + " a");
 
-            // add target attribute to a tag
-            if (result && target) {
-                ice.Util.getSelectedNodes("." + this._className + " a").forEach(function(node) {
+            // set target/rel attributes
+            link.forEach(function(node) {
+                node.removeAttribute("target");
+                node.removeAttribute("rel");
+                node.removeAttribute("_moz_dirty");
+
+                if (target)
                     node.setAttribute("target", target);
-                });
-            }
-
-            // add rel attribute to a tag
-            if (result && rel) {
-                ice.Util.getSelectedNodes("." + this._className + " a").forEach(function(node) {
+                if (rel)
                     node.setAttribute("rel", rel);
-                });
-            }
+            });
 
             delete this._skipDispatch;
             this._handleInput();
@@ -784,6 +783,7 @@
                 else {
                     result.linkURL = null;
                     result.linkTarget = null;
+                    result.linkRel = null;
                 }
             }
 
