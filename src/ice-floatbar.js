@@ -146,6 +146,7 @@
             this._element = this.editor.document.createElement("iframe");
             this._element.classList.add(this._className);
             this._element.onload = this._load.bind(this);
+            this._element.ice = this;
             this.editor.document.body.appendChild(this._element);
         },
 
@@ -173,6 +174,12 @@
         _load: function() {
             this._element.contentDocument.documentElement.classList.add(this._className + "-html");
             this._element.contentDocument.body.classList.add(this._className + "-body");
+
+            // add all data attributes from element to html
+            for (var i = 0; i < this._element.attributes.length; i++) {
+                if (this._element.attributes[i].name.substr(0, 5) === "data-")
+                    this._element.contentDocument.documentElement.setAttribute(this._element.attributes[i].name, this._element.attributes[i].value);
+            }
 
             // bind handles with this
             this._handleThisClick = this._handleClick.bind(this);
