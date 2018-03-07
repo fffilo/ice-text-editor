@@ -95,15 +95,42 @@
         },
 
         /**
+         * Wrap node
+         *
+         * @param  {Node}   node
+         * @param  {String} tag
+         * @return {Node}
+         */
+        wrapNode: function(node, tag) {
+            if (!(node instanceof Node))
+                return;
+
+            var el = document.createElement(tag);
+            node.parentElement.insertBefore(el, node);
+            el.appendChild(node);
+
+            return el;
+        },
+
+
+        /**
          * Unwrap node
          *
-         * @param  {Object} node
-         * @return {Void}
+         * @param  {Node} node
+         * @return {Node}
          */
         unwrapNode: function(node) {
+            if (!(node instanceof Node))
+                return;
+
             var el = node.parentElement;
             el.parentElement.insertBefore(node, el);
-            el.parentElement.removeChild(el);
+
+            el.normalize();
+            if (!el.childNodes.length)
+                el.parentElement.removeChild(el);
+
+            return node;
         },
 
         /**
@@ -111,7 +138,7 @@
          *
          * @param  {Mixed}  node
          * @param  {String} tagName
-         * @return {Void}
+         * @return {Mixed}
          */
         replaceTag: function(node, tagName) {
             if (!(node instanceof Node))
@@ -122,8 +149,14 @@
                 el.appendChild(node.childNodes[0]);
             }
 
+            for (var i = 0; i < node.attributes.length; i++) {
+                el.setAttribute(node.attributes[i].name, node.attributes[i].value);
+            }
+
             node.parentElement.insertBefore(el, node);
             node.parentElement.removeChild(node);
+
+            return el;
         },
 
         /**

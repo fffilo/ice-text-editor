@@ -42,6 +42,20 @@
         _className: "ice-editor",
 
         /**
+         * List of inline elements
+         *
+         * @type {Array}
+         */
+        _inlineElements: [ "a", "abbr", "acronym", "b", "bdo", "big", "br", "button", "cite", "code", "dfn", "em", "i", "img", "input", "kbd", "label", "map", "object", "q", "samp", "script", "select", "small", "span", "strong", "sub", "sup", "textarea", "time", "tt", "var" ],
+
+        /**
+         * List of block elements
+         *
+         * @type {Array}
+         */
+        _blockElements: [ "address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video" ],
+
+        /**
          * Default options
          *
          * @type {Object}
@@ -51,6 +65,7 @@
             allowLineBreak: true,
             allowHorizontalRule: true,
             allowSplit: true,
+            allowRichtextPaste: true,
             allowedBlocks: [
                 "h1",
                 "h2",
@@ -975,36 +990,131 @@
          * @return {Void}
          */
         _handlePaste: function(e) {
-            // do not allow paste richtext, there is too
-            // much unwanted data which makes it unpossible
-            // to handle correctly
-            e.preventDefault();
-
-            // no plain text data to paste?
             var that = this.ice;
-            var data = e.clipboardData.getData("text/plain");
+
+            // options
+            var rich = that.options("allowRichtextPaste");
+            var blocks = that.options("allowedBlocks");
+            var split = that.options("allowSplit");
+            var lnbr = that.options("allowLineBreak");
             var tag = that.options("defaultTag");
+            if (rich && !tag)
+                rich = false;
+
+            // data to paste
+            var data = e.clipboardData.getData(rich ? "text/html" : "text/plain");
             if (!data)
                 return;
 
-            // options allowSplit/allowLineBreak
-            if (!tag || !that.options("allowSplit"))
-                data = data.replace(/\n\n/g, "\n");
-            if (!that.options("allowLineBreak"))
-                data = data.replace(/\n/g, " ");
+            // do not allow paste richtext by default,
+            // there is too much unwanted data which
+            // makes it unpossible to handle correctly
+            e.preventDefault();
 
-            // convert data to html
-            if (tag) {
-                data = data
-                    .trim()
-                    .replace(/\n\n/g, "</" + tag + "><" + tag + ">")
-                    .replace(/\n/g, "<br />");
-                data = data || "<br />";
-                data = "<" + tag + ">" + data + "</" + tag + ">";
+            // handle plain data
+            if (!rich) {
+                // options allowSplit/allowLineBreak
+                if (!tag || !split)
+                    data = data.replace(/\n\n/g, "\n");
+                if (!lnbr)
+                    data = data.replace(/\n/g, " ");
+
+                // convert data to html
+                if (tag) {
+                    data = data
+                        .trim()
+                        .replace(/\n\n/g, "</" + tag + "><" + tag + ">")
+                        .replace(/\n/g, "<br />");
+                    data = data || "<br />";
+                    data = "<" + tag + ">" + data + "</" + tag + ">";
+                }
             }
 
-            // paste
+            // handle rich text data
+            else {
+                var div = that.document.createElement("div");
+                div.id = "ice";
+                div.innerHTML = data;
+
+                // difference between block elements
+                // and allowed blocks
+                var diff = that._blockElements.filter(function(item) {
+                    return blocks.indexOf(item) < 0;
+                });
+
+                // replace not alowed block elements
+                // whit default one
+                var children = div.querySelectorAll(diff.join(","));
+                children = Array.prototype.slice.call(children);
+                while (children.length) {
+                    var node = children.shift();
+                    ice.Util.replaceTag(node, tag);
+                }
+
+                // remove images
+                var children = div.querySelectorAll("img");
+                children = Array.prototype.slice.call(children);
+                while (children.length) {
+                    var node = children.shift();
+                    node.parentElement.removeChild(node);
+                }
+
+                // pasting h1 tag with font-size style in it
+                // will preserve font-size while changing it
+                // to h2, so remove style/class attributes
+                // for all block elements
+                var children = div.querySelectorAll(blocks.join(","));
+                children = Array.prototype.slice.call(children);
+                while (children.length) {
+                    var node = children.shift();
+                    node.removeAttribute("class");
+                    node.removeAttribute("style");
+                }
+
+                // wrap non block element
+                var children = div.children;
+                children = Array.prototype.slice.call(children);
+                while (children.length) {
+                    var node = children.shift();
+                    if (node.nodeType !== Node.ELEMENT_NODE)
+                        node = ice.Util.wrapNode(node, tag);
+                }
+
+                // block split not allowed, append all children
+                // content to first child and remove everithing
+                // but that first child
+                if (!split)
+                    while (div.children.length > 1) {
+                        div.children[1].children.forEach(function(node) {
+                            div.children[0].appendChild(node);
+                        });
+
+                        div.children[1].parentNode.removeChild(div.children[1]);
+                    }
+
+                // linebreaks not allowed, replace br tag
+                // with space
+                if (!lnbr)
+                    div.innerHTML = div.innerHTML.replace(/<br\s*\/?>/gi, " ");
+
+                // get data from temp element
+                div.normalize();
+                data = div.innerHTML;
+            }
+
+            // simulate paste
             that._execCommand("insertHTML", data);
+
+            // rich paste can insert multiple empty
+            // blocks, so fix it after paste
+            if (rich) {
+                var children = that.element.querySelectorAll(tag + ":empty");
+                children = Array.prototype.slice.call(children);
+                while (children.length) {
+                    var node = children.shift();
+                    node.parentElement.removeChild(node);
+                }
+            }
         }
 
     }
