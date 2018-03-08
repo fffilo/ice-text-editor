@@ -144,6 +144,10 @@
 
             // create
             this._element = this.editor.document.createElement("iframe");
+            for (var i = 0; i < this.editor.element.attributes.length; i++) {
+                if (this.editor.element.attributes[i].name.substr(0, 5) === "data-")
+                    this._element.setAttribute(this.editor.element.attributes[i].name, this.editor.element.attributes[i].value);
+            }
             this._element.classList.add(this._className);
             this._element.onload = this._load.bind(this);
             this._element.ice = this;
