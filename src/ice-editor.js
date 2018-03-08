@@ -881,6 +881,19 @@
                 child.parentElement.removeChild(child);
             }
 
+            // do not allow a tag inside a tag
+            var children = node.querySelectorAll("a");
+            children = Array.prototype.slice.call(children);
+            while (children.length) {
+                var child = children.shift();
+                if (ice.Util.is(child, "a a")) {
+                    child = ice.Util.replaceTag(child, "span");
+                    [ "download", "href", "hreflang", "media", "rel", "target", "type" ].forEach(function(item) {
+                        child.removeAttribute(item);
+                    });
+                }
+            }
+
             // pasting h1 tag with font-size style in it
             // will preserve font-size while changing it
             // to h2, so remove style/class attributes
@@ -889,8 +902,9 @@
             children = Array.prototype.slice.call(children);
             while (children.length) {
                 var child = children.shift();
-                child.removeAttribute("class");
-                child.removeAttribute("style");
+                [ "class", "style" ].forEach(function(item) {
+                    child.removeAttribute(item);
+                })
             }
 
             // wrap non block element
