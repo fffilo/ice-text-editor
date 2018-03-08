@@ -55,6 +55,8 @@
          */
         _blockElements: [ "address", "article", "aside", "blockquote", "canvas", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "li", "main", "nav", "noscript", "ol", "output", "p", "pre", "section", "table", "tfoot", "ul", "video" ],
 
+        _noElements: [ "meta", "img", ],
+
         /**
          * Default options
          *
@@ -1006,11 +1008,6 @@
             if (!data)
                 return;
 
-            // do not allow paste richtext by default,
-            // there is too much unwanted data which
-            // makes it unpossible to handle correctly
-            e.preventDefault();
-
             // handle plain data
             if (!rich) {
                 // options allowSplit/allowLineBreak
@@ -1051,8 +1048,8 @@
                     ice.Util.replaceTag(node, tag);
                 }
 
-                // remove images
-                var children = div.querySelectorAll("img");
+                // remove meta
+                var children = div.querySelectorAll(that._noElements.join(","));
                 children = Array.prototype.slice.call(children);
                 while (children.length) {
                     var node = children.shift();
@@ -1080,22 +1077,33 @@
                         node = ice.Util.wrapNode(node, tag);
                 }
 
-                // block split not allowed, append all children
-                // content to first child and remove everithing
-                // but that first child
-                if (!split)
-                    while (div.children.length > 1) {
-                        div.children[1].children.forEach(function(node) {
-                            div.children[0].appendChild(node);
-                        });
+                // block split not allowed, replace it with
+                // span and append line break after
+                if (!split) {
+                    var children = div.querySelectorAll(that._blockElements.join(","));
+                    children = Array.prototype.slice.call(children);
+                    while (children.length) {
+                        var node = children.shift();
+                        node = ice.Util.replaceTag(node, "span");
 
-                        div.children[1].parentNode.removeChild(div.children[1]);
+                        var br = that.document.createElement("br");
+                        node.appendChild(br);
                     }
+                }
 
-                // linebreaks not allowed, replace br tag
-                // with space
-                if (!lnbr)
-                    div.innerHTML = div.innerHTML.replace(/<br\s*\/?>/gi, " ");
+                // line break not allowed, replace br tag with
+                // text node with space in it
+                if (!lnbr) {
+                    var children = div.querySelectorAll(that._blockElements.join(","));
+                    children = Array.prototype.slice.call(children);
+                    while (children.length) {
+                        var node = children.shift();
+
+                        var br = that.document.createTextNode(" ");
+                        node.parentNode.insertBefore(br, node);
+                        node.parentNode.removeChild(node);
+                    }
+                }
 
                 // get data from temp element
                 div.normalize();
@@ -1103,6 +1111,7 @@
             }
 
             // simulate paste
+            e.preventDefault();
             that._execCommand("insertHTML", data);
 
             // rich paste can insert multiple empty
