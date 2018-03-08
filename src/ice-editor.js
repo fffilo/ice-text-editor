@@ -156,6 +156,7 @@
             }
 
             this._strip();
+            this._fixBlocks();
             this._triggerChange();
         },
 
@@ -816,6 +817,9 @@
         _closestBlock: function(node) {
             while (node && (!node.tagName || node.tagName && this.options("allowedBlocks").indexOf(node.tagName.toLowerCase()) === -1)) {
                 node = node.parentNode;
+
+                if (node === this.element)
+                    return null;
             }
 
             return node;
@@ -836,6 +840,112 @@
                 .replace(re1, "")
                 .replace(re2, "$1")
                 .trim();
+        },
+
+        /**
+         * Fix blocks: join/strip block elements
+         * and br tags
+         *
+         * @param  {Object} node (optional)
+         * @return {Void}
+         */
+        _fixBlocks: function(node) {
+            if (!node)
+                node = this.element;
+
+            var blocks = this.options("allowedBlocks");
+            var split = this.options("allowSplit");
+            var lnbr = this.options("allowLineBreak");
+            var tag = this.options("defaultTag");
+
+            // difference between block elements
+            // and allowed blocks
+            var diff = this._blockElements.filter(function(item) {
+                return blocks.indexOf(item) < 0;
+            });
+
+            // replace not alowed block elements
+            // whit default one
+            var children = node.querySelectorAll(diff.join(","));
+            children = Array.prototype.slice.call(children);
+            while (children.length) {
+                var child = children.shift();
+                ice.Util.replaceTag(child, tag);
+            }
+
+            // remove meta
+            var children = node.querySelectorAll(this._noElements.join(","));
+            children = Array.prototype.slice.call(children);
+            while (children.length) {
+                var child = children.shift();
+                child.parentElement.removeChild(child);
+            }
+
+            // pasting h1 tag with font-size style in it
+            // will preserve font-size while changing it
+            // to h2, so remove style/class attributes
+            // for all block elements
+            var children = node.querySelectorAll(blocks.join(","));
+            children = Array.prototype.slice.call(children);
+            while (children.length) {
+                var child = children.shift();
+                child.removeAttribute("class");
+                child.removeAttribute("style");
+            }
+
+            // wrap non block element
+            var children = node.children;
+            children = Array.prototype.slice.call(children);
+            while (children.length) {
+                var child = children.shift();
+                if (child.nodeType !== Node.ELEMENT_NODE)
+                    child = ice.Util.wrapNode(child, tag);
+            }
+
+            // block split not allowed, replace it with
+            // span and append line break after
+            if (!split) {
+                var children = node.querySelectorAll(this._blockElements.join(","));
+                children = Array.prototype.slice.call(children);
+                while (children.length) {
+                    var child = children.shift();
+                    child = ice.Util.replaceTag(child, "span");
+
+                    var br = this.document.createElement("br");
+                    child.appendChild(br);
+                }
+            }
+
+            // line break not allowed, replace br tag with
+            // text node with space in it
+            if (!lnbr) {
+                var children = node.querySelectorAll(this._blockElements.join(","));
+                children = Array.prototype.slice.call(children);
+                while (children.length) {
+                    var child = children.shift();
+
+                    var br = this.document.createTextNode(" ");
+                    child.parentNode.insertBefore(br, child);
+                    child.parentNode.removeChild(child);
+                }
+            }
+
+            // remove empty blocks
+            var children = node.querySelectorAll(tag + ":empty");
+            children = Array.prototype.slice.call(children);
+            while (children.length) {
+                var child = children.shift();
+                child.parentElement.removeChild(child);
+            }
+
+            // no default tag on element, wrap it
+            if (node === this.element && !node.querySelectorAll(tag).length) {
+                var html = node.innerHTML;
+                html = "<" + tag + ">" + html + "</" + tag + ">";
+                node.innerHTML = html;
+            }
+
+            node.normalize();
         },
 
         /**
@@ -954,19 +1064,23 @@
             var sel = window.getSelection();
             var tag = that.options("defaultTag");
 
-            if (tag && !that.element.childNodes.length)
-                that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
-            else if (!that.element.childNodes.length)
-                that._execCommand("insertHTML", "<br />");
-            else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].tagName === "BR")
-                that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
-            else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].nodeType === Node.TEXT_NODE)
-                that._execCommand("formatBlock", "<" + tag + ">");
-            else if (tag && sel.focusNode && sel.focusNode.nodeType === Node.TEXT_NODE && !that._closestBlock(sel.focusNode))
-                that._execCommand("formatBlock", "<" + tag + ">");
-            // @todo - last case warning (We don't execute document.execCommand() this time, because it is called recursively.)
+            setTimeout(function() {
+                if (tag && !that.element.childNodes.length)
+                    that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
+                else if (!that.element.childNodes.length)
+                    that._execCommand("insertHTML", "<br />");
+                else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].tagName === "BR")
+                    that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
+                else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].nodeType === Node.TEXT_NODE)
+                    that._execCommand("formatBlock", "<" + tag + ">");
+                else if (tag && sel.focusNode && sel.focusNode.nodeType === Node.TEXT_NODE && !that._closestBlock(sel.focusNode))
+                    that._execCommand("formatBlock", "<" + tag + ">");
 
-            that._triggerChange();
+                // @todo - last case warning (We don't execute document.execCommand() this time, because it is called recursively.)
+                // check if setTimeout fixes this issue
+
+                that._triggerChange();
+            });
         },
 
         /**
@@ -996,7 +1110,6 @@
 
             // options
             var rich = that.options("allowRichtextPaste");
-            var blocks = that.options("allowedBlocks");
             var split = that.options("allowSplit");
             var lnbr = that.options("allowLineBreak");
             var tag = that.options("defaultTag");
@@ -1030,100 +1143,17 @@
             // handle rich text data
             else {
                 var div = that.document.createElement("div");
-                div.id = "ice";
                 div.innerHTML = data;
 
-                // difference between block elements
-                // and allowed blocks
-                var diff = that._blockElements.filter(function(item) {
-                    return blocks.indexOf(item) < 0;
-                });
+                that._fixBlocks(div);
 
-                // replace not alowed block elements
-                // whit default one
-                var children = div.querySelectorAll(diff.join(","));
-                children = Array.prototype.slice.call(children);
-                while (children.length) {
-                    var node = children.shift();
-                    ice.Util.replaceTag(node, tag);
-                }
-
-                // remove meta
-                var children = div.querySelectorAll(that._noElements.join(","));
-                children = Array.prototype.slice.call(children);
-                while (children.length) {
-                    var node = children.shift();
-                    node.parentElement.removeChild(node);
-                }
-
-                // pasting h1 tag with font-size style in it
-                // will preserve font-size while changing it
-                // to h2, so remove style/class attributes
-                // for all block elements
-                var children = div.querySelectorAll(blocks.join(","));
-                children = Array.prototype.slice.call(children);
-                while (children.length) {
-                    var node = children.shift();
-                    node.removeAttribute("class");
-                    node.removeAttribute("style");
-                }
-
-                // wrap non block element
-                var children = div.children;
-                children = Array.prototype.slice.call(children);
-                while (children.length) {
-                    var node = children.shift();
-                    if (node.nodeType !== Node.ELEMENT_NODE)
-                        node = ice.Util.wrapNode(node, tag);
-                }
-
-                // block split not allowed, replace it with
-                // span and append line break after
-                if (!split) {
-                    var children = div.querySelectorAll(that._blockElements.join(","));
-                    children = Array.prototype.slice.call(children);
-                    while (children.length) {
-                        var node = children.shift();
-                        node = ice.Util.replaceTag(node, "span");
-
-                        var br = that.document.createElement("br");
-                        node.appendChild(br);
-                    }
-                }
-
-                // line break not allowed, replace br tag with
-                // text node with space in it
-                if (!lnbr) {
-                    var children = div.querySelectorAll(that._blockElements.join(","));
-                    children = Array.prototype.slice.call(children);
-                    while (children.length) {
-                        var node = children.shift();
-
-                        var br = that.document.createTextNode(" ");
-                        node.parentNode.insertBefore(br, node);
-                        node.parentNode.removeChild(node);
-                    }
-                }
-
-                // get data from temp element
-                div.normalize();
                 data = div.innerHTML;
             }
 
             // simulate paste
             e.preventDefault();
             that._execCommand("insertHTML", data);
-
-            // rich paste can insert multiple empty
-            // blocks, so fix it after paste
-            if (rich) {
-                var children = that.element.querySelectorAll(tag + ":empty");
-                children = Array.prototype.slice.call(children);
-                while (children.length) {
-                    var node = children.shift();
-                    node.parentElement.removeChild(node);
-                }
-            }
+            that._fixBlocks();
         }
 
     }
