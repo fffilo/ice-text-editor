@@ -916,24 +916,29 @@
                     child = ice.Util.wrapNode(child, tag);
             }
 
-            // block split not allowed, replace it with
-            // span and append line break after
+            // block split not allowed, append all content
+            // to first block element with line breaks
             if (!split) {
-                var children = node.querySelectorAll(this._blockElements.join(","));
+                var children = node.querySelectorAll(tag + " + " + tag);
                 children = Array.prototype.slice.call(children);
                 while (children.length) {
                     var child = children.shift();
-                    child = ice.Util.replaceTag(child, "span");
+                    var dest = child.previousElementSibling;
+                    child.childNodes.forEach(function(node) {
+                        dest.appendChild(node);
+                    });
 
                     var br = this.document.createElement("br");
-                    child.appendChild(br);
+                    dest.appendChild(br);
+
+                    child.parentNode.removeChild(child);
                 }
             }
 
             // line break not allowed, replace br tag with
             // text node with space in it
             if (!lnbr) {
-                var children = node.querySelectorAll(this._blockElements.join(","));
+                var children = node.querySelectorAll("br");
                 children = Array.prototype.slice.call(children);
                 while (children.length) {
                     var child = children.shift();
