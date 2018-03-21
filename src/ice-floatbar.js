@@ -330,10 +330,10 @@
             else
                 this.wrapper.removeAttribute("data-" + this._className + "-dropdown");
 
-            this._reposition();
-
             var event = new CustomEvent("iceeditorfloatbardropdown", { detail: { from: old, to: value } });
             this.editor.element.dispatchEvent(event);
+
+            this._reposition();
         },
 
         /**
@@ -457,7 +457,8 @@
                         node.value = value;
                     }
 
-                    this._nodeApply(node);
+                    var event = new Event("change");
+                    node.dispatchEvent(event);
                 }.bind(this));
             }
         },
@@ -530,12 +531,27 @@
             if (!node)
                 return;
 
-            var apply = this._nodeApply(node);
-            if (!apply)
-                return;
+            // get method and arguments from data attribute
+            // and replace items that starts with dollar
+            // sign with node property (for example:
+            // value with node.value)
+            var method = node.getAttribute("data-ice-method");
+            var attr = node.getAttribute("data-ice-args");
+            var args = JSON.parse(attr).map(function(item) {
+                var result = item;
+                if (typeof result === "string" && result.substr(0,1) === "$" && result.substr(1) in node)
+                    result = node[result.substr(1)];
+                if (item === "$value")
+                    result = ""
+                        + (node.getAttribute("data-ice-prefix") || "")
+                        + result
+                        + (node.getAttribute("data-ice-suffix") || "");
+                if (node.tagName === "INPUT" && ["checkbox", "radio"].indexOf(node.type) !== -1 && item === "$value" && !node.checked)
+                    result = undefined;
 
-            var method = apply[0];
-            var args = apply[1];
+                return result;
+            });
+
             if (typeof this[method] === "function")
                 this[method].apply(this, args);
         }
