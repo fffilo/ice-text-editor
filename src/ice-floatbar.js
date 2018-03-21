@@ -330,6 +330,8 @@
             else
                 this.wrapper.removeAttribute("data-" + this._className + "-dropdown");
 
+            this._reposition();
+
             var event = new CustomEvent("iceeditorfloatbardropdown", { detail: { from: old, to: value } });
             this.editor.element.dispatchEvent(event);
         },
@@ -345,8 +347,6 @@
                 this.dropdown(null);
             else
                 this.dropdown(value);
-
-            this._reposition();
         },
 
         /**
