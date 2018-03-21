@@ -280,6 +280,9 @@
 
             this.dropdown(null);
             this.element.classList.add(this._className + "-show");
+
+            var event = new CustomEvent("iceeditorfloatbarshow");
+            this.editor.element.dispatchEvent(event);
         },
 
         /**
@@ -293,6 +296,9 @@
 
             this.element.classList.remove(this._className + "-show");
             this.dropdown(null);
+
+            var event = new CustomEvent("iceeditorfloatbarhide");
+            this.editor.element.dispatchEvent(event);
         },
 
         /**
@@ -315,10 +321,17 @@
             if (typeof value === "undefined")
                 return this.wrapper.getAttribute("data-" + this._className + "-dropdown");
 
+            var old = this.dropdown();
+            if (value === old)
+                return;
+
             if (value)
                 this.wrapper.setAttribute("data-" + this._className + "-dropdown", value);
             else
                 this.wrapper.removeAttribute("data-" + this._className + "-dropdown");
+
+            var event = new CustomEvent("iceeditorfloatbardropdown", { detail: { from: old, to: value } });
+            this.editor.element.dispatchEvent(event);
         },
 
         /**
@@ -344,8 +357,14 @@
          * @return {Mixed}
          */
         exec: function(method) {
-            if (typeof this.editor[method] === "function")
-                this.editor[method].apply(this.editor, Array.prototype.slice.call(arguments, 1));
+            if (typeof this.editor[method] !== "function")
+                return;
+
+            var args = Array.prototype.slice.call(arguments, 1);
+            this.editor[method].apply(this.editor, args);
+
+            var event = new CustomEvent("iceeditorfloatbarexec", { detail: { method: method, arguments: args } });
+            this.editor.element.dispatchEvent(event);
         },
 
         /**
