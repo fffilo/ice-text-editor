@@ -393,8 +393,8 @@
             if (!this.element || !this.wrapper)
                 return;
 
-            //this.element.style.width = this.wrapper.scrollWidth + "px";
-            this.element.style.height = this.wrapper.scrollHeight + "px";
+            //this.element.style.width = this.wrapper.offsetWidth + "px";
+            this.element.style.height = this.wrapper.offsetHeight + "px";
 
             var position = {
                 left: rect.left + rect.width / 2 - this.element.offsetWidth / 2,
