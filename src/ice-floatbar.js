@@ -222,6 +222,9 @@
                     this._ui[attr] = [];
                 this._ui[attr].push(node);
             }.bind(this));
+
+            var event = new CustomEvent("iceeditorfloatbarinit");
+            this.editor.element.dispatchEvent(event);
         },
 
         /**
