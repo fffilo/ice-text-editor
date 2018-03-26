@@ -15,13 +15,15 @@
 .ice-floatbar-wrapper li,
 .ice-floatbar-wrapper p,
 .ice-floatbar-wrapper input { display: block; margin: 0; padding: 0; border: 0 none; outline: 0 none; color: inherit; background: transparent; }
+/*
 .ice-floatbar-wrapper ul { display: flex; margin: 0; padding: 0.25em; text-align: center; list-style-type: none; }
 .ice-floatbar-wrapper li { flex: 1; }
+*/
 .ice-floatbar-wrapper p { position: relative; padding: 0.5em 0.25em; }
 .ice-floatbar-wrapper p + p { padding-top: 0; }
 .ice-floatbar-wrapper a { display: block; height: 2em; line-height: 2em; font-weight: normal; outline: 0 none; color: inherit; text-decoration: none; }
 .ice-floatbar-wrapper a:hover { color: #2196f3; }
-.ice-floatbar-wrapper input { width: 100%; line-height: 2; font-size: 0.8em; color: inherit; font-weight: inherit; }
+.ice-floatbar-wrapper input { width: 100%; line-height: 2; font-size: 0.8em; font-weight: inherit; color: inherit; }
 .ice-floatbar-wrapper input:focus { color: inherit; font-weight: inherit; }
 .ice-floatbar-wrapper input::placeholder { color: #999; }
 .ice-floatbar-wrapper label { display: inline-block; line-height: 2; font-size: 0.8em; vertical-align: middle; color: inherit; font-weight: inherit; }
@@ -40,6 +42,13 @@
 .ice-floatbar-wrapper .ice-floatbar-nav { display: block; margin: 0; padding: 0; }
 .ice-floatbar-wrapper .ice-floatbar-nav a { min-width: 2em; }
 
+/* horizontal/vertical list */
+.ice-floatbar-wrapper .ice-floatbar-hlist { display: flex; padding: 0.25em; text-align: center; }
+.ice-floatbar-wrapper .ice-floatbar-hlist > * { flex: 1; }
+.ice-floatbar-wrapper .ice-floatbar-vlist { display: block; max-height: 10em; padding: 0.5em; font-size: 0.8em; text-align: left; overflow-y: scroll; }
+.ice-floatbar-wrapper .ice-floatbar-vlist > * { display: block; flex: initial; }
+.ice-floatbar-wrapper .ice-floatbar-vlist a { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
 /* dropdown */
 .ice-floatbar-wrapper .ice-floatbar-dropdown { display: none; margin-top: 0.25em; padding-top: 0.25em; border-top: 1px solid #aaa; }
 .ice-floatbar-wrapper[data-ice-floatbar-dropdown="format-block"] .ice-floatbar-dropdown.ice-floatbar-dropdown-format-block,
@@ -51,10 +60,10 @@
 /* inputs */
 .ice-floatbar-wrapper input[type="number"] {  width: calc(100% - 4.5em); }
 .ice-floatbar-wrapper input[type="range"] {  width: calc(100% - 4.5em); height: 1.75em; }
-.ice-floatbar-wrapper input[type="number"] + span,
-.ice-floatbar-wrapper input[type="range"] + span { position: absolute; display: block; top: 0.5em; right: 1.5em; bottom: 0.5em; width: 3em; font-size: 0.8em; line-height: 2; color: gray; text-align: right; }
-.ice-floatbar-wrapper input[type="number"] + span::after { content: attr(data-ice-suffix); }
-.ice-floatbar-wrapper input[type="range"] + span::after { content: attr(data-ice-status); }
+.ice-floatbar-wrapper input[type="number"] + .ice-floatbar-unit,
+.ice-floatbar-wrapper input[type="range"] + .ice-floatbar-unit { position: absolute; display: block; top: 0.5em; right: 1.5em; bottom: 0.5em; width: 3em; font-size: 0.8em; line-height: 2; color: gray; text-align: right; }
+.ice-floatbar-wrapper input[type="number"] + .ice-floatbar-unit::after { content: attr(data-ice-suffix); }
+.ice-floatbar-wrapper input[type="range"] + .ice-floatbar-unit::after { content: attr(data-ice-status); }
 .ice-floatbar-wrapper .ice-floatbar-switch { position: relative; display: inline-block; float: right; width: 4em; height: 2em; }
 .ice-floatbar-wrapper .ice-floatbar-switch input { display: none; }
 .ice-floatbar-wrapper .ice-floatbar-switch span { position: absolute; cursor: pointer; top: 0; right: 0; bottom: 0; left: 0; background-color: #ccc; transition: .4s; border-radius: 1em; }
@@ -62,11 +71,6 @@
 .ice-floatbar-wrapper .ice-floatbar-switch input:focus + span { box-shadow: 0 0 1px #2196f3; }
 .ice-floatbar-wrapper .ice-floatbar-switch input:checked + span { background-color: #2196f3; }
 .ice-floatbar-wrapper .ice-floatbar-switch input:checked + span::before { transform: translateX(2em); }
-
-/* list */
-.ice-floatbar-wrapper ul.ice-floatbar-list { display: block; max-height: 10em; padding: 0.5em; font-size: 0.8em; text-align: left; overflow-y: scroll; }
-.ice-floatbar-wrapper ul.ice-floatbar-list li { display: block; flex: initial; }
-.ice-floatbar-wrapper ul.ice-floatbar-list a { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* highlights */
 .ice-floatbar-wrapper [data-ice-decoration="bold"][data-ice-status="true"] [data-ice-method],
