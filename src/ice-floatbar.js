@@ -223,8 +223,12 @@
                 this._ui[attr].push(node);
             }.bind(this));
 
-            var event = new CustomEvent("iceeditorfloatbarinit");
-            this.editor.element.dispatchEvent(event);
+            // editor floatbar not yet instanced,
+            // wait for next tick...
+            setTimeout(function() {
+                var event = new CustomEvent("iceeditorfloatbarinit");
+                this.editor.element.dispatchEvent(event);
+            }.bind(this));
         },
 
         /**
