@@ -56,6 +56,8 @@
 .ice-floatbar-wrapper[data-ice-floatbar-dropdown="align"] .ice-floatbar-dropdown.ice-floatbar-dropdown-align,
 .ice-floatbar-wrapper[data-ice-floatbar-dropdown="link"] .ice-floatbar-dropdown.ice-floatbar-dropdown-link,
 .ice-floatbar-wrapper[data-ice-floatbar-dropdown="color"] .ice-floatbar-dropdown.ice-floatbar-dropdown-color { display: block; }
+.ice-floatbar-wrapper[data-ice-floatbar-dropdown="fore-color"] .ice-floatbar-dropdown.ice-floatbar-dropdown-fore-color { display: block; }
+.ice-floatbar-wrapper[data-ice-floatbar-dropdown="back-color"] .ice-floatbar-dropdown.ice-floatbar-dropdown-back-color { display: block; }
 
 /* inputs */
 .ice-floatbar-wrapper input[type="number"] {  width: calc(100% - 4.5em); }
