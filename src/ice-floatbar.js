@@ -414,7 +414,7 @@
 
             // floatbar off viewport
             if (rect.top - this.element.offsetHeight < 0) {
-                position.top = rect.top + rect.height;
+                position.top += rect.height + this.wrapper.offsetHeight;
                 position.className = "bottom";
             }
 
