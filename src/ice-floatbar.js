@@ -381,6 +381,9 @@
          * @return {Void}
          */
         _reposition: function(rect) {
+            if (!this.element || !this.wrapper)
+                return;
+
             if (!rect) {
                 var selection = this.editor.window.getSelection();
                 if (!selection.rangeCount)
@@ -389,9 +392,6 @@
 
                 rect = range.getBoundingClientRect();
             }
-
-            if (!this.element || !this.wrapper)
-                return;
 
             //this.element.style.width = this.wrapper.offsetWidth + "px";
             this.element.style.height = this.wrapper.offsetHeight + "px";
@@ -412,7 +412,8 @@
             position.left += scrollLeft - clientLeft;
             position.top += scrollTop - clientTop;
 
-            if (position.top < 0) {
+            // floatbar off viewport
+            if (rect.top - this.element.offsetHeight < 0) {
                 position.top = rect.top + rect.height;
                 position.className = "bottom";
             }
