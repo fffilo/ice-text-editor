@@ -751,10 +751,12 @@
                     result.align = "right";
 
                 var css = style(el, "background-color");
-                if (!("backColor" in result))
-                    result.backColor = css;
-                else if (result.backColor !== css)
-                    result.backColor = null;
+                if (css.replace(/\s+/g, "") !== "rgba(0,0,0,0)") {
+                    if (!("backColor" in result))
+                        result.backColor = css;
+                    else if (result.backColor !== css)
+                        result.backColor = null;
+                }
 
                 var css = style(el, "font-family");
                 if (!("fontName" in result))
@@ -773,8 +775,6 @@
                     result.foreColor = css;
                 else if (result.foreColor !== css)
                     result.foreColor = null;
-
-                result.hiliteColor = result.backColor;
 
                 var link = ice.Util.closest(node[i], "a");
                 if (link) {
@@ -804,6 +804,12 @@
                     result.linkRel = null;
                 }
             }
+
+            // 'till now we ignored transparent backgrounds,
+            // so set it if not already done so...
+            if (!("backColor" in result))
+                result.backColor = style(this.element, "background-color");
+            result.hiliteColor = result.backColor;
 
             return result;
         },

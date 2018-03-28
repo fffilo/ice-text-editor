@@ -58,6 +58,7 @@
 .ice-floatbar-wrapper[data-ice-floatbar-dropdown="color"] .ice-floatbar-dropdown.ice-floatbar-dropdown-color { display: block; }
 .ice-floatbar-wrapper[data-ice-floatbar-dropdown="fore-color"] .ice-floatbar-dropdown.ice-floatbar-dropdown-fore-color { display: block; }
 .ice-floatbar-wrapper[data-ice-floatbar-dropdown="back-color"] .ice-floatbar-dropdown.ice-floatbar-dropdown-back-color { display: block; }
+.ice-floatbar-wrapper[data-ice-floatbar-dropdown="hilite-color"] .ice-floatbar-dropdown.ice-floatbar-dropdown-hilite-color { display: block; }
 
 /* inputs */
 .ice-floatbar-wrapper input[type="number"] {  width: calc(100% - 4.5em); }
