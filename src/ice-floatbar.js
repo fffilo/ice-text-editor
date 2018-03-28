@@ -287,6 +287,7 @@
 
             this.dropdown(null);
             this.element.classList.add(this._className + "-show");
+            this.editor.document.documentElement.classList.add(this._className + "-showing");
 
             var event = new CustomEvent("iceeditorfloatbarshow");
             this.editor.element.dispatchEvent(event);
@@ -301,6 +302,7 @@
             if (!this.element.classList.contains(this._className + "-show"))
                 return;
 
+            this.editor.document.documentElement.classList.remove(this._className + "-showing");
             this.element.classList.remove(this._className + "-show");
             this.dropdown(null);
 
