@@ -629,7 +629,7 @@
         if (e.detail.editor.floatbar && (e.detail.range.collapsed || !e.detail.editor.floatbar.editor.options("floatbar")))
             return e.detail.editor.floatbar.hide();
 
-        //e.detail.editor.floatbar.dropdown(null);
+        e.detail.editor.floatbar.dropdown(null);
         e.detail.editor.floatbar._reposition(e.detail.rect);
         e.detail.editor.floatbar._setDecorations(e.detail.decorations);
         e.detail.editor.floatbar.show();
