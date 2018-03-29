@@ -684,6 +684,28 @@
         },
 
         /**
+         * Filter selection
+         *
+         * @param  {String} selector
+         * @return {Void}
+         */
+        filterSelection: function(selector) {
+            if (!this.active)
+                return false;
+
+            var node = ice.Util.getSelectedNodes(selector);
+            if (!node.length)
+                return;
+
+            var range = document.createRange();
+            range.selectNodeContents(node[0]);
+
+            var select = window.getSelection();
+            select.removeAllRanges();
+            select.addRange(range);
+        },
+
+        /**
          * Get selection decorations
          *
          * @return {Object}

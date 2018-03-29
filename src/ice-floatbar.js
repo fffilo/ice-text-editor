@@ -55,16 +55,14 @@
                 + '<div class="ice-floatbar-content">'
                 + '<nav class="ice-floatbar-nav">'
                 + '<ul class="ice-floatbar-hlist">'
-                + '<li><a href="#" title="Format Block" data-ice-method="toggle" data-ice-args="[&quot;format-block&quot;]"><i class="fa fa-paragraph"></i></a></li>'
-                + '<li data-ice-decoration="bold"><a href="#" title="Bold" data-ice-method="exec" data-ice-args="[&quot;bold&quot;]"><i class="fa fa-bold"></i></a></li>'
-                + '<li data-ice-decoration="italic"><a href="#" title="Italic" data-ice-method="exec" data-ice-args="[&quot;italic&quot;]"><i class="fa fa-italic"></i></a></li>'
-                + '<li><a href="#" title="Font" data-ice-method="toggle" data-ice-args="[&quot;font&quot;]"><i class="fa fa-font"></i></a></li>'
-                + '<li><a href="#" title="Text Align" data-ice-method="toggle" data-ice-args="[&quot;align&quot;]" ><i class="fa fa-align-center"></i></a></li>'
-                + '<li data-ice-decoration="linkCount">'
-                + '<a href="#" title="Link" data-ice-method="toggle" data-ice-args="[&quot;link&quot;]"><i class="fa fa-link"></i></a>'
-                + '<a href="#" title="Unlink" data-ice-method="exec" data-ice-args="[&quot;unlink&quot;]"><i class="fa fa-link"></i></a>'
-                + '</li>'
-                + '<li><a href="#" title="Color" data-ice-method="toggle" data-ice-args="[&quot;color&quot;]" ><i class="fa fa-circle"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-format-block"><a href="#" title="Format Block" data-ice-method="toggle" data-ice-args="[&quot;format-block&quot;]"><i class="fa fa-paragraph"></i></a></li>'
+                + '<li  class="ice-floatbar-list-item-bold" data-ice-decoration="bold"><a href="#" title="Bold" data-ice-method="exec" data-ice-args="[&quot;bold&quot;]"><i class="fa fa-bold"></i></a></li>'
+                + '<li  class="ice-floatbar-list-item-italic" data-ice-decoration="italic"><a href="#" title="Italic" data-ice-method="exec" data-ice-args="[&quot;italic&quot;]"><i class="fa fa-italic"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-font"><a href="#" title="Font" data-ice-method="toggle" data-ice-args="[&quot;font&quot;]"><i class="fa fa-font"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-align"><a href="#" title="Text Align" data-ice-method="toggle" data-ice-args="[&quot;align&quot;]" ><i class="fa fa-align-center"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-link" data-ice-decoration="linkCount"><a href="#" title="Link" data-ice-method="toggle" data-ice-args="[&quot;link&quot;]" data-ice-pre-method="filterSelection" data-ice-pre-args="[&quot;a&quot;]"><i class="fa fa-link"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-unlink" data-ice-decoration="linkCount"><a href="#" title="Unlink" data-ice-method="exec" data-ice-args="[&quot;unlink&quot;]"><i class="fa fa-chain-broken"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-color"><a href="#" title="Color" data-ice-method="toggle" data-ice-args="[&quot;color&quot;]" ><i class="fa fa-circle"></i></a></li>'
                 + '</ul>'
                 + '</nav>'
                 + '<article class="ice-floatbar-dropdown ice-floatbar-dropdown-format-block">'
@@ -295,12 +293,14 @@
             if (this.element.classList.contains(this._className + "-show"))
                 return;
 
+            var event = new CustomEvent("iceeditorfloatbarshow");
+            this.editor.element.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+
             this.dropdown(null);
             this.element.classList.add(this._className + "-show");
             this.editor.document.documentElement.classList.add(this._className + "-showing");
-
-            var event = new CustomEvent("iceeditorfloatbarshow");
-            this.editor.element.dispatchEvent(event);
         },
 
         /**
@@ -312,12 +312,14 @@
             if (!this.element.classList.contains(this._className + "-show"))
                 return;
 
+            var event = new CustomEvent("iceeditorfloatbarhide");
+            this.editor.element.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+
             this.editor.document.documentElement.classList.remove(this._className + "-showing");
             this.element.classList.remove(this._className + "-show");
             this.dropdown(null);
-
-            var event = new CustomEvent("iceeditorfloatbarhide");
-            this.editor.element.dispatchEvent(event);
         },
 
         /**
@@ -344,13 +346,15 @@
             if (value === old)
                 return;
 
+            var event = new CustomEvent("iceeditorfloatbardropdown", { detail: { from: old, to: value } });
+            this.editor.element.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+
             if (value)
                 this.wrapper.setAttribute("data-" + this._className + "-dropdown", value);
             else
                 this.wrapper.removeAttribute("data-" + this._className + "-dropdown");
-
-            var event = new CustomEvent("iceeditorfloatbardropdown", { detail: { from: old, to: value } });
-            this.editor.element.dispatchEvent(event);
 
             this._reposition();
         },
@@ -384,6 +388,23 @@
 
             var event = new CustomEvent("iceeditorfloatbarexec", { detail: { method: method, arguments: args } });
             this.editor.element.dispatchEvent(event);
+        },
+
+        filterSelection: function(selector) {
+            if (!this.editor.active)
+                return false;
+
+            var node = ice.Util.getSelectedNodes(selector);
+            if (!node.length)
+                return;
+
+            var range = this.editor.document.createRange();
+            range.selectNodeContents(node[0]);
+            this._selectionString = range.toString();
+
+            var select = this.editor.window.getSelection();
+            select.removeAllRanges();
+            select.addRange(range);
         },
 
         /**
@@ -555,25 +576,30 @@
             // and replace items that starts with dollar
             // sign with node property (for example:
             // value with node.value)
-            var method = node.getAttribute("data-ice-method");
-            var attr = node.getAttribute("data-ice-args");
-            var args = JSON.parse(attr).map(function(item) {
-                var result = item;
-                if (typeof result === "string" && result.substr(0,1) === "$" && result.substr(1) in node)
-                    result = node[result.substr(1)];
-                if (item === "$value")
-                    result = ""
-                        + (node.getAttribute("data-ice-prefix") || "")
-                        + result
-                        + (node.getAttribute("data-ice-suffix") || "");
-                if (node.tagName === "INPUT" && ["checkbox", "radio"].indexOf(node.type) !== -1 && item === "$value" && !node.checked)
-                    result = undefined;
+            ["pre-", "", "post-"].forEach(function(prefix) {
+                var method = node.getAttribute("data-ice-" + prefix + "method");
+                var attr = node.getAttribute("data-ice-" + prefix + "args");
+                if (!attr)
+                    return;
 
-                return result;
-            });
+                var args = JSON.parse(attr).map(function(item) {
+                    var result = item;
+                    if (typeof result === "string" && result.substr(0,1) === "$" && result.substr(1) in node)
+                        result = node[result.substr(1)];
+                    if (item === "$value")
+                        result = ""
+                            + (node.getAttribute("data-ice-prefix") || "")
+                            + result
+                            + (node.getAttribute("data-ice-suffix") || "");
+                    if (node.tagName === "INPUT" && ["checkbox", "radio"].indexOf(node.type) !== -1 && item === "$value" && !node.checked)
+                        result = undefined;
 
-            if (typeof this[method] === "function")
-                this[method].apply(this, args);
+                    return result;
+                });
+
+                if (typeof this[method] === "function")
+                    this[method].apply(this, args);
+            }.bind(this));
         }
 
     }
