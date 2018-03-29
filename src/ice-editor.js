@@ -1268,6 +1268,7 @@
                     startContainer: range.startContainer,
                     startOffset: range.startOffset
                 },
+                selectionString: range.toString(),
                 rect: range.getBoundingClientRect(),
                 decorations: _editor.decorations()
             };

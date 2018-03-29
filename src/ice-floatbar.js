@@ -25,6 +25,7 @@
 
         this._editor = editor;
         this._options = options;
+        this._selectionString = null;
 
         this._init();
     }
@@ -256,6 +257,15 @@
          */
         get wrapper() {
             return this._wrapper;
+        },
+
+        /**
+         * Get selection string
+         *
+         * @return {Mixed}
+         */
+        get selectionString() {
+            return this._selectionString;
         },
 
         /**
@@ -617,10 +627,13 @@
     // document unselect event:
     // hide current editor floatbar
     document.addEventListener("iceunselect", function(e) {
-        if (e.detail.editor.floatbar) {
-            if (!ice.Util.closest(e.detail.editor.document.activeElement, "." + ice.Floatbar.prototype._className))
-                e.detail.editor.floatbar.hide();
-        }
+        if (!e.detail.editor.floatbar)
+            return;
+
+        if (!ice.Util.closest(e.detail.editor.document.activeElement, "." + ice.Floatbar.prototype._className))
+            e.detail.editor.floatbar.hide();
+
+        e.detail.editor.floatbar._selectionString = null;
     });
 
     // document select event:
@@ -629,7 +642,10 @@
         if (e.detail.editor.floatbar && (e.detail.range.collapsed || !e.detail.editor.floatbar.editor.options("floatbar")))
             return e.detail.editor.floatbar.hide();
 
-        //e.detail.editor.floatbar.dropdown(null);
+        if (e.detail.selectionString !== e.detail.editor.floatbar.selectionString)
+            e.detail.editor.floatbar.dropdown(null);
+
+        e.detail.editor.floatbar._selectionString = e.detail.selectionString;
         e.detail.editor.floatbar._reposition(e.detail.rect);
         e.detail.editor.floatbar._setDecorations(e.detail.decorations);
         e.detail.editor.floatbar.show();
