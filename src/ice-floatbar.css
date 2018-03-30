@@ -96,6 +96,8 @@
 /* show/hide link/unlink */
 .ice-floatbar-wrapper .ice-floatbar-list-item-unlink { display: none; }
 .ice-floatbar-wrapper .ice-floatbar-list-item-unlink:not([data-ice-status="0"]) { display: block; }
+.ice-floatbar-wrapper .ice-floatbar-dropdown-link input[type="text"] { padding-right: 2.5em; }
+.ice-floatbar-wrapper .ice-floatbar-dropdown-link a[data-ice-link-test] { position: absolute; top: 0.5em; right: 0.25em; width: 1.5em; height: 1.5em; line-height: 1.5em; text-align: center; }
 
 /* font-awesome fallback * /
 .fa { display: inline-block; font-family: "Times New Roman", Times, serif; font-style: normal; text-decoration: none; }
@@ -107,7 +109,9 @@
 .fa-font::before { content: "F"; }
 .fa-link::before { content: "\1f517"; }
 .fa-chain-broken::before { content: "\1f517"; }
+.fa-external-link::before { content: "\2197"; }
 .fa-circle::before { content: "\25CF"; }
+.fa-times::before { content: "\2716"; }
 .fa-align-left::before { content: "\2190"; }
 .fa-align-center::before { content: "\2194"; }
 .fa-align-right::before { content: "\2192"; }

@@ -63,6 +63,7 @@
                 + '<li class="ice-floatbar-list-item-link" data-ice-decoration="linkCount"><a href="#" title="Link" data-ice-method="toggle" data-ice-args="[&quot;link&quot;]" data-ice-pre-method="filterSelection" data-ice-pre-args="[&quot;a&quot;]"><i class="fa fa-link"></i></a></li>'
                 + '<li class="ice-floatbar-list-item-unlink" data-ice-decoration="linkCount"><a href="#" title="Unlink" data-ice-method="exec" data-ice-args="[&quot;unlink&quot;]"><i class="fa fa-chain-broken"></i></a></li>'
                 + '<li class="ice-floatbar-list-item-color"><a href="#" title="Color" data-ice-method="toggle" data-ice-args="[&quot;color&quot;]" ><i class="fa fa-circle"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-remove-format"><a href="#" title="Remove All Formatting" data-ice-method="exec" data-ice-args="[&quot;removeFormat&quot;]" ><i class="fa fa-times"></i></a></li>'
                 + '</ul>'
                 + '</nav>'
                 + '<article class="ice-floatbar-dropdown ice-floatbar-dropdown-format-block">'
@@ -107,7 +108,10 @@
                 + '</ul>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown ice-floatbar-dropdown-link">'
-                + '<p><input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,&quot;&dollar;value&quot;,null,null]" data-ice-decoration="linkURL" /></p>'
+                + '<p>'
+                + '<input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-empty-value="#" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,&quot;&dollar;value&quot;,null,null]" data-ice-decoration="linkURL" />'
+                + '<a href="#" target="_parent|_blank" data-ice-link-test=""><i class="fa fa-external-link"></i></a>'
+                + '</p>'
                 + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" value="_blank" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,&quot;&dollar;value&quot;,null]" data-ice-decoration="linkTarget" /><span></span></label></p>'
                 + '<p><label>No Follow</label><label class="ice-floatbar-switch" title="No Follow"><input type="checkbox" value="nofollow" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,null,&quot;&dollar;value&quot;]" data-ice-decoration="linkRel" /><span></span></label></p>'
                 + '</article>'
@@ -390,6 +394,15 @@
             this.editor.element.dispatchEvent(event);
         },
 
+        /**
+         * Filter selection
+         * (c/p from ice-editor.js with addition
+         * that we reset selectionString before
+         * creating new selection)
+         *
+         * @param  {String} selector
+         * @return {Void}
+         */
         filterSelection: function(selector) {
             if (!this.editor.active)
                 return false;
@@ -398,11 +411,15 @@
             if (!node.length)
                 return;
 
-            var range = this.editor.document.createRange();
-            range.selectNodeContents(node[0]);
-            this._selectionString = range.toString();
+            var range = document.createRange();
+            var text = ice.Util.getTextNodes(node[0]);
+            var start = text[0];
+            var end = text[text.length - 1]
+            range.setStart(start, 0);
+            range.setEnd(end, end.length);
 
             var select = this.editor.window.getSelection();
+            this._selectionString = range.toString();
             select.removeAllRanges();
             select.addRange(range);
         },
@@ -546,11 +563,27 @@
          * @return {Void}
          */
         _handleClick: function(e) {
-            if (ice.Util.closest(e.target, "a"))
+            var target = e.target;
+            var link = ice.Util.closest(target, "a")
+            if (link && ice.Util.is(link, "[data-ice-link-test]")) {
+                var a = ice.Util.getSelectedNodes("a");
+                if (a && a.length && a[0].href && a[0].href !== "#")
+                    link.href = a[0].href;
+                else
+                    e.preventDefault();
+
+                setTimeout(function() {
+                    this.href = "#";
+                }.bind(link));
+
+                return;
+            }
+
+            if (link)
                 e.preventDefault();
 
             // this._handleChange will do the job
-            if (["input", "select", "textarea"].indexOf(e.target.tagName.toLowerCase()) !== -1)
+            if (["input", "select", "textarea"].indexOf(target.tagName.toLowerCase()) !== -1)
                 return;
 
             this._handleChange(e);
@@ -571,6 +604,10 @@
             var node = ice.Util.closest(e.target, "[data-ice-method]");
             if (!node)
                 return;
+
+            // do not allow empty value
+            if (node.value === "" && ice.Util.is(node, "[data-ice-empty-value]"))
+                node.value = node.getAttribute("data-ice-empty-value");
 
             // get method and arguments from data attribute
             // and replace items that starts with dollar

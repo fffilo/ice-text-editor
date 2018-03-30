@@ -698,7 +698,11 @@
                 return;
 
             var range = document.createRange();
-            range.selectNodeContents(node[0]);
+            var text = ice.Util.getTextNodes(node[0]);
+            var start = text[0];
+            var end = text[text.length - 1]
+            range.setStart(start, 0);
+            range.setEnd(end, end.length);
 
             var select = window.getSelection();
             select.removeAllRanges();

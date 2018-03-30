@@ -280,6 +280,23 @@
         },
 
         /**
+         * Get all text nodes under node
+         *
+         * @param  {Node}  node
+         * @return {Array}
+         */
+        getTextNodes: function(node) {
+            var walk = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+            var result = [];
+
+            var child;
+            while(child = walk.nextNode())
+                result.push(child);
+
+            return result;
+        },
+
+        /**
          * Get all text nodes in selected range
          *
          * @return {Array}
