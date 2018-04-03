@@ -68,6 +68,7 @@
             allowHorizontalRule: true,
             allowSplit: true,
             allowRichtextPaste: true,
+            autoSelectLink: false,
             allowedBlocks: [
                 "h1",
                 "h2",
@@ -1094,6 +1095,34 @@
             }
 
             return result;
+        },
+
+        /**
+         * Element click event handler:
+         * select entire anchor tag on click
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleMouseup: function(e) {
+            if (e.which !== 1)
+                return;
+
+            var that = this;
+            if (!(that instanceof ice.Editor))
+                that = that.ice;
+            if (that._skipDispatch)
+                return;
+            if (!that.options("autoSelectLink"))
+                return;
+            if (!that.window.getSelection().isCollapsed)
+                return;
+
+            var link = ice.Util.closest(e.target, "." + that._className + " a");
+            if (!link)
+                return;
+
+            that.filterSelection("a");
         },
 
         /**
