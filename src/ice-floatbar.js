@@ -401,18 +401,21 @@
          * creating new selection)
          *
          * @param  {String} selector
-         * @return {Object}
+         * @return {Void}
          */
         filterSelection: function(selector) {
             if (!this.editor.active)
-                return null;
+                return;
 
             var node = ice.Util.getSelectedNodes(selector);
-            if (!node.length)
-                return null;
+            if (!node || !node.length)
+                return;
+
+            var text = ice.Util.getTextNodes(node[0]);
+            if (!text)
+                return;
 
             var range = document.createRange();
-            var text = ice.Util.getTextNodes(node[0]);
             var start = text[0];
             var end = text[text.length - 1]
             range.setStart(start, 0);
@@ -422,8 +425,6 @@
             this._selectionString = range.toString();
             select.removeAllRanges();
             select.addRange(range);
-
-            return node[0];
         },
 
         /**
