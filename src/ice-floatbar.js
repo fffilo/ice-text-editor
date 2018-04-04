@@ -415,13 +415,18 @@
             if (!text)
                 return;
 
-            var range = document.createRange();
+            var select = window.getSelection();
+            var range = select.getRangeAt(0);
             var start = text[0];
             var end = text[text.length - 1]
+
+            // selection not changed
+            if (range.startContainer === start && range.startOffset === 0 && range.endContainer === end && range.endOffset === end.length)
+                return;
+
+            range = document.createRange();
             range.setStart(start, 0);
             range.setEnd(end, end.length);
-
-            var select = this.editor.window.getSelection();
             this._selectionString = range.toString();
             select.removeAllRanges();
             select.addRange(range);
