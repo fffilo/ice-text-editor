@@ -1,7 +1,9 @@
 /* display and position */
-.ice-floatbar { position: absolute; display: block; visibility: hidden; top: -2em; width: 18em; margin: 0; padding: 0; z-index: 1000; border: 0; box-sizing: border-box; transition: top .4s, left .4s; }
+.ice-floatbar { position: absolute; display: flex; flex-direction: column; visibility: hidden; top: -2em; width: auto; height: auto; margin: 0; padding: 0; z-index: 1000; box-sizing: border-box; pointer-events: none; transition: top .4s, left .4s; }
+.ice-floatbar > * { pointer-events: all; }
 .ice-floatbar * { box-sizing: border-box; }
 .ice-floatbar.ice-floatbar-show { visibility: visible; }
+.ice-floatbar-iframe { position: relative; display: block; width: auto; height: auto; border: 0; }
 
 /* reset */
 .ice-floatbar-html,
@@ -27,12 +29,12 @@
 
 /* display content */
 .ice-floatbar.ice-floatbar-position-bottom { transform: translateY(-0.125em); }
-.ice-floatbar.ice-floatbar-position-top { transform: translateY(0.125em); }
+.ice-floatbar.ice-floatbar-position-top { transform: translateY(0.125em); flex-direction: column-reverse; }
 .ice-floatbar-wrapper.ice-floatbar-position-bottom::before,
 .ice-floatbar-wrapper.ice-floatbar-position-top::after { content: ""; position: absolute; display: block; left: 50%; width: 0; height: 0; margin: 0; padding: 0; border: 0.25em solid transparent; transform: translateX(-50%); z-index: 1; }
 .ice-floatbar-wrapper.ice-floatbar-position-bottom::before { bottom: calc(100% - 0.5em); border-bottom-color: rgba(0,0,0,0.9); }
 .ice-floatbar-wrapper.ice-floatbar-position-top::after { top: calc(100% - 0.5em); border-top-color: rgba(0,0,0,0.9); }
-.ice-floatbar-content { position: relative; margin: 0.5em; padding: 0.25em; font-family: Arial, Helvetica, sans-serif; background: rgba(0,0,0,0.9); border-radius: 0.25em; box-shadow: 0 0 0.5em 0 rgba(255, 255, 255, 0.5); }
+.ice-floatbar-content { position: relative; width: 17.25em; margin: 0.5em; padding: 0.25em; font-family: Arial, Helvetica, sans-serif; background: rgba(0,0,0,0.9); border-radius: 0.25em; box-shadow: 0 0 0.5em 0 rgba(255, 255, 255, 0.5); }
 
 /* main navigation */
 .ice-floatbar-wrapper .ice-floatbar-nav { display: block; margin: 0; padding: 0; }

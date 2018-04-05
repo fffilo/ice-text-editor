@@ -110,7 +110,7 @@
                 + '<article class="ice-floatbar-dropdown ice-floatbar-dropdown-link">'
                 + '<p>'
                 + '<input type="text" title="Link URL" placeholder="Link URL" value="" data-ice-empty-value="#" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,&quot;&dollar;value&quot;,null,null]" data-ice-decoration="linkURL" />'
-                + '<a href="#" target="_parent|_blank" data-ice-link-test=""><i class="fa fa-external-link"></i></a>'
+                + '<a href="#" target="_parent|_blank" title="Open Link" data-ice-link-test=""><i class="fa fa-external-link"></i></a>'
                 + '</p>'
                 + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" value="_blank" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,&quot;&dollar;value&quot;,null]" data-ice-decoration="linkTarget" /><span></span></label></p>'
                 + '<p><label>No Follow</label><label class="ice-floatbar-switch" title="No Follow"><input type="checkbox" value="nofollow" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,null,&quot;&dollar;value&quot;]" data-ice-decoration="linkRel" /><span></span></label></p>'
@@ -146,15 +146,20 @@
             }
 
             // create
-            this._element = this.editor.document.createElement("iframe");
+            this._element = this.editor.document.createElement("div");
             for (var i = 0; i < this.editor.element.attributes.length; i++) {
                 if (this.editor.element.attributes[i].name.substr(0, 5) === "data-")
                     this._element.setAttribute(this.editor.element.attributes[i].name, this.editor.element.attributes[i].value);
             }
             this._element.classList.add(this._className);
-            this._element.onload = this._load.bind(this);
             this._element.ice = this;
             this.editor.document.body.appendChild(this._element);
+
+            // iframe
+            this._iframe = this.editor.document.createElement("iframe");
+            this._iframe.classList.add(this._className + "-iframe");
+            this._iframe.onload = this._load.bind(this);
+            this._element.appendChild(this._iframe);
         },
 
         /**
@@ -179,13 +184,13 @@
          * @return {Void}
          */
         _load: function() {
-            this._element.contentDocument.documentElement.classList.add(this._className + "-html");
-            this._element.contentDocument.body.classList.add(this._className + "-body");
+            this._iframe.contentDocument.documentElement.classList.add(this._className + "-html");
+            this._iframe.contentDocument.body.classList.add(this._className + "-body");
 
             // add all data attributes from element to html
-            for (var i = 0; i < this._element.attributes.length; i++) {
-                if (this._element.attributes[i].name.substr(0, 5) === "data-")
-                    this._element.contentDocument.documentElement.setAttribute(this._element.attributes[i].name, this._element.attributes[i].value);
+            for (var i = 0; i < this._iframe.parentNode.attributes.length; i++) {
+                if (this._iframe.parentNode.attributes[i].name.substr(0, 5) === "data-")
+                    this._iframe.contentDocument.documentElement.setAttribute(this._iframe.parentNode.attributes[i].name, this._iframe.parentNode.attributes[i].value);
             }
 
             // bind handles with this
@@ -200,12 +205,12 @@
             this._wrapper.classList.add(this._className + "-position-top");
             this._wrapper.addEventListener("click", this._handleThisClick);
             this._wrapper.addEventListener("change", this._handleThisChange);
-            this._element.contentDocument.body.appendChild(this._wrapper);
+            this._iframe.contentDocument.body.appendChild(this._wrapper);
 
             // append all sylesheets to iframe
             for (var i = 0; i < document.styleSheets.length; i++) {
                 var style = document.styleSheets[i].ownerNode.cloneNode();
-                this._element.contentDocument.head.appendChild(style);
+                this._iframe.contentDocument.head.appendChild(style);
             }
 
             // hide not allowed format blocks
@@ -250,6 +255,15 @@
          */
         get element() {
             return this._element;
+        },
+
+        /**
+         * Get this.iframe object
+         *
+         * @return {Object}
+         */
+        get iframe() {
+            return this._iframe;
         },
 
         /**
@@ -439,7 +453,7 @@
          * @return {Void}
          */
         _reposition: function(rect) {
-            if (!this.element || !this.wrapper)
+            if (!this.element || !this.iframe || !this.wrapper)
                 return;
 
             if (!rect) {
@@ -451,8 +465,8 @@
                 rect = range.getBoundingClientRect();
             }
 
-            //this.element.style.width = this.wrapper.offsetWidth + "px";
-            this.element.style.height = this.wrapper.offsetHeight + "px";
+            this.iframe.style.width = this.wrapper.offsetWidth + "px";
+            this.iframe.style.height = this.wrapper.offsetHeight + "px";
 
             var position = {
                 left: rect.left + rect.width / 2 - this.element.offsetWidth / 2,
@@ -472,7 +486,7 @@
 
             // floatbar off viewport
             if (rect.top - this.element.offsetHeight < 0) {
-                position.top += rect.height + this.wrapper.offsetHeight;
+                position.top += rect.height + this.element.offsetHeight;
                 position.className = "bottom";
             }
 
