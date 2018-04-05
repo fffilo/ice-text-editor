@@ -258,12 +258,21 @@
         },
 
         /**
-         * Get this.iframe object
+         * Get window object from iframe
          *
          * @return {Object}
          */
-        get iframe() {
-            return this._iframe;
+        get window() {
+            return this.document ? this.document.defaultView : null;
+        },
+
+        /**
+         * Get document object from iframe
+         *
+         * @return {Object}
+         */
+        get document() {
+            return this._iframe ? this._iframe.contentDocument : null;
         },
 
         /**
@@ -453,7 +462,7 @@
          * @return {Void}
          */
         _reposition: function(rect) {
-            if (!this.element || !this.iframe || !this.wrapper)
+            if (!this.element || !this._iframe || !this.wrapper)
                 return;
 
             if (!rect) {
@@ -465,8 +474,8 @@
                 rect = range.getBoundingClientRect();
             }
 
-            this.iframe.style.width = this.wrapper.offsetWidth + "px";
-            this.iframe.style.height = this.wrapper.offsetHeight + "px";
+            this._iframe.style.width = this.wrapper.offsetWidth + "px";
+            this._iframe.style.height = this.wrapper.offsetHeight + "px";
 
             var position = {
                 left: rect.left + rect.width / 2 - this.element.offsetWidth / 2,
