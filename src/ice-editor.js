@@ -292,7 +292,7 @@
             if (!this.active)
                 return false;
 
-            return this._execCommandStyleWithoutCSS("bold");
+            return this._execCommandStyleWithoutOrWithCSS("bold");
         },
 
         /**
@@ -368,7 +368,7 @@
             if (!this.active)
                 return false;
 
-            return this._execCommandStyleWithoutCSS("italic");
+            return this._execCommandStyleWithoutOrWithCSS("italic");
         },
 
         /**
@@ -381,7 +381,7 @@
                 return false;
 
             this._skipDispatch = true;
-            var result = this._execCommandStyleWithoutCSS("strikeThrough");
+            var result = this._execCommandStyleWithoutOrWithCSS("strikeThrough");
 
             // replace depricated strike tag with s tag
             if (result) {
@@ -433,7 +433,7 @@
             if (!this.active)
                 return false;
 
-            return this._execCommandStyleWithoutCSS("underline");
+            return this._execCommandStyleWithoutOrWithCSS("underline");
         },
 
         /**
@@ -1042,11 +1042,35 @@
          * Document exeCommand proxy
          *
          * @param  {String}  key
-         * @param  {String}  value (optional)
+         * @param  {Mixed}   value (optional)
          * @return {Boolean}
          */
         _execCommand: function(key, value) {
             return this.document.execCommand(key, false, value);
+        },
+
+        /**
+         * Document execCommand with styleWithCSS
+         *
+         * @param  {String}  key
+         * @param  {Mixed}   value (optional)
+         * @return {Boolean}
+         */
+        _execCommandStyleWithCSS: function(key, value) {
+            this._execCommand("styleWithCSS", true);
+            return this._execCommand(key, value);
+        },
+
+        /**
+         * Document execCommand without styleWithCSS
+         *
+         * @param  {String}  key
+         * @param  {Mixed}   value (optional)
+         * @return {Boolean}
+         */
+        _execCommandStyleWithoutCSS: function(key, value) {
+            this._execCommand("styleWithCSS", false);
+            return this._execCommand(key, value);
         },
 
         /**
@@ -1057,48 +1081,20 @@
          * without css as well
          *
          * @param  {String}  key
-         * @param  {String}  value (optional)
+         * @param  {Mixed}   value (optional)
          * @return {Boolean}
          */
-        _execCommandStyleWithCSS: function(key, value) {
+        _execCommandStyleWithoutOrWithCSS: function(key, value) {
             var innerHTML = this.element.innerHTML;
             var result = false;
 
             if (!result) {
-                this._execCommand("styleWithCSS", true);
-                this._execCommand(key, value);
+                this._execCommandStyleWithoutCSS(key, value);
                 result = this.element.innerHTML !== innerHTML;
             }
 
             if (!result) {
-                this._execCommand("styleWithCSS", false);
-                this._execCommand(key, value);
-                result = this.element.innerHTML !== innerHTML;
-            }
-
-            return result;
-        },
-
-        /**
-         * See _execCommandStyleWithCSS
-         *
-         * @param  {String}  key
-         * @param  {String}  value (optional)
-         * @return {Boolean}
-         */
-        _execCommandStyleWithoutCSS: function(key, value) {
-            var innerHTML = this.element.innerHTML;
-            var result = false;
-
-            if (!result) {
-                this._execCommand("styleWithCSS", false);
-                this._execCommand(key, value);
-                result = this.element.innerHTML !== innerHTML;
-            }
-
-            if (!result) {
-                this._execCommand("styleWithCSS", true);
-                this._execCommand(key, value);
+                this._execCommandStyleWithCSS(key, value);
                 result = this.element.innerHTML !== innerHTML;
             }
 
