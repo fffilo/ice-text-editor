@@ -34,7 +34,7 @@
 .ice-floatbar-wrapper.ice-floatbar-position-top::after { content: ""; position: absolute; display: block; left: 50%; width: 0; height: 0; margin: 0; padding: 0; border: 0.25em solid transparent; transform: translateX(-50%); z-index: 1; }
 .ice-floatbar-wrapper.ice-floatbar-position-bottom::before { bottom: calc(100% - 0.5em); border-bottom-color: rgba(0,0,0,0.9); }
 .ice-floatbar-wrapper.ice-floatbar-position-top::after { top: calc(100% - 0.5em); border-top-color: rgba(0,0,0,0.9); }
-.ice-floatbar-content { position: relative; width: 18em; margin: 0.5em; padding: 0.25em; font-family: Arial, Helvetica, sans-serif; background: rgba(0,0,0,0.9); border-radius: 0.25em; box-shadow: 0 0 0.5em 0 rgba(255, 255, 255, 0.5); }
+.ice-floatbar-content { position: relative; width: 18.5em; margin: 0.5em; padding: 0.25em; font-family: Arial, Helvetica, sans-serif; background: rgba(0,0,0,0.9); border-radius: 0.25em; box-shadow: 0 0 0.5em 0 rgba(255, 255, 255, 0.5); }
 
 /* main navigation */
 .ice-floatbar-wrapper .ice-floatbar-nav { display: block; margin: 0; padding: 0; }

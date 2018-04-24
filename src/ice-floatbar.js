@@ -19,12 +19,12 @@
      * @param  {Object} options
      * @return {Void}
      */
-    ice.Floatbar = function ice_Floatbar(editor, options) {
+    ice.Floatbar = function ice_Floatbar(options) {
         if (!(this instanceof ice_Floatbar))
             throw "ice.Floatbar: ice.Floatbar is a constructor";
 
-        this._editor = editor;
         this._options = options;
+        this._editor = null;
         this._selectionString = null;
 
         this._init();
@@ -50,19 +50,20 @@
          * @type {Object}
          */
         _defaults: {
+            parent: window.document.body,
             template: ''
                 + '<div class="ice-floatbar-wrapper">'
                 + '<div class="ice-floatbar-content">'
                 + '<nav class="ice-floatbar-nav">'
                 + '<ul class="ice-floatbar-hlist">'
-                + '<li class="ice-floatbar-list-item-format-block"><a href="#" title="Format Block" data-ice-method="toggle" data-ice-args="[&quot;format-block&quot;]"><i class="fa fa-paragraph"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-format-block"><a href="#" title="Format Block" data-ice-method="toggleDropdown" data-ice-args="[&quot;format-block&quot;]"><i class="fa fa-paragraph"></i></a></li>'
                 + '<li  class="ice-floatbar-list-item-bold" data-ice-decoration="bold"><a href="#" title="Bold" data-ice-method="exec" data-ice-args="[&quot;bold&quot;]"><i class="fa fa-bold"></i></a></li>'
                 + '<li  class="ice-floatbar-list-item-italic" data-ice-decoration="italic"><a href="#" title="Italic" data-ice-method="exec" data-ice-args="[&quot;italic&quot;]"><i class="fa fa-italic"></i></a></li>'
-                + '<li class="ice-floatbar-list-item-font"><a href="#" title="Font" data-ice-method="toggle" data-ice-args="[&quot;font&quot;]"><i class="fa fa-font"></i></a></li>'
-                + '<li class="ice-floatbar-list-item-align"><a href="#" title="Text Align" data-ice-method="toggle" data-ice-args="[&quot;align&quot;]" ><i class="fa fa-align-center"></i></a></li>'
-                + '<li class="ice-floatbar-list-item-link" data-ice-decoration="linkCount"><a href="#" title="Link" data-ice-method="toggle" data-ice-args="[&quot;link&quot;]" data-ice-pre-method="filterSelection" data-ice-pre-args="[&quot;a&quot;]"><i class="fa fa-link"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-font"><a href="#" title="Font" data-ice-method="toggleDropdown" data-ice-args="[&quot;font&quot;]"><i class="fa fa-font"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-align"><a href="#" title="Text Align" data-ice-method="toggleDropdown" data-ice-args="[&quot;align&quot;]" ><i class="fa fa-align-center"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-link" data-ice-decoration="linkCount"><a href="#" title="Link" data-ice-method="toggleDropdown" data-ice-args="[&quot;link&quot;]" data-ice-pre-method="exec" data-ice-pre-args="[&quot;filterSelection&quot;,&quot;a&quot;]"><i class="fa fa-link"></i></a></li>'
                 + '<li class="ice-floatbar-list-item-unlink" data-ice-decoration="linkCount"><a href="#" title="Unlink" data-ice-method="exec" data-ice-args="[&quot;unlink&quot;]"><i class="fa fa-chain-broken"></i></a></li>'
-                + '<li class="ice-floatbar-list-item-color"><a href="#" title="Color" data-ice-method="toggle" data-ice-args="[&quot;color&quot;]" ><i class="fa fa-circle"></i></a></li>'
+                + '<li class="ice-floatbar-list-item-color"><a href="#" title="Color" data-ice-method="toggleDropdown" data-ice-args="[&quot;color&quot;]" ><i class="fa fa-circle"></i></a></li>'
                 + '<li class="ice-floatbar-list-item-remove-format"><a href="#" title="Remove All Formatting" data-ice-method="exec" data-ice-args="[&quot;removeFormat&quot;]" ><i class="fa fa-times"></i></a></li>'
                 + '</ul>'
                 + '</nav>'
@@ -120,7 +121,13 @@
                 + '<p><input type="text" title="Background Color" placeholder="Background Color" value="" data-ice-method="exec" data-ice-args="[&quot;backColor&quot;,&quot;&dollar;value&quot;]" data-ice-decoration="backColor" /></p>'
                 + '</article>'
                 + '</div>'
-                + '</div>'
+                + '</div>',
+            oninit: null,
+            onready: null,
+            onshow: null,
+            onhide: null,
+            ondropdown: null,
+            onexec: null
         },
 
         /**
@@ -129,11 +136,6 @@
          * @return {Void}
          */
         _init: function() {
-            if (!(this.editor instanceof window.ice.Editor))
-                throw "ice.Floatbar: Constructor editor argument must be of ice.Editor instance";
-            if (this.editor.floatbar)
-                return;
-
             // options
             this._options = typeof this._options === "object" ? this._options : {};
             for (var i in this._defaults) {
@@ -145,21 +147,45 @@
                     delete this._options[i];
             }
 
-            // create
-            this._element = this.editor.document.createElement("div");
-            for (var i = 0; i < this.editor.element.attributes.length; i++) {
-                if (this.editor.element.attributes[i].name.substr(0, 5) === "data-")
-                    this._element.setAttribute(this.editor.element.attributes[i].name, this.editor.element.attributes[i].value);
+            // fix parent
+            if (typeof this._options.parent === "string")
+                this._options.parent = document.querySelector(this._options.parent);
+            if (!(this._options.parent instanceof window.Node))
+                this._options.parent = this._defaults.parent;
+            if (!(this._options.parent instanceof window.Node))
+                this._options.parent = document.body;
+
+            // fix events
+            [ "oninit", "onready", "onshow", "onhide", "ondropdown", "onexec" ].forEach(function(item) {
+                if (typeof this._options[item] !== "function")
+                    this._options[item] = function(e) {};
+            }.bind(this))
+
+            // define event handlers
+            this._handler = {
+                load: this._handleLoad.bind(this),
+                click: this._handleClick.bind(this),
+                change: this._handleChange.bind(this),
+                select: this._handleSelect.bind(this),
+                unselect: this._handleUnselect.bind(this),
             }
+
+            // create
+            this._element = this.options("parent").ownerDocument.createElement("div");
             this._element.classList.add(this._className);
             this._element.ice = this;
-            this.editor.document.body.appendChild(this._element);
+            this.options("parent").ownerDocument.body.appendChild(this._element);
 
             // iframe
-            this._iframe = this.editor.document.createElement("iframe");
+            this._iframe = this.options("parent").ownerDocument.createElement("iframe");
             this._iframe.classList.add(this._className + "-iframe");
-            this._iframe.onload = this._load.bind(this);
+            this._iframe.onload = this._handler.load;
             this._element.appendChild(this._iframe);
+
+            // event
+            var event = new CustomEvent("icefloatbarinit");
+            this.options("oninit").call(this, event);
+            this.element.dispatchEvent(event);
         },
 
         /**
@@ -168,79 +194,29 @@
          * @return {Void}
          */
         destroy: function() {
+            // remove event listeners
+            this._element.ownerDocument.removeEventListener("iceunselect", this._handler.unselect);
+            this._element.ownerDocument.removeEventListener("iceselect", this._handler.select);
+            delete this._handler;
+
+            // remove floatbar element
             delete this._element.ice;
             this._element.parentElement.removeChild(this._element);
+
+            // clear all
+            this._options = null;
+            this._editor = null;
             this._element = null;
+            this._iframe = null;
+            this._wrapper = null;
+            this._ui = null;
+            this._selectionString = null;
 
-            delete this._handleThisClick;
-            delete this._handleThisChange;
         },
 
         /**
-         * Load iframe:
-         * add classes to dom nodes, append
-         * template and add event listeners
-         *
-         * @return {Void}
-         */
-        _load: function() {
-            this._iframe.contentDocument.documentElement.classList.add(this._className + "-html");
-            this._iframe.contentDocument.body.classList.add(this._className + "-body");
-
-            // add all data attributes from element to html
-            for (var i = 0; i < this._iframe.parentNode.attributes.length; i++) {
-                if (this._iframe.parentNode.attributes[i].name.substr(0, 5) === "data-")
-                    this._iframe.contentDocument.documentElement.setAttribute(this._iframe.parentNode.attributes[i].name, this._iframe.parentNode.attributes[i].value);
-            }
-
-            // bind handles with this
-            this._handleThisClick = this._handleClick.bind(this);
-            this._handleThisChange = this._handleChange.bind(this);
-
-            // template
-            var div = this.editor.document.createElement("div");
-            div.innerHTML = this.options("template");
-            this._wrapper = div.childNodes[0];
-            this._wrapper.classList.add(this._className + "-wrapper");
-            this._wrapper.classList.add(this._className + "-position-top");
-            this._wrapper.addEventListener("click", this._handleThisClick);
-            this._wrapper.addEventListener("change", this._handleThisChange);
-            this._iframe.contentDocument.body.appendChild(this._wrapper);
-
-            // append all sylesheets to iframe
-            for (var i = 0; i < document.styleSheets.length; i++) {
-                var style = document.styleSheets[i].ownerNode.cloneNode();
-                this._iframe.contentDocument.head.appendChild(style);
-            }
-
-            // hide not allowed format blocks
-            this.wrapper.querySelectorAll('[data-ice-method="formatBlock"][data-ice-argument]').forEach(function(node) {
-                if (this.editor.options("allowedBlocks").indexOf(node.getAttribute("data-ice-argument")) === -1) {
-                    node.style.display = "none";
-                }
-            }.bind(this));
-
-            // @todo - font family list
-
-            // define ui (decoration nodes)
-            this._ui = {};
-            this.wrapper.querySelectorAll("[data-ice-decoration]").forEach(function(node) {
-                var attr = node.getAttribute("data-ice-decoration");
-                if (!(attr in this._ui))
-                    this._ui[attr] = [];
-                this._ui[attr].push(node);
-            }.bind(this));
-
-            // editor floatbar not yet instanced,
-            // wait for next tick...
-            setTimeout(function() {
-                var event = new CustomEvent("iceeditorfloatbarinit");
-                this.editor.element.dispatchEvent(event);
-            }.bind(this));
-        },
-
-        /**
-         * Get this.editor object
+         * Get this.editor object:
+         * active ice editor
          *
          * @return {Object}
          */
@@ -320,14 +296,14 @@
             if (this.element.classList.contains(this._className + "-show"))
                 return;
 
-            var event = new CustomEvent("iceeditorfloatbarshow");
-            this.editor.element.dispatchEvent(event);
+            var event = new CustomEvent("icefloatbarshow");
+            this.options("onshow").call(this, event);
+            this.element.dispatchEvent(event);
             if (event.defaultPrevented)
                 return;
 
             this.dropdown(null);
             this.element.classList.add(this._className + "-show");
-            this.editor.document.documentElement.classList.add(this._className + "-showing");
         },
 
         /**
@@ -339,24 +315,38 @@
             if (!this.element.classList.contains(this._className + "-show"))
                 return;
 
-            var event = new CustomEvent("iceeditorfloatbarhide");
-            this.editor.element.dispatchEvent(event);
+            var event = new CustomEvent("icefloatbarhide");
+            this.options("onhide").call(this, event);
+            this.element.dispatchEvent(event);
             if (event.defaultPrevented)
                 return;
 
-            this.editor.document.documentElement.classList.remove(this._className + "-showing");
             this.element.classList.remove(this._className + "-show");
             this.dropdown(null);
         },
 
         /**
-         * Refresh floatbar
+         * Toggle show/hide
+         *
+         * @return {Void}
+         */
+        toggle: function() {
+            if (this.element.classList.contains(this._className + "-show"))
+                this.hide();
+            else
+                this.show();
+        },
+
+        /**
+         * Refresh floatbar:
+         * set decorators and reposition element
          *
          * @return {Void}
          */
         refresh: function() {
-            this._reposition();
+            this._setAttributes();
             this._setDecorations();
+            this._reposition();
         },
 
         /**
@@ -373,8 +363,9 @@
             if (value === old)
                 return;
 
-            var event = new CustomEvent("iceeditorfloatbardropdown", { detail: { from: old, to: value } });
-            this.editor.element.dispatchEvent(event);
+            var event = new CustomEvent("icefloatbardropdown", { detail: { from: old, to: value } });
+            this.options("ondropdown").call(this, event);
+            this.element.dispatchEvent(event);
             if (event.defaultPrevented)
                 return;
 
@@ -392,7 +383,7 @@
          * @param  {String} value
          * @return {Void}
          */
-        toggle: function(value) {
+        toggleDropdown: function(value) {
             if (this.dropdown() === value)
                 this.dropdown(null);
             else
@@ -402,57 +393,23 @@
         /**
          * Execute ice-editor method
          * note: you can pass additional arguments
+         * after method param
          *
          * @param  {String} method
          * @return {Mixed}
          */
         exec: function(method) {
-            if (typeof this.editor[method] !== "function")
+            if (!this.editor || !method || typeof this.editor[method] !== "function")
                 return;
 
             var args = Array.prototype.slice.call(arguments, 1);
+            var event = new CustomEvent("icefloatbarexec", { detail: { method: method, arguments: args } });
+            this.options("onexec").call(this, event);
+            this.element.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+
             this.editor[method].apply(this.editor, args);
-
-            var event = new CustomEvent("iceeditorfloatbarexec", { detail: { method: method, arguments: args } });
-            this.editor.element.dispatchEvent(event);
-        },
-
-        /**
-         * Filter selection
-         * (c/p from ice-editor.js with addition
-         * that we reset selectionString before
-         * creating new selection)
-         *
-         * @param  {String} selector
-         * @return {Void}
-         */
-        filterSelection: function(selector) {
-            if (!this.editor.active)
-                return;
-
-            var node = ice.Util.getSelectedNodes(selector);
-            if (!node || !node.length)
-                return;
-
-            var text = ice.Util.getTextNodes(node[0]);
-            if (!text)
-                return;
-
-            var select = window.getSelection();
-            var range = select.getRangeAt(0);
-            var start = text[0];
-            var end = text[text.length - 1]
-
-            // selection not changed
-            if (range.startContainer === start && range.startOffset === 0 && range.endContainer === end && range.endOffset === end.length)
-                return;
-
-            range = document.createRange();
-            range.setStart(start, 0);
-            range.setEnd(end, end.length);
-            this._selectionString = range.toString();
-            select.removeAllRanges();
-            select.addRange(range);
         },
 
         /**
@@ -462,7 +419,7 @@
          * @return {Void}
          */
         _reposition: function(rect) {
-            if (!this.element || !this._iframe || !this.wrapper)
+            if (!this.element || !this.wrapper || !this.editor)
                 return;
 
             if (!rect) {
@@ -499,13 +456,20 @@
                 position.className = "bottom";
             }
 
+            // left/top position
             this.element.style.left = Math.round(position.left) + "px";
             this.element.style.top = Math.round(position.top) + "px";
-            this.element.classList.remove(this._className + "-position-top");
-            this.element.classList.remove(this._className + "-position-bottom");
+
+            // floatbar direction
+            if (this.element.classList.contains(this._className + "-position-top") && position.className !== "top")
+                this.element.classList.remove(this._className + "-position-top");
+            if (this.element.classList.contains(this._className + "-position-bottom") && position.className !== "bottom")
+                this.element.classList.remove(this._className + "-position-bottom");
+            if (this.wrapper.classList.contains(this._className + "-position-top") && position.className !== "top")
+                this.wrapper.classList.remove(this._className + "-position-top");
+            if (this.wrapper.classList.contains(this._className + "-position-bottom") && position.className !== "bottom")
+                this.wrapper.classList.remove(this._className + "-position-bottom");
             this.element.classList.add(this._className + "-position-" + position.className);
-            this.wrapper.classList.remove(this._className + "-position-top");
-            this.wrapper.classList.remove(this._className + "-position-bottom");
             this.wrapper.classList.add(this._className + "-position-" + position.className);
         },
 
@@ -516,6 +480,9 @@
          * @return {Void}
          */
         _setDecorations: function(decorations) {
+            if (!this.element || !this.wrapper || !this.editor)
+                return;
+
             if (!decorations)
                 decorations = this.editor.decorations();
 
@@ -553,36 +520,97 @@
         },
 
         /**
-         * Get arguments from data attribute and
-         * replace items that starts with dollar
-         * sign with node property (for example:
-         * value with node.value)
+         * Set html node data attributes
          *
-         * @param  {Object} node
-         * @return {Array}
+         * @return {Void}
          */
-        _nodeApply: function(node) {
-            var method = node.getAttribute("data-ice-method");
-            if (!method)
-                return null;
+        _setAttributes: function() {
+            // get attributes as object
+            var attrHtml = {},
+                attrEdit = {};
+            if (this.document)
+                Array.prototype.slice.call(this.document.documentElement.attributes)
+                    .filter(function(item) {
+                        return item.name.substr(0, 5) === "data-";
+                    })
+                    .forEach(function(item) {
+                        attrHtml[item.name] = item.value;
+                    });
+            if (this.editor)
+                Array.prototype.slice.call(this.editor.element.attributes)
+                    .filter(function(item) {
+                        return item.name.substr(0, 5) === "data-";
+                    })
+                    .forEach(function(item) {
+                        attrEdit[item.name] = item.value;
+                    });
 
-            var attr = node.getAttribute("data-ice-args");
-            var args = JSON.parse(attr).map(function(item) {
-                var result = item;
-                if (typeof result === "string" && result.substr(0,1) === "$" && result.substr(1) in node)
-                    result = node[result.substr(1)];
-                if (item === "$value")
-                    result = ""
-                        + (node.getAttribute("data-ice-prefix") || "")
-                        + result
-                        + (node.getAttribute("data-ice-suffix") || "");
-                if (node.tagName === "INPUT" && ["checkbox", "radio"].indexOf(node.type) !== -1 && item === "$value" && !node.checked)
-                    result = undefined;
+            // remove
+            for (var key in attrHtml) {
+                if (!(key in attrEdit))
+                    this.document.documentElement.removeAttribute(key);
+            }
 
-                return result;
-            });
+            // add
+            for (var key in attrEdit) {
+                this.document.documentElement.setAttribute(key, attrEdit[key]);
+            }
+        },
 
-            return [ method, args ];
+        /**
+         * Iframe load event handler:
+         * add classes to dom nodes, append
+         * template and add event listeners
+         *
+         * @return {Void}
+         */
+        _handleLoad: function() {
+            // add ice class to html/body node
+            this.document.documentElement.classList.add(this._className + "-html");
+            this.document.body.classList.add(this._className + "-body");
+
+            // add all data attributes from element to html
+            for (var i = 0; i < this.element.attributes.length; i++) {
+                if (this.element.attributes[i].name.substr(0, 5) === "data-")
+                    this.document.documentElement.setAttribute(this.element.attributes[i].name, this.element.attributes[i].value);
+            }
+
+            // append all document sylesheets to iframe
+            for (var i = 0; i < this.element.ownerDocument.styleSheets.length; i++) {
+                var style = this.element.ownerDocument.styleSheets[i].ownerNode.cloneNode();
+                this.document.head.appendChild(style);
+            }
+
+            // create template
+            var div = this.document.createElement("div");
+            div.innerHTML = this.options("template");
+            this._wrapper = div.childNodes[0];
+            this._wrapper.classList.add(this._className + "-wrapper");
+            this._wrapper.classList.add(this._className + "-position-top");
+            this._wrapper.addEventListener("click", this._handler.click);
+            this._wrapper.addEventListener("change", this._handler.change);
+            this.document.body.appendChild(this._wrapper);
+
+            // define ui (decoration nodes)
+            this._ui = {};
+            this.wrapper.querySelectorAll("[data-ice-decoration]").forEach(function(node) {
+                var attr = node.getAttribute("data-ice-decoration");
+                if (!(attr in this._ui))
+                    this._ui[attr] = [];
+                this._ui[attr].push(node);
+            }.bind(this));
+
+            // bind ice editor selection change
+            this.element.ownerDocument.addEventListener("iceselect", this._handler.select);
+            this.element.ownerDocument.addEventListener("iceunselect", this._handler.unselect);
+
+            // refresh
+            this.refresh();
+
+            // event
+            var event = new CustomEvent("icefloatbarready");
+            this.options("onready").call(this, event);
+            this.element.dispatchEvent(event);
         },
 
         /**
@@ -595,7 +623,10 @@
          */
         _handleClick: function(e) {
             var target = e.target;
-            var link = ice.Util.closest(target, "a")
+            var link = ice.Util.closest(target, "a");
+
+            // test link
+            // @todo - refacture
             if (link && ice.Util.is(link, "[data-ice-link-test]")) {
                 var a = ice.Util.getSelectedNodes("a");
                 if (a && a.length && a[0].href && a[0].href !== "#")
@@ -643,8 +674,8 @@
             // get method and arguments from data attribute
             // and replace items that starts with dollar
             // sign with node property (for example:
-            // value with node.value)
-            ["pre-", "", "post-"].forEach(function(prefix) {
+            // $value with node.value)
+            ["pre-", "", "post-"].forEach(function(prefix, index) {
                 var method = node.getAttribute("data-ice-" + prefix + "method");
                 var attr = node.getAttribute("data-ice-" + prefix + "args");
                 if (!attr)
@@ -665,94 +696,55 @@
                     return result;
                 });
 
+                // dirty hack:
+                // pre method filterSelection changes editor
+                // selection, so we need to wait a while
+                // so the selection actually changes
                 if (typeof this[method] === "function")
-                    this[method].apply(this, args);
+                    setTimeout(function() {
+                        this[method].apply(this, args);
+                    }.bind(this), index*10);
             }.bind(this));
+        },
+
+        /**
+         * Iceselect event handler
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleSelect: function(e) {
+            var dropdown = this.selectionString !== e.detail.selectionString;
+
+            this._editor = e.detail.editor;
+            this._selectionString = e.detail.selectionString;
+            this._setAttributes();
+
+            if (e.detail.range.collapsed)
+                return this.hide();
+
+            if (dropdown)
+                this.dropdown(null);
+
+            this._reposition(e.detail.rect);
+            this._setDecorations(e.detail.decorations);
+
+            return this.show();
+        },
+
+        /**
+         * Iceunselect event handler
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleUnselect: function(e) {
+            this._editor = null;
+            this._selectionString = null;
+            this._setAttributes();
+            this.hide();
         }
 
     }
-
-    /**
-     * Add floatbar option to editor
-     *
-     * @type {Boolean}
-     */
-    ice.Editor.prototype._defaults.floatbar = true;
-
-    /**
-     * Init floatbar on editor prototype
-     *
-     * @return {Void}
-     */
-    ice.Editor.prototype._initFloatbar = function() {
-        this._floatbar = new ice.Floatbar(this);
-    }
-
-    /**
-     * Destroy floatbar on editor prototype
-     *
-     * @return {Void}
-     */
-    ice.Editor.prototype._destroyFloatbar = function() {
-        this._floatbar.destroy();
-        this._floatbar = null;
-    }
-
-    /**
-     * Editor input event handler:
-     * refresh floatbar decorations
-     *
-     * @param  {Object} e
-     * @return {Void}
-     */
-    ice.Editor.prototype._handleInputFloatbar = function(e) {
-        setTimeout(function() {
-            this.ice.floatbar.refresh();
-        }.bind(this));
-    }
-
-    // define floatbar getter on editor prototype
-    Object.defineProperty(ice.Editor.prototype, "floatbar", {
-        get: function() {
-            return this._floatbar;
-        }
-    });
-
-    // document unselect event:
-    // hide current editor floatbar
-    document.addEventListener("iceunselect", function(e) {
-        if (!e.detail.editor.floatbar)
-            return;
-
-        if (!ice.Util.closest(e.detail.editor.document.activeElement, "." + ice.Floatbar.prototype._className))
-            e.detail.editor.floatbar.hide();
-
-        e.detail.editor.floatbar._selectionString = null;
-    });
-
-    // document select event:
-    // reposition and show current editor floatbar
-    document.addEventListener("iceselect", function(e) {
-        if (e.detail.editor.floatbar && (e.detail.range.collapsed || !e.detail.editor.floatbar.editor.options("floatbar")))
-            return e.detail.editor.floatbar.hide();
-
-        if (e.detail.selectionString !== e.detail.editor.floatbar.selectionString)
-            e.detail.editor.floatbar.dropdown(null);
-
-        e.detail.editor.floatbar._selectionString = e.detail.selectionString;
-        e.detail.editor.floatbar._reposition(e.detail.rect);
-        e.detail.editor.floatbar._setDecorations(e.detail.decorations);
-        e.detail.editor.floatbar.show();
-    });
-
-    // window select event:
-    // refresh floatbar decorations
-    window.addEventListener("resize", function(e) {
-        var ice = window.ice.Util.getActiveEditor();
-        if (!ice || !ice.floatbar || !ice.options("floatbar"))
-            return;
-
-        ice.floatbar.refresh()
-    });
 
 })();
