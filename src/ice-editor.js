@@ -939,13 +939,31 @@
             // will preserve font-size while changing it
             // to h2, so remove style/class attributes
             // for all block elements
+            // addition: we need to preserve textAlign
+            // inline style
             var children = node.querySelectorAll(blocks.join(","));
             children = Array.prototype.slice.call(children);
             while (children.length) {
                 var child = children.shift();
+                var preserveClass = [];
+                var preserveProp = {};
+                [ "textAlign" ].forEach(function(item) {
+                    if (child.style[item])
+                        preserveProp[item] = child.style[item];
+                });
+
+                // remove class/style
                 [ "class", "style" ].forEach(function(item) {
                     child.removeAttribute(item);
-                })
+                });
+
+                // set preserved class/style
+                preserveClass.forEach(function(item) {
+                    child.classList.add(item);
+                });
+                for (var key in preserveProp) {
+                    child.style[key] = preserveProp[key];
+                }
             }
 
             // wrap non block element
