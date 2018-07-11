@@ -65,7 +65,7 @@
         _defaults: {
             defaultTag: "p",
             allowLineBreak: true,
-            allowHorizontalRule: true,
+            allowHorizontalRule: false,
             allowSplit: true,
             allowRichtextPaste: true,
             autoSelectLink: false,
@@ -103,13 +103,14 @@
          * @type {Object}
          */
         _shortcuts: {
-            "13,0,0,0": [ "split" ],                // ENTER
-            "13,0,0,1": [ "insertLineBreak" ],      // Shift+ENTER
-            "90,0,1,0": [ "undo" ],                 // Ctrl+Z
-            "89,0,1,0": [ "redo" ],                 // Ctrl+Y
-            "66,0,1,0": [ "bold" ],                 // Ctrl+B
-            "73,0,1,0": [ "italic" ],               // Ctrl+I
-            "85,0,1,0": [ "underline" ]             // Ctrl+U
+            "13,0,0,0": [ "split" ],                    // Enter
+            "13,0,0,1": [ "insertLineBreak" ],          // Shift+Enter
+            "13,0,1,0": [ "insertHorizontalRule" ],     // Ctrl+Enter
+            "90,0,1,0": [ "undo" ],                     // Ctrl+Z
+            "89,0,1,0": [ "redo" ],                     // Ctrl+Y
+            "66,0,1,0": [ "bold" ],                     // Ctrl+B
+            "73,0,1,0": [ "italic" ],                   // Ctrl+I
+            "85,0,1,0": [ "underline" ]                 // Ctrl+U
         },
 
         /**
@@ -543,23 +544,8 @@
                 return false;
             else if (!this.options("defaultTag") || !this.options("allowSplit"))
                 return this.insertLineBreak();
-            // @todo - li block???
 
-            this._skipDispatch = true;
-
-            if (!this.window.getSelection().isCollapsed)
-                this._execCommand("delete");
-
-            var result = this._execCommand("insertParagraph");
-            var tag = this.options("defaultTag");
-            if (tag)
-                this.formatBlock(tag);
-
-            delete this._skipDispatch;
-            if (result)
-                this._handleInput();
-
-            return result;
+            return this._execCommand("insertParagraph");
         },
 
         /**
@@ -1148,7 +1134,44 @@
         },
 
         /**
+         * Element keydown event handler:
+         * prevent backspace (chrome only)
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleKeydown: function(e) {
+            var that = this;
+            if (!(that instanceof ice.Editor))
+                that = that.ice;
+            if (that._skipDispatch)
+                return;
+            if (e.which != 8)
+                return;
+
+            var blocks = that.options("allowedBlocks").join("|");
+            var html = that.element.innerHTML;
+            var re;
+
+            // only one empty block element (only <br> inside)
+            re = new RegExp("^<(" + blocks + ")><br\\s*\\/?></(" + blocks + ")>$", "i");
+            if (html.match(re))
+                return e.preventDefault();
+
+            // only one empty ul/ol block element (only one <li> with <br> inside)
+            re = new RegExp("^<(ul|ol)><li><br\\s*\\/?></li></(ul|ol)>$", "i");
+            if (html.match(re)) {
+                e.preventDefault();
+
+                var tag = that.options("defaultTag");
+                if (tag)
+                    that.formatBlock(tag);
+            }
+        },
+
+        /**
          * Element input event handler:
+         * fallback for _handleKeydown,
          * parse, clear, fix...
          *
          * @param  {Object} e
@@ -1164,25 +1187,26 @@
             that.element.normalize();
 
             var sel = window.getSelection();
+            var block = sel.focusNode ? that._closestBlock(sel.focusNode) : null;
             var tag = that.options("defaultTag");
 
-            setTimeout(function() {
-                if (tag && !that.element.childNodes.length)
-                    that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
-                else if (!that.element.childNodes.length)
-                    that._execCommand("insertHTML", "<br />");
-                else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].tagName === "BR")
-                    that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
-                else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].nodeType === Node.TEXT_NODE)
-                    that._execCommand("formatBlock", "<" + tag + ">");
-                else if (tag && sel.focusNode && sel.focusNode.nodeType === Node.TEXT_NODE && !that._closestBlock(sel.focusNode))
-                    that._execCommand("formatBlock", "<" + tag + ">");
+            // empty editor, add <br> wrapped with default tag
+            if (tag && !that.element.childNodes.length)
+                that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
 
-                // @todo - last case warning (We don't execute document.execCommand() this time, because it is called recursively.)
-                // check if setTimeout fixes this issue
+            // empty editor, add <br> (no wrap, default tag not defined)
+            else if (!that.element.childNodes.length)
+                that._execCommand("insertHTML", "<br />");
 
-                that._triggerChange();
-            });
+            // only one <br>, wrap it with default tag
+            else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].tagName === "BR")
+                that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
+
+            // non wrapped inline element or not allowed block
+            else if (tag && sel.focusNode === that.element && sel.focusNode.childNodes[sel.focusOffset] && !that._closestBlock(sel.focusNode.childNodes[sel.focusOffset]))
+                that._execCommand("formatBlock", "<" + tag + ">");
+
+            that._triggerChange();
         },
 
         /**
@@ -1191,7 +1215,7 @@
          *
          * @param  {Object} e
          * @return {Void}
-         */
+         * /
         _handleBlur: function(e) {
             var that = this.ice;
 
