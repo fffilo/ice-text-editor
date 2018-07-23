@@ -1198,9 +1198,13 @@
             else if (!that.element.childNodes.length)
                 that._execCommand("insertHTML", "<br />");
 
-            // only one <br>, wrap it with default tag
+            // only one <br> tag, wrap it with default tag
             else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].tagName === "BR")
                 that._execCommand("insertHTML", "<" + tag + "><br /></" + tag + ">");
+
+            // only one textNode, wrap it with default tag
+            else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].nodeType === Node.TEXT_NODE)
+                that._execCommand("formatBlock", "<" + tag + ">");
 
             // non wrapped inline element or not allowed block
             else if (tag && sel.focusNode === that.element && sel.focusNode.childNodes[sel.focusOffset] && !that._closestBlock(sel.focusNode.childNodes[sel.focusOffset]))
