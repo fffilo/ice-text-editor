@@ -12,3 +12,6 @@
 .ice-editor p,
 .ice-editor pre,
 .ice-editor blockquote { display: block; }
+.ice-editor [style^="color:"] a,
+.ice-editor [style*=";color:"] a,
+.ice-editor [style*="; color:"] a { color: inherit; }
