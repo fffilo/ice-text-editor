@@ -1124,7 +1124,7 @@
                 return;
             if (!that.options("autoSelectLink"))
                 return;
-            if (!that.window.getSelection().isCollapsed)
+            if (!that.options("autoSelectAll") && !that.window.getSelection().isCollapsed)
                 return;
 
             var link = ice.Util.closest(e.target, "." + that._className + " a");
