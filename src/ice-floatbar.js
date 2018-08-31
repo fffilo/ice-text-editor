@@ -164,6 +164,7 @@
             // define event handlers
             this._handler = {
                 load: this._handleLoad.bind(this),
+                resize: this._handleResize.bind(this),
                 click: this._handleClick.bind(this),
                 change: this._handleChange.bind(this),
                 select: this._handleSelect.bind(this),
@@ -182,6 +183,9 @@
             this._iframe.onload = this._handler.load;
             this._element.appendChild(this._iframe);
 
+            // resize
+            this._element.ownerDocument.defaultView.addEventListener("resize", this._handler.resize);
+
             // event
             var event = new CustomEvent("icefloatbarinit");
             this.options("oninit").call(this, event);
@@ -195,6 +199,7 @@
          */
         destroy: function() {
             // remove event listeners
+            this._element.ownerDocument.defaultView.removeEventListener("resize", this._handler.resize);
             this._element.ownerDocument.removeEventListener("iceunselect", this._handler.unselect);
             this._element.ownerDocument.removeEventListener("iceselect", this._handler.select);
             delete this._handler;
@@ -611,6 +616,21 @@
             var event = new CustomEvent("icefloatbarready");
             this.options("onready").call(this, event);
             this.element.dispatchEvent(event);
+        },
+
+        /**
+         * Element's window resize event handler:
+         * reposition on window stop resizing
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleResize: function(e) {
+            clearInterval(this._repositionInterval);
+            this._repositionInterval = setTimeout(function() {
+                this._repositionInterval = null;
+                this._reposition();
+            }.bind(this), 250);
         },
 
         /**

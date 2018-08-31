@@ -69,6 +69,7 @@
             allowSplit: true,
             allowRichtextPaste: true,
             autoSelectLink: false,
+            autoSelectAll: true,
             allowedBlocks: [
                 "h1",
                 "h2",
@@ -1284,6 +1285,25 @@
             e.preventDefault();
             that._execCommand("insertHTML", data);
             that._fixBlocks();
+        },
+
+        /**
+         * Element focus event handler:
+         * autoselect all
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleFocus: function(e) {
+            var that = this.ice;
+            if (!that.options("autoSelectAll"))
+                return;
+
+            var selection = that.window.getSelection();
+            var range = that.document.createRange();
+            range.selectNodeContents(that.element);
+            selection.removeAllRanges();
+            selection.addRange(range);
         }
 
     }
