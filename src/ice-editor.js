@@ -69,7 +69,7 @@
             allowSplit: true,
             allowRichtextPaste: true,
             autoSelectLink: false,
-            autoSelectAll: true,
+            autoSelectAll: false,
             allowedBlocks: [
                 "h1",
                 "h2",
@@ -1355,6 +1355,17 @@
     document.addEventListener("keydown", function(e) {
         if ((e.keyCode === 89 || e.keyCode === 90) && e[window.ice.Util.isMac ? "metaKey" : "ctrlKey"])
             e.preventDefault();
+    });
+
+    // Focus contenteditable
+    document.addEventListener("click", function(e) {
+        var element = ice.Util.closest(e.target, ".ice-editor, .ice-focus");
+        if (!element || !ice.Util.is(element,".ice-focus"))
+            return;
+
+        var editor = element.querySelector(".ice-editor");
+        if (editor && editor !== document.activeElement)
+            editor.focus();
     });
 
     /**
