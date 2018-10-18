@@ -546,7 +546,28 @@
             else if (!this.options("defaultTag") || !this.options("allowSplit"))
                 return this.insertLineBreak();
 
-            return this._execCommand("insertParagraph");
+            var tag = this.options("defaultTag");
+            var result = this._execCommand("insertParagraph");
+
+            // on split empty <li> tag editor inserts
+            // <div> instead <p>
+            if (tag !== "div") {
+                var select = window.getSelection();
+                var range = select.getRangeAt(0);
+                var block = this._closestBlock(range.startContainer, true);
+                if (block && block.tagName === "DIV") {
+                    block = ice.Util.replaceTag(block, tag);
+                    block.innerHTML = "<br />";
+
+                    range = document.createRange();
+                    range.setStart(block, 0);
+                    range.setEnd(block, 0);
+                    select.removeAllRanges();
+                    select.addRange(range);
+                }
+            }
+
+            return result;
         },
 
         /**
@@ -839,11 +860,13 @@
         /**
          * Find closest block node
          *
-         * @param  {Object} node
+         * @param  {Object}  node
+         * @param  {Boolean} allBlocks (optional)
          * @return {Object}
          */
-        _closestBlock: function(node) {
-            while (node && (!node.tagName || node.tagName && this.options("allowedBlocks").indexOf(node.tagName.toLowerCase()) === -1)) {
+        _closestBlock: function(node, allBlocks) {
+            var blocks = allBlocks ? this._blockElements : this.options("allowedBlocks");
+            while (node && (!node.tagName || node.tagName && blocks.indexOf(node.tagName.toLowerCase()) === -1)) {
                 node = node.parentNode;
 
                 if (node === this.element)
@@ -885,6 +908,12 @@
             var split = this.options("allowSplit");
             var lnbr = this.options("allowLineBreak");
             var tag = this.options("defaultTag");
+
+            // allow list elements
+            if (blocks.indexOf("ul") !== -1 || blocks.indexOf("ol") !== -1) {
+                blocks = blocks.slice(0);
+                blocks.push("li");
+            }
 
             // difference between block elements
             // and allowed blocks
@@ -1004,11 +1033,11 @@
             }
 
             // no default tag on element, wrap it
-            if (node === this.element && !node.querySelectorAll(tag).length) {
-                var html = node.innerHTML;
-                html = "<" + tag + ">" + html + "</" + tag + ">";
-                node.innerHTML = html;
-            }
+            //if (node === this.element && !node.querySelectorAll(tag).length) {
+            //    var html = node.innerHTML;
+            //    html = "<" + tag + ">" + html + "</" + tag + ">";
+            //    node.innerHTML = html;
+            //}
 
             node.normalize();
         },
