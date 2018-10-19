@@ -548,13 +548,14 @@
 
             var tag = this.options("defaultTag");
             var result = this._execCommand("insertParagraph");
+            var select = window.getSelection();
+            var range = select.getRangeAt(0);
+            var block = this._closestBlock(range.startContainer, true);
+            var trigger = false;
 
             // on split empty <li> tag editor inserts
             // <div> instead <p>
             if (tag !== "div") {
-                var select = window.getSelection();
-                var range = select.getRangeAt(0);
-                var block = this._closestBlock(range.startContainer, true);
                 if (block && block.tagName === "DIV") {
                     block = ice.Util.replaceTag(block, tag);
                     block.innerHTML = "<br />";
@@ -564,8 +565,20 @@
                     range.setEnd(block, 0);
                     select.removeAllRanges();
                     select.addRange(range);
+
+                    trigger = true;
                 }
             }
+
+            // firefox creates new empty <ul> on
+            // <ul> split
+            if (block && block.nextElementSibling && block.nextElementSibling.tagName === "UL" && !block.nextElementSibling.childElementCount) {
+                block.nextElementSibling.parentNode.removeChild(block.nextElementSibling);
+                trigger = true;
+            }
+
+            if (trigger)
+                this._triggerChange();
 
             return result;
         },
@@ -1191,11 +1204,38 @@
             // only one empty ul/ol block element (only one <li> with <br> inside)
             re = new RegExp("^<(ul|ol)><li><br\\s*\\/?></li></(ul|ol)>$", "i");
             if (html.match(re)) {
-                e.preventDefault();
-
                 var tag = that.options("defaultTag");
                 if (tag)
                     that.formatBlock(tag);
+
+                return e.preventDefault();
+            }
+
+            // first empty block element
+            var select = window.getSelection();
+            var range = select.getRangeAt(0);
+            if (range.collapsed && range.startContainer) {
+                var block = range.startContainer;
+                var empty = (!block.childElementCount) || (block.childElementCount === 1 && block.children[0].tagName === "BR");
+                var first = block.parentNode.children[0] === block;
+                if (block.tagName === "LI" && empty && first) {
+                    block = ice.Util.replaceTag(block, that.options("defaultTag"));
+                    block.parentNode.parentNode.insertBefore(block, block.parentNode);
+                    if (!block.parentNode.childElementCount)
+                        block.parentNode.parentNode.removeChild(block.parentNode);
+
+                    range = document.createRange();
+                    range.setStart(block, 0);
+                    range.setEnd(block, 0);
+                    select.removeAllRanges();
+                    select.addRange(range);
+
+                    that._triggerChange();
+
+                    return e.preventDefault();
+                }
+                else if (block.tagName !== "LI" && empty && first)
+                    return e.preventDefault();
             }
         },
 
@@ -1216,8 +1256,8 @@
 
             that.element.normalize();
 
-            var sel = window.getSelection();
-            var block = sel.focusNode ? that._closestBlock(sel.focusNode) : null;
+            var select = window.getSelection();
+            var block = select.focusNode ? that._closestBlock(select.focusNode) : null;
             var tag = that.options("defaultTag");
 
             // empty editor, add <br> wrapped with default tag
@@ -1237,8 +1277,19 @@
                 that._execCommand("formatBlock", "<" + tag + ">");
 
             // non wrapped inline element or not allowed block
-            else if (tag && sel.focusNode === that.element && sel.focusNode.childNodes[sel.focusOffset] && !that._closestBlock(sel.focusNode.childNodes[sel.focusOffset]))
+            else if (tag && select.focusNode === that.element && select.focusNode.childNodes[select.focusOffset] && !that._closestBlock(select.focusNode.childNodes[select.focusOffset]))
                 that._execCommand("formatBlock", "<" + tag + ">");
+
+            // on del click before <ul> element firefox selects
+            // text element inside <ul> (should select <li>)
+            else if (select.anchorNode && select.anchorNode.nodeType === Node.TEXT_NODE && select.anchorNode.parentElement.tagName === "UL") {
+                var block = select.anchorNode.parentElement.children[0];
+                var range = document.createRange();
+                range.setStart(block, 0);
+                range.setEnd(block, 0);
+                select.removeAllRanges();
+                select.addRange(range);
+            }
 
             that._triggerChange();
         },
