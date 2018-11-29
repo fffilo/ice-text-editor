@@ -740,7 +740,7 @@
             this._selectionString = e.detail.selectionString;
             this._setAttributes();
 
-            if (e.detail.range.collapsed)
+            if (!e.detail.hasSelection)
                 return this.hide();
 
             if (dropdown)

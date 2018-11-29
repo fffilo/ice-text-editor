@@ -1471,6 +1471,7 @@
             if (!selection.rangeCount)
                 return null;
             var range = selection.getRangeAt(0);
+            var rect = range.getBoundingClientRect();
             _editor = ice;
 
             // @todo - in IE CustomEvent is not constructor
@@ -1484,8 +1485,9 @@
                     startContainer: range.startContainer,
                     startOffset: range.startOffset
                 },
+                hasSelection: !range.collapsed && !!(rect.top || rect.right || rect.bottom || rect.left),
                 selectionString: range.toString(),
-                rect: range.getBoundingClientRect(),
+                rect: rect,
                 decorations: _editor.decorations()
             };
             var event = new CustomEvent("iceselect", { detail: detail });
