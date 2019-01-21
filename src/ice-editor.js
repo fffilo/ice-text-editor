@@ -506,7 +506,14 @@
             });
 
             delete this._skipDispatch;
-            this._handleInput();
+            if (result || target !== decoration.target || rel !== decoration.rel) {
+                var event = new Event("input", { bubbles: true });
+                this.element.dispatchEvent(event);
+            }
+            else
+                // this._execCommand already triggered input
+                // event, doing normalization only
+                this._handleInput();
 
             return result;
         },
