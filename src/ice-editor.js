@@ -1012,7 +1012,7 @@
             children = Array.prototype.slice.call(children);
             while (children.length) {
                 var child = children.shift();
-                if (child.nodeType !== Node.ELEMENT_NODE)
+                if (child.nodeType !== Node.ELEMENT_NODE || blocks.indexOf(child.tagName.toLowerCase()) === -1)
                     child = ice.Util.wrapNode(child, tag);
             }
 
