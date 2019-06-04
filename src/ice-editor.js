@@ -1063,6 +1063,123 @@
         },
 
         /**
+         * Fix paste: remove/replace/fix element
+         * child nodes
+         *
+         * @param  {Object} node
+         * @return {Void}
+         */
+        _fixPaste: function(node) {
+            var doc = this.document;
+            var blockElements = this._blockElements;
+            var validTags = [ "h1", "h2", "h3", "h4", "h5", "h6", "p", "pre", "blockquote", "ul", "ol", "li", "a", "b", "br", "hr", "i", "s", "span", "sub", "sup" ];
+            var replaceTags = { font: "span", strong: "b", em: "i", strike: "s", del: "s" };
+            var attrToStyle = { color: "color", face: "font-family", size: "font-size" };
+            var resetStyleForTags = { b: "font-weight", i: "font-style", s: "text-decoration" };
+            var innerWrapStyle = { "font-weight: bold": "b", "font-style: italic": "i", "font-style: oblique": "i", "text-decoration: line-through": "s", "text-decoration: underline": "u", "text-decoration-line: underline": "u" };
+            var validStylesInline = [ "background-color", "color", "font-family", "font-size", "font-style", "font-weight", "text-decoration", "text-decoration-line" ];
+            var validStylesBlock = [ "text-align" ];
+
+            // list all element children (in reverse order)
+            var children = node.querySelectorAll("*");
+            children = Array.prototype.slice.call(children);
+            children.reverse();
+
+            // iterate children and fix them
+            children.forEach(function(child) {
+                var newChild = child;
+                var tag = child.tagName.toLowerCase();
+                var newTag = tag;
+                if (validTags.indexOf(newTag) === -1)
+                    newTag = "span";
+                if (newTag in replaceTags)
+                    newTag = replaceTags[newTag];
+
+                // fix style attribute (remove duplicates,
+                // alphabetize)
+                child.setAttribute("style", child.style.cssText);
+
+                // convert attributes to css styles (eq.
+                // replace color attribute with color css)
+                for (var attr in attrToStyle) {
+                    var value = child.getAttribute(attr);
+                    var css = child.style[attr];
+                    if (!value || css)
+                        continue;
+
+                    child.removeAttribute(attr);
+                    child.style[attrToStyle[attr]] = value;
+                }
+
+                // remove some child styles (no need for
+                // eq. box-sizing)
+                Array.prototype.slice.call(child.style).forEach(function(item) {
+                    if ((validStylesBlock.indexOf(newTag) !== -1 ? validStylesBlock : validStylesInline).indexOf(item) === -1)
+                        child.style[item] = null;
+                });
+
+                // reset some styles (no need for eq.
+                // font-weight:bold on <b>)
+                if (newTag in resetStyleForTags)
+                    child.style[resetStyleForTags[newTag]] = null;
+
+                // inner wrap child for with styles (eq.
+                // <span style="font-weight:bold"/> to
+                // <span><b/></span>)
+                Array.prototype.slice.call(child.style).forEach(function(item) {
+                    if ((item + ": " + child.style[item]) in innerWrapStyle) {
+                        var temp = doc.createElement(innerWrapStyle[item + ": " + child.style[item]]);
+                        Array.prototype.slice.call(child.childNodes).forEach(function(item) {
+                            temp.appendChild(item);
+                        });
+
+                        child.appendChild(temp);
+                        child.style[item] = null;
+                    }
+                });
+
+                // tag is valid, do nothing
+                if (tag === newTag)
+                    return;
+
+                // child has children
+                if (child.childNodes.length) {
+                    // create new element
+                    newChild = doc.createElement(newTag);
+                    Array.prototype.slice.call(child.childNodes).forEach(function(item) {
+                        newChild.appendChild(item);
+                    });
+
+                    // replace it with old one
+                    child.parentElement.insertBefore(newChild, child);
+
+                    // ...and apply styles
+                    Array.prototype.slice.call(child.style).forEach(function(item) {
+                        newChild.style[item] = child.style[item];
+                    });
+
+                    // remove span with empty stylesheet (unwrap)
+                    if (newTag === "span" && !newChild.style.cssText) {
+                        Array.prototype.slice.call(newChild.childNodes).forEach(function(item) {
+                            newChild.parentElement.insertBefore(item, newChild);
+                        });
+
+                        newChild.parentElement.removeChild(newChild);
+                    }
+
+                    // add linebreak before newChild
+                    else if ((blockElements.indexOf(tag) !== -1)  || (newChild.previousElementSibling && blockElements.indexOf(newChild.previousElementSibling.tagName.toLowerCase()) !== -1)) {
+                        var temp = doc.createElement("br");
+                        newChild.parentElement.insertBefore(temp, newChild);
+                    }
+                }
+
+                // remove original element
+                child.parentElement.removeChild(child);
+            });
+        },
+
+        /**
          * Trigger event
          *
          * @param  {String} eventName
@@ -1363,6 +1480,7 @@
                 var div = that.document.createElement("div");
                 div.innerHTML = data;
 
+                that._fixPaste(div);
                 that._fixBlocks(div);
 
                 data = div.innerHTML;
