@@ -113,6 +113,34 @@
         },
 
         /**
+         * Wrap nodeList
+         *
+         * @param  {NodeList} node
+         * @param  {String}   tag
+         * @return {Node}
+         */
+        wrapNodeList: function(node, tag) {
+            try {
+                node = Array.prototype.slice.call(node);
+            }
+            catch (e) {
+                return;
+            }
+
+            if (!node.length)
+                return;
+
+            var el = document.createElement(tag);
+            node[0].parentElement.insertBefore(el, node[0]);
+
+            node.forEach(function(item) {
+                el.appendChild(item);
+            });
+
+            return el;
+        },
+
+        /**
          * Unwrap node
          *
          * @param  {Node} node

@@ -1007,29 +1007,48 @@
                 }
             }
 
-            // wrap non block element
-            var children = node.children;
-            children = Array.prototype.slice.call(children);
+            // wrap non block elements
+            var children = Array.prototype.slice.call(node.children).filter(function(item) {
+                return item.nodeType !== Node.ELEMENT_NODE || blocks.indexOf(item.tagName.toLowerCase()) === -1;
+            });
+            var wrapper = [];
             while (children.length) {
                 var child = children.shift();
-                if (child.nodeType !== Node.ELEMENT_NODE || blocks.indexOf(child.tagName.toLowerCase()) === -1)
-                    child = ice.Util.wrapNode(child, tag);
+                if (!wrapper.length) {
+                    wrapper.push([ child ]);
+                    continue;
+                }
+
+                var group = wrapper[wrapper.length - 1];
+                var last = group[group.length - 1];
+                if (last === child.previousElementSibling) {
+                    group.push(child);
+                    continue;
+                }
+
+                wrapper.push([ child ]);
+            }
+            while (wrapper.length) {
+                var group = wrapper.shift();
+                ice.Util.wrapNodeList(group, tag);
             }
 
             // block split not allowed, append all content
             // to first block element with line breaks
             if (!split) {
-                var children = node.querySelectorAll(tag + " + " + tag);
+                var children = node.childNodes;
                 children = Array.prototype.slice.call(children);
+                var target = children.shift();
+
                 while (children.length) {
                     var child = children.shift();
-                    var dest = child.previousElementSibling;
-                    child.childNodes.forEach(function(node) {
-                        dest.appendChild(node);
+
+                    child.childNodes.forEach(function(item) {
+                        target.appendChild(item);
                     });
 
                     var br = this.document.createElement("br");
-                    dest.appendChild(br);
+                    target.appendChild(br);
 
                     child.parentNode.removeChild(child);
                 }
@@ -1047,6 +1066,29 @@
                     child.parentNode.insertBefore(br, child);
                     child.parentNode.removeChild(child);
                 }
+            }
+
+            // block inside block
+            var selector = blocks
+                .filter(function(item) {
+                    return item !== "li";
+                })
+                .map(function(item) {
+                    return tag + " " + item;
+                })
+                .join(", ");
+            var children = node.querySelectorAll(selector);
+            children = Array.prototype.slice.call(children);
+            while (children.length) {
+                var child = children.shift();
+                var br = this.document.createElement("br");
+                child.parentNode.insertBefore(br, child);
+
+                child.childNodes.forEach(function(item) {
+                    child.parentElement.insertBefore(item, child);
+                });
+
+                child.parentElement.removeChild(child);
             }
 
             // remove empty blocks
@@ -1165,15 +1207,41 @@
 
                     // remove span with empty stylesheet (unwrap)
                     if (newTag === "span" && !newChild.style.cssText) {
+                        var temp = newChild.childNodes[0];
                         Array.prototype.slice.call(newChild.childNodes).forEach(function(item) {
                             newChild.parentElement.insertBefore(item, newChild);
                         });
 
                         newChild.parentElement.removeChild(newChild);
+                        newChild = temp || null;
                     }
 
-                    // add linebreak before newChild
-                    else if ((blockElements.indexOf(tag) !== -1)  || (newChild.previousElementSibling && blockElements.indexOf(newChild.previousElementSibling.tagName.toLowerCase()) !== -1)) {
+                    // apply span's stylesheet to it's only-child and remove span (unwrap)
+                    else if (newTag === "span" && newChild.childNodes.length === 1 && newChild.childNodes[0].nodeType !== Node.TEXT_NODE ) {
+                        Array.prototype.slice.call(newChild.style).forEach(function(item) {
+                            if (newChild.childNodes[0].style[item])
+                                return;
+                            if (item === resetStyleForTags[newChild.childNodes[0].tagName.toLowerCase()])
+                                return;
+
+                            newChild.childNodes[0].style[item] = newChild.style[item];
+                        });
+
+                        var temp = newChild.childNodes[0];
+                        Array.prototype.slice.call(newChild.childNodes).forEach(function(item) {
+                            newChild.parentElement.insertBefore(item, newChild);
+                        });
+
+                        newChild.parentElement.removeChild(newChild);
+                        newChild = temp || null;
+                    }
+
+                    // add linebreak before newChild if original node is
+                    // block type or previous node is block type (no need
+                    // to check next node be cause we're itarating in
+                    // reverse order and that node has already beed
+                    // altered)
+                    if (newChild && ((blockElements.indexOf(tag) !== -1) || (newChild.previousElementSibling && blockElements.indexOf(newChild.previousElementSibling.tagName.toLowerCase()) !== -1))) {
                         var temp = doc.createElement("br");
                         newChild.parentElement.insertBefore(temp, newChild);
                     }
@@ -1182,7 +1250,7 @@
                 // remove original element
                 child.parentElement.removeChild(child);
             });
-        },
+    },
 
         /**
          * Trigger event
@@ -1486,7 +1554,7 @@
                 div.innerHTML = data;
 
                 that._fixPaste(div);
-                that._fixBlocks(div);
+                //that._fixBlocks(div);
 
                 data = div.innerHTML;
             }
