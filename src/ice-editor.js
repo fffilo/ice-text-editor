@@ -1126,6 +1126,7 @@
             var innerWrapStyle = { "font-weight: bold": "b", "font-style: italic": "i", "font-style: oblique": "i", "text-decoration: line-through": "s", "text-decoration: underline": "u", "text-decoration-line: underline": "u" };
             var validStylesInline = [ "background-color", "color", "font-family", "font-size", "font-style", "font-weight", "text-decoration", "text-decoration-line" ];
             var validStylesBlock = [ "text-align" ];
+            var validAttributes = [ "style", "href", "target", "rel" ];
 
             // list all element children (in reverse order)
             var children = node.querySelectorAll("*");
@@ -1157,6 +1158,12 @@
                     child.removeAttribute(attr);
                     child.style[attrToStyle[attr]] = value;
                 }
+
+                // remove unnecessary attributes
+                Array.prototype.slice.call(child.attributes).forEach(function(item) {
+                    if (validAttributes.indexOf(item.name) === -1)
+                        child.removeAttribute(item.name);
+                });
 
                 // remove some child styles (no need for
                 // eq. box-sizing)
@@ -1241,7 +1248,7 @@
                     // to check next node be cause we're itarating in
                     // reverse order and that node has already beed
                     // altered)
-                    if (newChild && ((blockElements.indexOf(tag) !== -1) || (newChild.previousElementSibling && blockElements.indexOf(newChild.previousElementSibling.tagName.toLowerCase()) !== -1))) {
+                    if (newChild && newChild.previousElementSibling && ((blockElements.indexOf(tag) !== -1) || (blockElements.indexOf(newChild.previousElementSibling.tagName.toLowerCase()) !== -1))) {
                         var temp = doc.createElement("br");
                         newChild.parentElement.insertBefore(temp, newChild);
                     }
@@ -1250,7 +1257,7 @@
                 // remove original element
                 child.parentElement.removeChild(child);
             });
-    },
+        },
 
         /**
          * Trigger event
