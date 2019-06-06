@@ -1074,7 +1074,7 @@
                     return item !== "li";
                 })
                 .map(function(item) {
-                    return tag + " " + item;
+                    return ".ice-editor " + tag + " " + item;
                 })
                 .join(", ");
             var children = node.querySelectorAll(selector);
