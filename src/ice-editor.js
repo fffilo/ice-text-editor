@@ -1008,7 +1008,7 @@
             }
 
             // wrap non block elements
-            var children = Array.prototype.slice.call(node.children).filter(function(item) {
+            var children = Array.prototype.slice.call(node.childNodes).filter(function(item) {
                 return item.nodeType !== Node.ELEMENT_NODE || blocks.indexOf(item.tagName.toLowerCase()) === -1;
             });
             var wrapper = [];
