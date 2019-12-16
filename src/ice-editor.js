@@ -175,21 +175,18 @@
             this.element.removeAttribute("contenteditable");
             this.element.classList.remove(this._className);
 
-            // unbind events
             for (var method in this) {
-                if (method.substr(0, 7) === "_handle") {
+                // unbind events
+                if (/^_handle/.test(method)) {
                     var arr = method.replace(/([A-Z])/g, "_$1").toLowerCase().split("_");
-                    var obj = arr[2];
-                    var event = arr[3];
-                    var desc = arr[4];
+                    var event = arr[2];
+                    //var desc = arr[3];
 
                     this.element.removeEventListener(event, this[method]);
                 }
-            }
 
-            // call method that starts with _destroy
-            for (var method in this) {
-                if (method.substr(0, 8) === "_destroy")
+                // call method that starts with _destroy
+                if (/^_destroy/.test(method))
                     this[method]();
             }
 
