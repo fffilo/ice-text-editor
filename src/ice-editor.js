@@ -12,12 +12,12 @@
     "use strict";
 
     /**
-     * ice.Editor constructor
+     * ice_Editor constructor
      *
      * @param {Node}   element
      * @param {Object} options
      */
-    ice.Editor = function ice_Editor(element, options) {
+    var ice_Editor = function(element, options) {
         if (!(this instanceof ice_Editor))
             throw "ice.Editor: ice.Editor is a constructor";
 
@@ -28,11 +28,11 @@
     }
 
     /**
-     * ice.Editor prototype
+     * ice_Editor prototype
      *
      * @type {Object}
      */
-    ice.Editor.prototype = {
+    ice_Editor.prototype = {
 
         /**
          * Element class attribute
@@ -1589,6 +1589,12 @@
         }
 
     }
+
+    // Reassign constructor
+    ice_Editor.prototype.constructor = ice_Editor;
+
+    // Globalize
+    ice.Editor = ice_Editor;
 
     /**
      * Get document active editor

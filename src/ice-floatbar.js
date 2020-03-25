@@ -13,13 +13,13 @@
     "use strict";
 
     /**
-     * ice.Floatbar constructor
+     * ice_Floatbar constructor
      *
      * @param  {Object} editor
      * @param  {Object} options
      * @return {Void}
      */
-    ice.Floatbar = function ice_Floatbar(options) {
+    var ice_Floatbar = function(options) {
         if (!(this instanceof ice_Floatbar))
             throw "ice.Floatbar: ice.Floatbar is a constructor";
 
@@ -31,11 +31,11 @@
     }
 
     /**
-     * ice.Floatbar prototype
+     * ice_Floatbar prototype
      *
      * @type {Object}
      */
-    ice.Floatbar.prototype = {
+    ice_Floatbar.prototype = {
 
         /**
          * Element class attribute
@@ -766,5 +766,11 @@
         }
 
     }
+
+    // Reassign constructor
+    ice_Floatbar.prototype.constructor = ice_Floatbar;
+
+    // Globalize
+    ice.Floatbar = ice_Floatbar;
 
 })();
