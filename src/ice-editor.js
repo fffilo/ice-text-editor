@@ -1597,8 +1597,9 @@
      * @return {Object}
      */
     ice.Util.getActiveEditor = function() {
-        var selection = (this instanceof ice.Editor ? this.window : window).getSelection();
-        var node = selection.focusNode;
+        var win = this instanceof ice.Editor ? this.window : window;
+        var selection = win.getSelection();
+        var node = selection ? selection.focusNode : null;
 
         while (node && !(node.ice instanceof ice.Editor)) {
             node = node.parentNode;
