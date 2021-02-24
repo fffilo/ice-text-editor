@@ -894,17 +894,18 @@
         },
 
         /**
-         * Remove whitespaces between block elements
+         * Remove comments and whitespaces between block
+         * elements
          *
          * @return {Void}
          */
         _strip: function() {
             this._innerHTML = this.element.innerHTML;
 
-            ice.Util.getTextNodes(this.element).forEach(function(node) {
-                if (/^\s+$/.test(node.nodeValue))
-                    node.parentElement.removeChild(node);
-            });
+            //ice.Util.getTextNodes(this.element).forEach(function(node) {
+            //    if (/^\s+$/.test(node.nodeValue))
+            //        node.parentElement.removeChild(node);
+            //});
 
             var re1 = new RegExp("<!--[\\s\\S]*?-->", "g");
             var re2 = new RegExp("\\s+(<(" + this.options("allowedBlocks").join("|") + "|hr)>)", "g");
