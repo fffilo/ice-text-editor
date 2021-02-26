@@ -167,6 +167,7 @@
                 resize: this._handleResize.bind(this),
                 click: this._handleClick.bind(this),
                 change: this._handleChange.bind(this),
+                mousedown: this._handleMousedown.bind(this),
                 select: this._handleSelect.bind(this),
                 unselect: this._handleUnselect.bind(this),
             }
@@ -199,14 +200,15 @@
          */
         destroy: function() {
             // remove event listeners
-            this._element.ownerDocument.defaultView.removeEventListener("resize", this._handler.resize);
-            this._element.ownerDocument.removeEventListener("iceunselect", this._handler.unselect);
-            this._element.ownerDocument.removeEventListener("iceselect", this._handler.select);
+            this.element.ownerDocument.defaultView.removeEventListener("resize", this._handler.resize);
+            this.element.ownerDocument.removeEventListener("iceunselect", this._handler.unselect);
+            this.element.ownerDocument.removeEventListener("iceselect", this._handler.select);
+            this.element.ownerDocument.removeEventListener("mousedown", this._handler.mousedown);
             delete this._handler;
 
             // remove floatbar element
-            delete this._element.ice;
-            this._element.parentElement.removeChild(this._element);
+            delete this.element.ice;
+            this.element.parentElement.removeChild(this.element);
 
             // clear all
             this._options = null;
@@ -606,6 +608,7 @@
             }.bind(this));
 
             // bind ice editor selection change
+            this.element.ownerDocument.addEventListener("mousedown", this._handler.mousedown);
             this.element.ownerDocument.addEventListener("iceselect", this._handler.select);
             this.element.ownerDocument.addEventListener("iceunselect", this._handler.unselect);
 
@@ -763,6 +766,20 @@
             this._selectionString = null;
             this._setAttributes();
             this.hide();
+        },
+
+        /**
+         * Document mousedown event handler
+         *
+         * Click on document hides the ice-floatbar form. If
+         * there is a input element focused on that form the
+         * change won't be triggered, so let's force it...
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleMousedown: function(e) {
+            this.document.activeElement.blur();
         }
 
     }
