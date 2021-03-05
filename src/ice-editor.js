@@ -909,11 +909,13 @@
 
             var re1 = new RegExp("<!--[\\s\\S]*?-->", "g");
             var re2 = new RegExp("\\s+(<(" + this.options("allowedBlocks").join("|") + "|hr)>)", "g");
-
-            this.element.innerHTML = this.element.innerHTML
+            var innerHTML = this.element.innerHTML
                 .replace(re1, "")
                 .replace(re2, "$1")
                 .trim();
+
+            if (innerHTML !== this.element.innerHTML)
+                this.element.innerHTML = innerHTML;
         },
 
         /**
