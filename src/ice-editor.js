@@ -1129,7 +1129,8 @@
             var validAttributes = [ "style", "href", "target", "rel" ];
 
             // list all element children (in reverse order)
-            var children = node.querySelectorAll("*");
+            var childSelector = "*:not(.ice-preserve):not(.ice-preserve *)";
+            var children = node.querySelectorAll(childSelector);
             children = Array.prototype.slice.call(children);
             children.reverse();
 
