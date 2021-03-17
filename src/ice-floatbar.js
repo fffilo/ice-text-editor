@@ -189,6 +189,7 @@
 
             // event
             var event = new CustomEvent("icefloatbarinit");
+            this._handleOnInit.call(this, event);
             this.options("oninit").call(this, event);
             this.element.dispatchEvent(event);
         },
@@ -304,6 +305,7 @@
                 return;
 
             var event = new CustomEvent("icefloatbarshow");
+            this._handleOnShow.call(this, event);
             this.options("onshow").call(this, event);
             this.element.dispatchEvent(event);
             if (event.defaultPrevented)
@@ -323,6 +325,7 @@
                 return;
 
             var event = new CustomEvent("icefloatbarhide");
+            this._handleOnHide.call(this, event);
             this.options("onhide").call(this, event);
             this.element.dispatchEvent(event);
             if (event.defaultPrevented)
@@ -371,6 +374,7 @@
                 return;
 
             var event = new CustomEvent("icefloatbardropdown", { detail: { from: old, to: value } });
+            this._handleOnDropdown.call(this, event);
             this.options("ondropdown").call(this, event);
             this.element.dispatchEvent(event);
             if (event.defaultPrevented)
@@ -411,6 +415,7 @@
 
             var args = Array.prototype.slice.call(arguments, 1);
             var event = new CustomEvent("icefloatbarexec", { detail: { method: method, arguments: args } });
+            this._handleOnExec.call(this, event);
             this.options("onexec").call(this, event);
             this.element.dispatchEvent(event);
             if (event.defaultPrevented)
@@ -565,6 +570,66 @@
         },
 
         /**
+         * Instance oninit event handler
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleOnInit: function(e) {
+            // pass
+        },
+
+        /**
+         * Instance onready event handler
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleOnReady: function(e) {
+            // pass
+        },
+
+        /**
+         * Instance onshow event handler
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleOnShow: function(e) {
+            // pass
+        },
+
+        /**
+         * Instance onhide event handler
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleOnHide: function(e) {
+            // pass
+        },
+
+        /**
+         * Instance ondropdown event handler
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleOnDropdown: function(e) {
+            // pass
+        },
+
+        /**
+         * Instance onexec event handler
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleOnExec: function(e) {
+            // pass
+        },
+
+        /**
          * Iframe load event handler:
          * add classes to dom nodes, append
          * template and add event listeners
@@ -617,6 +682,7 @@
 
             // event
             var event = new CustomEvent("icefloatbarready");
+            this._handleOnReady.call(this, event);
             this.options("onready").call(this, event);
             this.element.dispatchEvent(event);
         },
