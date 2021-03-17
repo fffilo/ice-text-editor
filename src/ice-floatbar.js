@@ -719,14 +719,8 @@
                     return result;
                 });
 
-                // dirty hack:
-                // pre method filterSelection changes editor
-                // selection, so we need to wait a while
-                // so the selection actually changes
                 if (typeof this[method] === "function")
-                    setTimeout(function() {
-                        this[method].apply(this, args);
-                    }.bind(this), index*10);
+                    this[method].apply(this, args);
             }.bind(this));
         },
 
