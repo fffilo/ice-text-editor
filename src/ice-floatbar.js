@@ -127,7 +127,8 @@
             onshow: null,
             onhide: null,
             ondropdown: null,
-            onexec: null
+            onexec: null,
+            onreposition: null
         },
 
         /**
@@ -156,7 +157,7 @@
                 this._options.parent = document.body;
 
             // fix events
-            [ "oninit", "onready", "onshow", "onhide", "ondropdown", "onexec" ].forEach(function(item) {
+            [ "oninit", "onready", "onshow", "onhide", "ondropdown", "onexec", "onreposition" ].forEach(function(item) {
                 if (typeof this._options[item] !== "function")
                     this._options[item] = function(e) {};
             }.bind(this))
@@ -446,6 +447,7 @@
             this._iframe.style.width = this.wrapper.offsetWidth + "px";
             this._iframe.style.height = this.wrapper.offsetHeight + "px";
 
+            var initPosition = [ parseFloat(this.element.style.left), parseFloat(this.element.style.top) ];
             var position = {
                 left: rect.left + rect.width / 2 - this.element.offsetWidth / 2,
                 top: rect.top - this.element.offsetHeight,
@@ -483,6 +485,12 @@
                 this.wrapper.classList.remove(this._className + "-position-bottom");
             this.element.classList.add(this._className + "-position-" + position.className);
             this.wrapper.classList.add(this._className + "-position-" + position.className);
+
+            // event
+            var event = new CustomEvent("icefloatbarreposition", { detail: { from: initPosition, to: [ parseFloat(this.element.style.left), parseFloat(this.element.style.top) ] } });
+            this._handleOnReposition.call(this, event);
+            this.options("onreposition").call(this, event);
+            this.element.dispatchEvent(event);
         },
 
         /**
@@ -626,6 +634,16 @@
          * @return {Void}
          */
         _handleOnExec: function(e) {
+            // pass
+        },
+
+        /**
+         * Instance onreposition event handler
+         *
+         * @param  {Object} e
+         * @return {Void}
+         */
+        _handleOnReposition: function(e) {
             // pass
         },
 
