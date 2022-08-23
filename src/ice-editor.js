@@ -528,6 +528,54 @@
         },
 
         /**
+         * Edit link rel attribute
+         *
+         * @param  {String}  relation nofollow or noopener or noreferrer...
+         * @param  {Boolean} value    add or remove relation
+         * @return {Boolean}
+         */
+        linkRel: function(relation, value) {
+            var result = false;
+            if (!this.active)
+                return result;
+
+            var decoration = this.decorations();
+            if (!decoration.linkCount)
+                return result;
+
+            this._skipDispatch = true;
+
+            ice.Util.getSelectedNodes("." + this._className + " a").forEach(function(node) {
+                var attr = node.getAttribute("rel"),
+                    arr = attr ? attr.replace(/^\s+|\s+$/g, "").split(/\s+/) : [],
+                    index = arr.indexOf(relation);
+                if ((value && index !== -1) || (!value && index === -1))
+                    return;
+
+                if (value)
+                    arr.push(relation);
+                else
+                    arr.splice(index, 1);
+
+                if (arr.length)
+                    node.setAttribute("rel", arr.join(" "));
+                else
+                    node.removeAttribute("rel");
+
+                result = true;
+            });
+
+            delete this._skipDispatch;
+
+            if (result) {
+                var event = new Event("input", { bubbles: true });
+                this.element.dispatchEvent(event);
+            }
+
+            return result;
+        },
+
+        /**
          * Remove format on selection
          *
          * @return {Boolean}

@@ -114,7 +114,7 @@
                 + '<a href="#" target="_parent|_blank" title="Open Link" data-ice-link-test=""><i class="fa fa-external-link"></i></a>'
                 + '</p>'
                 + '<p><label>Show in New Tab</label><label class="ice-floatbar-switch" title="Show in New Tab"><input type="checkbox" value="_blank" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,&quot;&dollar;value&quot;,null]" data-ice-decoration="linkTarget" /><span></span></label></p>'
-                + '<p><label>No Follow</label><label class="ice-floatbar-switch" title="No Follow"><input type="checkbox" value="nofollow" data-ice-method="exec" data-ice-args="[&quot;createLink&quot;,null,null,&quot;&dollar;value&quot;]" data-ice-decoration="linkRel" /><span></span></label></p>'
+                + '<p><label>No Follow</label><label class="ice-floatbar-switch" title="No Follow"><input type="checkbox" value="nofollow" data-ice-method="exec" data-ice-args="[&quot;linkRel&quot;,&quot;nofollow&quot;,&quot;&dollar;value&quot;]" data-ice-decoration="linkRel" data-ice-decoration-check="_setNodeDecorationInputCheckboxContainsWord" /><span></span></label></p>'
                 + '</article>'
                 + '<article class="ice-floatbar-dropdown ice-floatbar-dropdown-color">'
                 + '<p><input type="text" title="Foreground Color" placeholder="Foreground Color" value="" data-ice-method="exec" data-ice-args="[&quot;foreColor&quot;,&quot;&dollar;value&quot;]" data-ice-decoration="foreColor" /></p>'
@@ -220,7 +220,6 @@
             this._wrapper = null;
             this._ui = null;
             this._selectionString = null;
-
         },
 
         /**
@@ -513,30 +512,79 @@
                     //var suffix = node.getAttribute("data-ice-suffix") || "";
                     node.setAttribute("data-ice-status", value);
 
-                    // value (input/select/textarea)
-                    if (node.tagName === "INPUT" && ["checkbox", "radio"].indexOf(node.type) !== -1) {
-                        node.checked = node.value == value;
-                    }
-                    else if (node.tagName === "INPUT" && ["number", "range"].indexOf(node.type) !== -1) {
-                        var match = (value || "").match(/(\d+(\.\d+)?)(\w+)?/);
-                        if (match) {
-                            var number = parseFloat(match[1]);
-                            var unit = match[2] || "";
+                    // use custom method to set decoration (user defined in html)
+                    var checkMethod = node.getAttribute("data-ice-decoration-check");
+                    if (checkMethod && typeof this[checkMethod] === "function")
+                        this[checkMethod].call(this, node, value);
 
-                            if (unit)
-                                node.setAttribute("data-ice-suffix", unit);
-
-                            node.value = number;
-                        }
-                    }
-                    else if (typeof node.value === "string") {
-                        node.value = value;
-                    }
+                    // ... or use default ones (value -> input/select/textarea)
+                    else if (node.tagName === "INPUT" && ["checkbox", "radio"].indexOf(node.type) !== -1)
+                        this._setNodeDecorationInputCheckboxRadio(node, value);
+                    else if (node.tagName === "INPUT" && ["number", "range"].indexOf(node.type) !== -1)
+                        this._setNodeDecorationInputNumberRange(node, value);
+                    else if (typeof node.value === "string")
+                        this._setNodeDecorationDefault(node, value);
 
                     var event = new Event("change");
                     node.dispatchEvent(event);
                 }.bind(this));
             }
+        },
+
+        /**
+         * Set decoration to (input) node:
+         * default method is to simply set the value
+         *
+         * @param  {Object} node
+         * @param  {Mixed}  value
+         * @return {Void}
+         */
+        _setNodeDecorationDefault: function(node, value) {
+            node.value = value;
+        },
+
+        /**
+         * Set decoration to input (checkbox or radio) node.
+         *
+         * @param  {Object} node
+         * @param  {Mixed}  value
+         * @return {Void}
+         */
+        _setNodeDecorationInputCheckboxRadio: function(node, value) {
+            node.checked = node.value == value;
+        },
+
+        /**
+         * Set decoration to input (number or range) node.
+         *
+         * @param  {Object} node
+         * @param  {Mixed}  value
+         * @return {Void}
+         */
+        _setNodeDecorationInputNumberRange: function(node, value) {
+            var match = (value || "").match(/(\d+(\.\d+)?)(\w+)?/);
+            if (match) {
+                var number = parseFloat(match[1]);
+                var unit = match[2] || "";
+
+                if (unit)
+                    node.setAttribute("data-ice-suffix", unit);
+
+                node.value = number;
+            }
+        },
+
+        /**
+         * Set decoration to input checkbox:
+         * checked if value contains word in node.value
+         *
+         * @param  {Object} node
+         * @param  {Mixed}  value
+         * @return {Void}
+         */
+        _setNodeDecorationInputCheckboxContainsWord: function(node, value) {
+            var re = new RegExp("(?:^|\\s)" + node.value + "(?:\\s|$)");
+            node.checked = re.test(value);
         },
 
         /**
