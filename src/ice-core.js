@@ -187,6 +187,77 @@
         },
 
         /**
+         * Get previous node
+         *
+         * @param  {Node}  node
+         * @return {Mixed}
+         */
+        previousNode: function(node) {
+            if (node.previousSibling)
+                return node.previousSibling;
+            else if (node.parentElement)
+                return ice.Util.previousNode(node.parentElement);
+
+            return null;
+        },
+
+        /**
+         * Get previous element node
+         *
+         * @param  {Node}  node
+         * @return {Mixed}
+         */
+        previousElementNode: function(node) {
+            let result = null,
+                show = NodeFilter.SHOW_ELEMENT,
+                accept = NodeFilter.FILTER_ACCEPT,
+                reject = NodeFilter.FILTER_REJECT,
+                filter = {
+                    acceptNode: function(node) {
+                        return node.nodeType === Node.ELEMENT_NODE ? accept : reject;
+                    },
+                },
+                prev = node;
+            while (prev && !result) {
+                prev = ice.Util.previousNode(prev);
+
+                if (prev.nodeType === Node.ELEMENT_NODE)
+                    result = prev.ownerDocument.createTreeWalker(prev, show, filter).lastChild() || prev;
+            }
+
+            return result && result.nodeType === Node.ELEMENT_NODE ? result : null;
+        },
+
+        /**
+         * Get previous text node
+         *
+         * @param  {Node}  node
+         * @return {Mixed}
+         */
+        previousTextNode: function(node) {
+            var result = null,
+                show = NodeFilter.SHOW_TEXT,
+                accept = NodeFilter.FILTER_ACCEPT,
+                reject = NodeFilter.FILTER_REJECT,
+                filter = {
+                    acceptNode: function(node) {
+                        return node.nodeType === Node.TEXT_NODE ? accept : reject;
+                    },
+                },
+                prev = node;
+            while (prev && !result) {
+                prev = ice.Util.previousNode(prev);
+
+                if (prev.nodeType === Node.ELEMENT_NODE)
+                    result = prev.ownerDocument.createTreeWalker(prev, show, filter).lastChild();
+                else if (prev.nodeType === Node.TEXT_NODE)
+                    result = prev;
+            }
+
+            return result && result.nodeType === Node.TEXT_NODE ? result : null;
+        },
+
+        /**
          * Get next node while searching
          * through children and parent
          * elements
@@ -203,6 +274,36 @@
                     return node.nextSibling;
 
                 node = node.parentNode;
+            }
+
+            return node;
+        },
+
+        /**
+         * Get next element node
+         *
+         * @param  {Node}  node
+         * @return {Mixed}
+         */
+        nextElementNode: function(node) {
+            node = ice.Util.nextNode(node);
+            while (node && node.nodeType !== Node.ELEMENT_NODE) {
+                node = ice.Util.nextNode(node);
+            }
+
+            return node;
+        },
+
+        /**
+         * Get next text node
+         *
+         * @param  {Node}  node
+         * @return {Mixed}
+         */
+        nextTextNode: function(node) {
+            node = ice.Util.nextNode(node);
+            while (node && node.nodeType !== Node.TEXT_NODE) {
+                node = ice.Util.nextNode(node);
             }
 
             return node;
@@ -239,29 +340,48 @@
 
             var result = [];
             var range = selection.getRangeAt(0);
-            var startContainer = range.startContainer.childNodes[range.startOffset] || range.startContainer;
-            var endContainer = range.endContainer.childNodes[range.endOffset] || range.endContainer;
+            var startContainer = range.startContainer;
+            var startOffset = range.startOffset;
+            var endContainer = range.endContainer;
+            var endOffset = range.endOffset;
             var commonAncestor = range.commonAncestorContainer;
             var node;
 
-            // start/end fix
-            if (startContainer && range.startOffset === startContainer.length || endContainer && range.endOffset && range.endOffset === 0) {
-                if (startContainer && range.startOffset === startContainer.length && startContainer.nextSibling) {
-                    startContainer = startContainer.nextSibling;
-                    while (startContainer.childNodes && startContainer.childNodes.length) {
-                        startContainer = startContainer.childNodes[0];
-                    }
-                }
-                if (endContainer && range.endOffset === 0 && endContainer.previousSibling) {
-                    endContainer = endContainer.previousSibling;
-                    while (endContainer.childNodes && endContainer.childNodes.length) {
-                        endContainer = endContainer.childNodes[endContainer.childNodes.length - 1];
-                    }
+            // use only text nodes in selection
+            if (startContainer.nodeType !== Node.TEXT_NODE) {
+                startContainer = range.startContainer.childNodes[range.startOffset];
+                if (startContainer.nodeType !== Node.TEXT_NODE) {
+                    var texts = ice.Util.getTextNodes(startContainer);
+                    if (texts.length)
+                        startContainer = texts[0];
                 }
 
+                startOffset = 0;
+            }
+
+            if (endContainer.nodeType !== Node.TEXT_NODE) {
+                endContainer = range.endContainer.childNodes[range.endOffset]
+                if (endContainer.nodeType !== Node.TEXT_NODE) {
+                    var texts = ice.Util.getTextNodes(startContainer);
+                    if (texts.length)
+                        endContainer = texts[0];
+                }
+
+                endOffset = 0;
+
+                var prev = ice.Util.previousTextNode(endContainer);
+                if (prev) {
+                    endContainer = prev;
+                    endOffset = prev.length;
+                }
+            }
+
+            // fix common ancestor
+            if (startContainer !== range.startContainer || startOffset !== range.startOffset || endContainer !== range.endContainer || endOffset !== range.endOffset) {
                 range = document.createRange();
-                range.setStart(startContainer, 0);
-                range.setEnd(endContainer, endContainer.length);
+                range.setStart(startContainer, startOffset);
+                range.setEnd(endContainer, endOffset);
+
                 commonAncestor = range.commonAncestorContainer;
             }
 
