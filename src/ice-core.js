@@ -347,7 +347,7 @@
             var commonAncestor = range.commonAncestorContainer;
             var node;
 
-            // use only text nodes in selection
+            // use only text nodes in start container/offset
             if (startContainer.nodeType !== Node.TEXT_NODE) {
                 startContainer = range.startContainer.childNodes[range.startOffset];
                 if (startContainer.nodeType !== Node.TEXT_NODE) {
@@ -359,6 +359,15 @@
                 startOffset = 0;
             }
 
+            if (startContainer.nodeType === Node.TEXT_NODE && startOffset === startContainer.length) {
+                var next = ice.Util.nextTextNode(startContainer);
+                if (next) {
+                    startContainer = next;
+                    startOffset = 0;
+                }
+            }
+
+            // use only text nodes in end container/offset
             if (endContainer.nodeType !== Node.TEXT_NODE) {
                 endContainer = range.endContainer.childNodes[range.endOffset]
                 if (endContainer.nodeType !== Node.TEXT_NODE) {
@@ -368,7 +377,9 @@
                 }
 
                 endOffset = 0;
+            }
 
+            if (endContainer.nodeType === Node.TEXT_NODE && !endOffset) {
                 var prev = ice.Util.previousTextNode(endContainer);
                 if (prev) {
                     endContainer = prev;
