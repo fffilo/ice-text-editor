@@ -381,6 +381,8 @@
                     endContainer = prev;
                     endOffset = endContainer.length;
                 }
+                else
+                    break;
             }
 
             // fix common ancestor
