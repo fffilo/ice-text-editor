@@ -1312,15 +1312,15 @@
          * Trigger event
          *
          * @param  {String} eventName
-         * @param  {Object} details   (optional)
+         * @param  {Object} options   (optional)
          * @return {Object}
          */
-        _trigger: function(eventName, details) {
+        _trigger: function(eventName, options) {
             if (this._skipDispatch === true || this._skipDispatch === eventName)
                 return null;
 
             // @todo - in IE CustomEvent is not constructor
-            var event = new CustomEvent("ice" + eventName, { detail: details || {} });
+            var event = new CustomEvent("ice" + eventName, options || {});
             this.element.dispatchEvent(event);
 
             return event;
