@@ -158,6 +158,11 @@
                 }
             }
 
+            // remove empty span elements
+            this.element.querySelectorAll("span:empty").forEach(function(node) {
+                node.parentElement.removeChild(node);
+            });
+
             this._strip();
             this._fixBlocks();
             this._triggerChange();
@@ -1055,6 +1060,9 @@
                 }
             }
 
+            // replace <font> with <span>
+            this._fixFontTag(node);
+
             // wrap non block elements
             var children = Array.prototype.slice.call(node.childNodes).filter(function(item) {
                 return item.nodeType !== Node.ELEMENT_NODE || blocks.indexOf(item.tagName.toLowerCase()) === -1;
@@ -1309,6 +1317,39 @@
         },
 
         /**
+         * Replace depricated <font> with <span>
+         *
+         * @param  {Object} node
+         * @return {Void}
+         */
+        _fixFontTag: function(node) {
+            var children = Array.prototype.slice.call(node.querySelectorAll("font"));
+            while (children.length) {
+                ice.Util.saveSelectionRange();
+
+                var font = children.shift();
+                var span;
+
+                if (font.childNodes.length === 1 && font.childNodes[0].nodeType === Node.ELEMENT_NODE && font.childNodes[0].tagName === "SPAN")
+                    span = font.childNodes[0];
+                else {
+                    span = this.document.createElement("span");
+                    while (font.childNodes.length) {
+                        span.appendChild(font.childNodes[0]);
+                    }
+                }
+
+                span.style.color = span.style.color || font.getAttribute("color") || "";
+                span.style.fontFamily = span.style.fontFamily || font.getAttribute("face") || "";
+
+                font.parentNode.insertBefore(span, font);
+                font.parentNode.removeChild(font);
+
+                ice.Util.restoreSelectionRange();
+            }
+        },
+
+        /**
          * Trigger event
          *
          * @param  {String} eventName
@@ -1507,6 +1548,7 @@
             if (that._skipDispatch)
                 return;
 
+            that._fixFontTag(that.element);
             that.element.normalize();
 
             var select = window.getSelection();
@@ -1527,6 +1569,10 @@
 
             // only one textNode, wrap it with default tag
             else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].nodeType === Node.TEXT_NODE)
+                that._execCommand("formatBlock", "<" + tag + ">");
+
+            // only one <span>, wrap it with default tag
+            else if (tag && that.element.childNodes.length === 1 && that.element.childNodes[0].nodeType === Node.ELEMENT_NODE && that.element.childNodes[0].tagName === "SPAN")
                 that._execCommand("formatBlock", "<" + tag + ">");
 
             // non wrapped inline element or not allowed block
